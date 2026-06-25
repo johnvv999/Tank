@@ -38,7 +38,7 @@ ArduinoLEDMatrix matrix;
 void showStatus(const char* msg) {
   matrix.beginDraw();
   matrix.stroke(0xFFFFFFFF);
-  matrix.textScrollSpeed(60);
+  matrix.textScrollSpeed(150);
   matrix.textFont(Font_5x7);
   matrix.beginText(0, 1, 0xFFFFFF);
   matrix.println(msg);
@@ -118,23 +118,38 @@ void setup() {
     Serial.print(".");
   }
 
+// Wait for valid IP address
+  start = millis();
+  while (WiFi.localIP() == IPAddress(0, 0, 0, 0) && millis() - start < 10000) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
+
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\nHome WiFi unreachable — OTA unavailable.");
     showStatus("NWIFI");
-    delay(1500);
+    delay(3000);
   } else {
     Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
-
+    delay(3000);
     // JAndrassy ArduinoOTA — 4-argument begin() for R4
-    ArduinoOTA.begin(WiFi.localIP(), OTA_NAME, OTA_PASSWORD, InternalStorage);
+
+    ArduinoOTA.begin(WiFi.localIP(), OTA_NAME, "", InternalStorage);
 
     Serial.println("OTA ready.");
     showStatus("RDY");
-    delay(1000);
+    delay(3000);
   }
 
   showStatus("TEST");
   delay(1000);
+
+
+ArduinoOTA.begin(WiFi.localIP(), "TankTest", "password", InternalStorage);
+
+
 }
 
 // ────────────────────────────────────────────────────────────

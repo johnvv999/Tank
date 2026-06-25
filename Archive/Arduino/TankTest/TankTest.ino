@@ -6,8 +6,8 @@
 #include "Arduino_LED_Matrix.h"
 
 // Your home network credentials
-const char* HOME_SSID     = "YourHomeSSID";
-const char* HOME_PASSWORD = "YourHomePassword";
+const char* HOME_SSID     = "Dexter5G";
+const char* HOME_PASSWORD = "maxmaddie";
 
 // OTA window in milliseconds
 const unsigned long OTA_WINDOW_MS = 15000;
