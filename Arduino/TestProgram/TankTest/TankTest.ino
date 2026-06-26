@@ -27,7 +27,7 @@ const int R_RPWM = 9;   // Right motor
 const int R_LPWM = 10;
 
 // ── Test speed (0–255) ───────────────────────────────────────
-const int SPEED = 30;  // ~70% — safe starting point
+const int SPEED = 100;  // ~70% — safe starting point
 
 // ── Globals ──────────────────────────────────────────────────
 ArduinoLEDMatrix matrix;
@@ -106,8 +106,9 @@ void setup() {
 
   // LED matrix
   matrix.begin();
-
-  // Connect to home WiFi
+}
+/*
+//  Connect to home WiFi
   Serial.print("Connecting to home WiFi");
   showStatus("WiFi");
 
@@ -116,16 +117,16 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED && millis() - start < 15000) {
     delay(500);
     Serial.print(".");
-  }
+ }
 
-// Wait for valid IP address
-  start = millis();
-  while (WiFi.localIP() == IPAddress(0, 0, 0, 0) && millis() - start < 10000) {
+   Wait for valid IP address
+    start = millis();
+    while (WiFi.localIP() == IPAddress(0, 0, 0, 0) && millis() - start < 3000) {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
+// Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("\nHome WiFi unreachable — OTA unavailable.");
@@ -151,6 +152,7 @@ ArduinoOTA.begin(WiFi.localIP(), "TankTest", "password", InternalStorage);
 
 
 }
+*/
 
 // ────────────────────────────────────────────────────────────
 //  Main test loop
