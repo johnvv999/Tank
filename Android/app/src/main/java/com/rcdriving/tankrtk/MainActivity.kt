@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
 
             val leftSpeed by vm.leftMotor.collectAsState()
             val rightSpeed by vm.rightMotor.collectAsState()
-            val currentSpeedPercent by vm.currentSpeedPercent.collectAsState()
+            val speedDisplayPercent by vm.speedDisplayPercent.collectAsState()
             val minSpeedPercent by vm.minSpeedPercent.collectAsState()
             val maxSpeedPercent by vm.maxSpeedPercent.collectAsState()
             val trimOffset by vm.trimOffset.collectAsState()
@@ -37,6 +37,11 @@ class MainActivity : ComponentActivity() {
             val isPlaying by vm.isPlaying.collectAsState()
             val recordedPath by vm.recordedPath.collectAsState()
             val playbackPath by vm.playbackPath.collectAsState()
+
+            // Derived directly from properly-collected state above, so Compose
+            // correctly redraws whenever any of the three inputs change.
+            val actualSpeedPercent = minSpeedPercent + (speedDisplayPercent / 100f) * (maxSpeedPercent - minSpeedPercent)
+            val speedScale = actualSpeedPercent / 100f
 
             LaunchedEffect(isRecording) {
                 if (isRecording) {
@@ -70,10 +75,9 @@ class MainActivity : ComponentActivity() {
                         leftSpeed = leftSpeed,
                         rightSpeed = rightSpeed,
                         connectionStatus = connectionStatus,
-                        speedPercent = vm.displaySpeedPercent(),
+                        speedPercent = speedDisplayPercent,
                         onJoystickMove = { x, y ->
                             val turboScale = if (turboEnabled) 1f else 0.5f
-                            val speedScale = vm.currentSpeedScale()
                             val scale = turboScale * speedScale
 
                             val (rawLeft, rawRight) = mixTankDrive(x * scale, y * scale)
