@@ -21,33 +21,35 @@ class TankViewModel : ViewModel() {
     private val _waypoints = MutableStateFlow<List<Waypoint>>(emptyList())
     val waypoints: StateFlow<List<Waypoint>> = _waypoints
 
-    // Speed level: 1 = min, 4 = max. Interpolates between the configurable
-    // min/max speed percentages set on the Settings screen.
-    private val _speedLevel = MutableStateFlow(2)
-    val speedLevel: StateFlow<Int> = _speedLevel
-
     private val _minSpeedPercent = MutableStateFlow(30)
     val minSpeedPercent: StateFlow<Int> = _minSpeedPercent
 
     private val _maxSpeedPercent = MutableStateFlow(100)
     val maxSpeedPercent: StateFlow<Int> = _maxSpeedPercent
 
-    fun setMinSpeed(percent: Int) { _minSpeedPercent.value = percent.coerceIn(0, 100) }
-    fun setMaxSpeed(percent: Int) { _maxSpeedPercent.value = percent.coerceIn(0, 100) }
+    // Current drive speed as a direct percentage, stepped by 5% per +/- tap,
+    // clamped to whatever Min/Max range is set on the Settings screen.
+    private val _currentSpeedPercent = MutableStateFlow(50)
+    val currentSpeedPercent: StateFlow<Int> = _currentSpeedPercent
 
-    fun currentSpeedScale(): Float {
-        val min = _minSpeedPercent.value / 100f
-        val max = _maxSpeedPercent.value / 100f
-        val t = (_speedLevel.value - 1) / 3f
-        return min + (max - min) * t
+    fun setMinSpeed(percent: Int) {
+        _minSpeedPercent.value = percent.coerceIn(0, 100)
+        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(_minSpeedPercent.value, _maxSpeedPercent.value)
     }
 
+    fun setMaxSpeed(percent: Int) {
+        _maxSpeedPercent.value = percent.coerceIn(0, 100)
+        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(_minSpeedPercent.value, _maxSpeedPercent.value)
+    }
+
+    fun currentSpeedScale(): Float = _currentSpeedPercent.value / 100f
+
     fun increaseSpeed() {
-        _speedLevel.value = (_speedLevel.value + 1).coerceAtMost(4)
+        _currentSpeedPercent.value = (_currentSpeedPercent.value + 5).coerceAtMost(_maxSpeedPercent.value)
     }
 
     fun decreaseSpeed() {
-        _speedLevel.value = (_speedLevel.value - 1).coerceAtLeast(1)
+        _currentSpeedPercent.value = (_currentSpeedPercent.value - 5).coerceAtLeast(_minSpeedPercent.value)
     }
 
     // Trim: steering bias to correct drift, split between motors, doesn't change overall speed.
