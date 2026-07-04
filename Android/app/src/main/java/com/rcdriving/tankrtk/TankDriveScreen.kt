@@ -18,15 +18,12 @@ import androidx.compose.ui.unit.sp
 fun TankDriveScreen(
     leftSpeed: Int,
     rightSpeed: Int,
-    speedLevel: Int,
-    trimOffset: Int,
+    connectionStatus: ConnectionStatus,
     onJoystickMove: (Float, Float) -> Unit,
     onStop: () -> Unit,
-    onTrimLeft: () -> Unit,
-    onTrimRight: () -> Unit,
-    onSpeed: () -> Unit,
     turboEnabled: Boolean,
-    onTurboToggle: (Boolean) -> Unit
+    onTurboToggle: (Boolean) -> Unit,
+    onOpenSettings: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -34,15 +31,22 @@ fun TankDriveScreen(
             .background(Color(0xFF0A2F0A))
             .padding(16.dp)
     ) {
-        Text(
-            text = "RC Tank Control",
-            color = Color.White,
-            fontSize = 26.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            textAlign = TextAlign.Center
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ConnectionStatusIndicator(connectionStatus)
+            Text(
+                text = "RC Tank Control",
+                color = Color.White,
+                fontSize = 26.sp,
+                textAlign = TextAlign.Center
+            )
+            SmallButton("⚙", onOpenSettings)
+        }
+
+        Spacer(Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -55,45 +59,19 @@ fun TankDriveScreen(
         Spacer(Modifier.height(20.dp))
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            Joystick(
-                size = 260.dp,
-                onMove = onJoystickMove
-            )
+            Joystick(size = 260.dp, onMove = onJoystickMove)
         }
 
-        Spacer(Modifier.height(12.dp))
-
-        Text(
-            text = "Trim: $trimOffset   |   Speed: $speedLevel/4",
-            color = Color.White,
-            fontSize = 14.sp,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            SmallButton("◀ TRIM", onTrimLeft)
-            StopButton(onStop)
-            SmallButton("TRIM ▶", onTrimRight)
-        }
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(20.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            SmallButton("SPEED $speedLevel/4", onSpeed)
+            StopButton(onStop)
         }
 
         Spacer(Modifier.height(20.dp))
