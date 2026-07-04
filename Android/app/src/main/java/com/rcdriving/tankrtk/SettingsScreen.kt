@@ -2,9 +2,7 @@ package com.rcdriving.tankrtk
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -31,50 +29,46 @@ fun SettingsScreen(
     onTrimLeft: () -> Unit,
     onTrimRight: () -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A2F0A))
-            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ConnectionStatusIndicator(connectionStatus, showLabel = true)
-        }
-
-        Spacer(Modifier.height(4.dp))
-
-        Text(
-            text = "Access Point: $TANK_AP_SSID",
-            color = Color.White,
-            fontSize = 14.sp
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Text("Trim", color = Color.White, fontSize = 16.sp)
-        Spacer(Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            SmallButton("−", onTrimLeft)
-            Text("$trimOffset", color = Color.White, fontSize = 20.sp)
-            SmallButton("+", onTrimRight)
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {
-                SpeedField("Min Speed (%)", minSpeedPercent, onMinSpeedChange)
-                Spacer(Modifier.height(12.dp))
-                SpeedField("Max Speed (%)", maxSpeedPercent, onMaxSpeedChange)
+        Column(modifier = Modifier.align(Alignment.TopStart)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ConnectionStatusIndicator(connectionStatus, showLabel = true)
             }
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "Access Point: $TANK_AP_SSID",
+                color = Color.White,
+                fontSize = 14.sp
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            Text("Trim", color = Color.White, fontSize = 16.sp)
+            Spacer(Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                SmallButton("−", onTrimLeft)
+                Text("$trimOffset", color = Color.White, fontSize = 20.sp)
+                SmallButton("+", onTrimRight)
+            }
+        }
+
+        Column(
+            modifier = Modifier.align(Alignment.CenterEnd),
+            horizontalAlignment = Alignment.End
+        ) {
+            SpeedField("Min Speed (%)", minSpeedPercent, onMinSpeedChange)
+            Spacer(Modifier.height(12.dp))
+            SpeedField("Max Speed (%)", maxSpeedPercent, onMaxSpeedChange)
         }
     }
 }

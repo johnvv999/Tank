@@ -86,7 +86,7 @@ fun TankDriveScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (turboEnabled) Color.Blue else Color.DarkGray
                     ),
-                    modifier = Modifier.width(140.dp)
+                    modifier = Modifier.width(140.dp).height(64.dp)
                 ) {
                     Text(if (turboEnabled) "TURBO" else "TURTLE", color = Color.White)
                 }
