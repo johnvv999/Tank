@@ -22,10 +22,13 @@ fun TankDriveScreen(
     leftSpeed: Int,
     rightSpeed: Int,
     connectionStatus: ConnectionStatus,
+    speedLevel: Int,
     onJoystickMove: (Float, Float) -> Unit,
     onStop: () -> Unit,
     turboEnabled: Boolean,
-    onToggleTurbo: () -> Unit
+    onToggleTurbo: () -> Unit,
+    onIncreaseSpeed: () -> Unit,
+    onDecreaseSpeed: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -65,30 +68,40 @@ fun TankDriveScreen(
         Box(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    TinyButton("+", onIncreaseSpeed)
+                    Spacer(Modifier.height(4.dp))
+                    Text("Lvl $speedLevel", color = Color.White, fontSize = 12.sp)
+                    Spacer(Modifier.height(4.dp))
+                    TinyButton("−", onDecreaseSpeed)
+                }
+
+                Spacer(Modifier.width(16.dp))
+
                 Button(
                     onClick = onToggleTurbo,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (turboEnabled) Color.Blue else Color.DarkGray
                     ),
-                    modifier = Modifier.width(160.dp)
+                    modifier = Modifier.width(140.dp)
                 ) {
                     Text(if (turboEnabled) "TURBO" else "TURTLE", color = Color.White)
                 }
             }
 
-            // Offset halved from the previous -56.dp — nudge further if this isn't quite right.
             StopOctagonButton(
                 onClick = onStop,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = (-8).dp, y = (-28).dp)
-                    .size(70.dp)
+                    .offset(x = (-8).dp, y = (-30).dp)
+                    .size(100.dp)
             )
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
     }
 }
 
@@ -116,6 +129,18 @@ fun SmallButton(text: String, onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun TinyButton(text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+        modifier = Modifier.size(48.dp),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Text(text, fontSize = 18.sp)
+    }
+}
+
 private val OctagonShape = GenericShape { size, _ ->
     val w = size.width
     val h = size.height
@@ -140,6 +165,6 @@ fun StopOctagonButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
-        Text("STOP", color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center)
+        Text("STOP", color = Color.White, fontSize = 15.sp, textAlign = TextAlign.Center)
     }
 }

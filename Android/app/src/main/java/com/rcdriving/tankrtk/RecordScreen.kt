@@ -20,8 +20,8 @@ import kotlin.math.cos
 
 // TODO: replace with the exact coordinates of Coggins Street you want the map centered on.
 // This is currently just Hilton Head Island generally.
-private const val MAP_ORIGIN_LAT = 32.2163
-private const val MAP_ORIGIN_LON = -80.7526
+private const val MAP_ORIGIN_LAT = 32.222424
+private const val MAP_ORIGIN_LON = -80.676946
 
 @Composable
 fun RecordScreen(
@@ -42,16 +42,8 @@ fun RecordScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A2F0A))
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        Text(
-            text = "Path Record / Playback",
-            color = Color.White,
-            fontSize = 22.sp,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-            textAlign = TextAlign.Center
-        )
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,18 +70,7 @@ fun RecordScreen(
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = "Recorded points: ${recordedPath.size}" +
-                if (isPlaying) "   |   Playback: ${playbackPath.size}/${recordedPath.size}" else "",
-            color = Color.White,
-            fontSize = 14.sp,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -122,6 +103,17 @@ fun RecordScreen(
                 Text("CLEAR")
             }
         }
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "Recorded points: ${recordedPath.size}" +
+                if (isPlaying) "   |   Playback: ${playbackPath.size}/${recordedPath.size}" else "",
+            color = Color.White,
+            fontSize = 13.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

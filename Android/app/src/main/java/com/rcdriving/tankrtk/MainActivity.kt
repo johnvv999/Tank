@@ -68,6 +68,7 @@ class MainActivity : ComponentActivity() {
                         leftSpeed = leftSpeed,
                         rightSpeed = rightSpeed,
                         connectionStatus = connectionStatus,
+                        speedLevel = speedLevel,
                         onJoystickMove = { x, y ->
                             val turboScale = if (turboEnabled) 1f else 0.5f
                             val speedScale = vm.currentSpeedScale()
@@ -84,7 +85,9 @@ class MainActivity : ComponentActivity() {
                             vm.setMotors(0, 0)
                         },
                         turboEnabled = turboEnabled,
-                        onToggleTurbo = { turboEnabled = !turboEnabled }
+                        onToggleTurbo = { turboEnabled = !turboEnabled },
+                        onIncreaseSpeed = { vm.increaseSpeed() },
+                        onDecreaseSpeed = { vm.decreaseSpeed() }
                     )
                 },
                 recordContent = {

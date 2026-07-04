@@ -8,7 +8,7 @@ class PathReplayer(
     private val tankWifiClient: TankWifiClient
 ) {
     // Suspend version — safe to call from a coroutine (e.g. LaunchedEffect).
-    // Does not block the calling thread the way the old Thread.sleep version did.
+    // Does not block the calling thread the way a Thread.sleep version would.
     suspend fun replay(path: Path, onProgress: (Int) -> Unit) {
         if (path.points.size < 2) return
         onProgress(1)
