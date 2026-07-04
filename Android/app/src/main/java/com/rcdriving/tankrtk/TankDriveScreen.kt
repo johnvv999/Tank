@@ -1,9 +1,9 @@
 package com.rcdriving.tankrtk
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,8 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,11 +76,11 @@ fun TankDriveScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    TinyButton("+", onIncreaseSpeed)
+                    TinyButton(isPlus = true, onClick = onIncreaseSpeed)
                     Spacer(Modifier.height(4.dp))
                     Text("$speedPercent%", color = Color.White, fontSize = 14.sp)
                     Spacer(Modifier.height(4.dp))
-                    TinyButton("-", onDecreaseSpeed)
+                    TinyButton(isPlus = false, onClick = onDecreaseSpeed)
                 }
 
                 Spacer(Modifier.width(16.dp))
@@ -133,7 +134,7 @@ fun SmallButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun TinyButton(text: String, onClick: () -> Unit) {
+fun TinyButton(isPlus: Boolean, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = CircleShape,
@@ -141,10 +142,27 @@ fun TinyButton(text: String, onClick: () -> Unit) {
         modifier = Modifier.size(64.dp),
         contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Canvas(modifier = Modifier.size(22.dp)) {
+            val strokeWidth = 4.dp.toPx()
+            drawLine(
+                color = Color.White,
+                start = Offset(0f, size.height / 2f),
+                end = Offset(size.width, size.height / 2f),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round
+            )
+            if (isPlus) {
+                drawLine(
+                    color = Color.White,
+                    start = Offset(size.width / 2f, 0f),
+                    end = Offset(size.width / 2f, size.height),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+            }
+        }
     }
 }
-
 
 private val OctagonShape = GenericShape { size, _ ->
     val w = size.width
