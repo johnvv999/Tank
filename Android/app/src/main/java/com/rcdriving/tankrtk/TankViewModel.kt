@@ -21,15 +21,25 @@ class TankViewModel : ViewModel() {
     private val _waypoints = MutableStateFlow<List<Waypoint>>(emptyList())
     val waypoints: StateFlow<List<Waypoint>> = _waypoints
 
-    // Speed level: 1 = precision, 4 = max. Scales joystick output before mixing.
-    private val speedScales = listOf(0.3f, 0.55f, 0.8f, 1.0f)
+    // Speed level: 1 = min, 4 = max. Interpolates between the configurable
+    // min/max speed percentages set on the Settings screen.
     private val _speedLevel = MutableStateFlow(2)
     val speedLevel: StateFlow<Int> = _speedLevel
 
-    fun currentSpeedScale(): Float = speedScales[_speedLevel.value - 1]
+    private val _minSpeedPercent = MutableStateFlow(30)
+    val minSpeedPercent: StateFlow<Int> = _minSpeedPercent
 
-    fun cycleSpeed() {
-        _speedLevel.value = if (_speedLevel.value >= 4) 1 else _speedLevel.value + 1
+    private val _maxSpeedPercent = MutableStateFlow(100)
+    val maxSpeedPercent: StateFlow<Int> = _maxSpeedPercent
+
+    fun setMinSpeed(percent: Int) { _minSpeedPercent.value = percent.coerceIn(0, 100) }
+    fun setMaxSpeed(percent: Int) { _maxSpeedPercent.value = percent.coerceIn(0, 100) }
+
+    fun currentSpeedScale(): Float {
+        val min = _minSpeedPercent.value / 100f
+        val max = _maxSpeedPercent.value / 100f
+        val t = (_speedLevel.value - 1) / 3f
+        return min + (max - min) * t
     }
 
     fun increaseSpeed() {

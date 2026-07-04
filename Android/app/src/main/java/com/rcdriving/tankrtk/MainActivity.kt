@@ -29,6 +29,8 @@ class MainActivity : ComponentActivity() {
             val leftSpeed by vm.leftMotor.collectAsState()
             val rightSpeed by vm.rightMotor.collectAsState()
             val speedLevel by vm.speedLevel.collectAsState()
+            val minSpeedPercent by vm.minSpeedPercent.collectAsState()
+            val maxSpeedPercent by vm.maxSpeedPercent.collectAsState()
             val trimOffset by vm.trimOffset.collectAsState()
             val connectionStatus by tankWifiClient.status.collectAsState()
             val isRecording by vm.isRecording.collectAsState()
@@ -106,12 +108,14 @@ class MainActivity : ComponentActivity() {
                 },
                 settingsContent = {
                     SettingsScreen(
-                        speedLevel = speedLevel,
+                        minSpeedPercent = minSpeedPercent,
+                        maxSpeedPercent = maxSpeedPercent,
                         trimOffset = trimOffset,
                         connectionStatus = connectionStatus,
+                        onMinSpeedChange = { vm.setMinSpeed(it) },
+                        onMaxSpeedChange = { vm.setMaxSpeed(it) },
                         onTrimLeft = { vm.adjustTrim(-5) },
-                        onTrimRight = { vm.adjustTrim(5) },
-                        onSpeed = { vm.cycleSpeed() }
+                        onTrimRight = { vm.adjustTrim(5) }
                     )
                 }
             )
