@@ -18,9 +18,12 @@ import androidx.compose.ui.unit.sp
 fun TankDriveScreen(
     leftSpeed: Int,
     rightSpeed: Int,
+    speedLevel: Int,
+    trimOffset: Int,
     onJoystickMove: (Float, Float) -> Unit,
     onStop: () -> Unit,
-    onTrim: () -> Unit,
+    onTrimLeft: () -> Unit,
+    onTrimRight: () -> Unit,
     onSpeed: () -> Unit,
     turboEnabled: Boolean,
     onTurboToggle: (Boolean) -> Unit
@@ -63,15 +66,34 @@ fun TankDriveScreen(
             )
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Trim: $trimOffset   |   Speed: $speedLevel/4",
+            color = Color.White,
+            fontSize = 14.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            SmallButton("TRIM", onTrim)
+            SmallButton("◀ TRIM", onTrimLeft)
             StopButton(onStop)
-            SmallButton("SPEED", onSpeed)
+            SmallButton("TRIM ▶", onTrimRight)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            SmallButton("SPEED $speedLevel/4", onSpeed)
         }
 
         Spacer(Modifier.height(20.dp))
