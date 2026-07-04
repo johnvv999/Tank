@@ -3,9 +3,8 @@ package com.rcdriving.tankrtk
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -16,20 +15,48 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        tankWifiClient.connect()
+
         setContent {
             val vm: TankViewModel = viewModel()
+            var turboEnabled by remember { mutableStateOf(true) }
 
-            TankScreen(
-                viewModel = vm,
+            val leftSpeed by vm.leftMotor.collectAsState()
+            val rightSpeed by vm.rightMotor.collectAsState()
+            val speedLevel by vm.speedLevel.collectAsState()
+            val trimOffset by vm.trimOffset.collectAsState()
+
+            TankDriveScreen(
+                leftSpeed = leftSpeed,
+                rightSpeed = rightSpeed,
+                speedLevel = speedLevel,
+                trimOffset = trimOffset,
                 onJoystickMove = { x, y ->
-                    val (leftPWM, rightPWM) = mixTankDrive(x, y)
-                    val cmd = formatTankCommand(leftPWM, rightPWM)
-                    tankWifiClient.send(cmd)
+                    val turboScale = if (turboEnabled) 1f else 0.5f
+                    val speedScale = vm.currentSpeedScale()
+                    val scale = turboScale * speedScale
+
+                    val (rawLeft, rawRight) = mixTankDrive(x * scale, y * scale)
+                    val (leftPWM, rightPWM) = applyTrim(rawLeft, rawRight, trimOffset)
+
+                    tankWifiClient.send(formatTankCommand(leftPWM, rightPWM))
                     vm.setMotors(leftPWM, rightPWM)
                 },
-                onConnect = { tankWifiClient.connect() },
-                onDisconnect = { tankWifiClient.disconnect() }
+                onStop = {
+                    tankWifiClient.send(formatTankCommand(0, 0))
+                    vm.setMotors(0, 0)
+                },
+                onTrimLeft = { vm.adjustTrim(-5) },
+                onTrimRight = { vm.adjustTrim(5) },
+                onSpeed = { vm.cycleSpeed() },
+                turboEnabled = turboEnabled,
+                onTurboToggle = { turboEnabled = it }
             )
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        tankWifiClient.disconnect()
     }
 }

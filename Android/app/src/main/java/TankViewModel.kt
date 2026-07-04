@@ -21,6 +21,25 @@ class TankViewModel : ViewModel() {
     private val _waypoints = MutableStateFlow<List<Waypoint>>(emptyList())
     val waypoints: StateFlow<List<Waypoint>> = _waypoints
 
+    // Speed level: 1 = precision, 4 = max. Scales joystick output before mixing.
+    private val speedScales = listOf(0.3f, 0.55f, 0.8f, 1.0f)
+    private val _speedLevel = MutableStateFlow(2)
+    val speedLevel: StateFlow<Int> = _speedLevel
+
+    fun currentSpeedScale(): Float = speedScales[_speedLevel.value - 1]
+
+    fun cycleSpeed() {
+        _speedLevel.value = if (_speedLevel.value >= 4) 1 else _speedLevel.value + 1
+    }
+
+    // Trim: steering bias to correct drift, split between motors, doesn't change overall speed.
+    private val _trimOffset = MutableStateFlow(0)
+    val trimOffset: StateFlow<Int> = _trimOffset
+
+    fun adjustTrim(delta: Int) {
+        _trimOffset.value = (_trimOffset.value + delta).coerceIn(-30, 30)
+    }
+
     fun setMotors(left: Int, right: Int) {
         _leftMotor.value = left
         _rightMotor.value = right

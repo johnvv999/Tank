@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.rcdriving.tankrtk"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.rcdriving.tankrtk"
@@ -33,6 +33,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+
 }
