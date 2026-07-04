@@ -29,7 +29,7 @@ class TankViewModel : ViewModel() {
 
     // Current drive speed as a direct percentage, stepped by 5% per +/- tap,
     // clamped to whatever Min/Max range is set on the Settings screen.
-    private val _currentSpeedPercent = MutableStateFlow(50)
+    private val _currentSpeedPercent = MutableStateFlow(0)
     val currentSpeedPercent: StateFlow<Int> = _currentSpeedPercent
 
     fun setMinSpeed(percent: Int) {
@@ -41,10 +41,20 @@ class TankViewModel : ViewModel() {
         _maxSpeedPercent.value = percent.coerceIn(0, 100)
         _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(_minSpeedPercent.value, _maxSpeedPercent.value)
     }
+    
+	fun currentSpeedScale(): Float = _currentSpeedPercent.value / 100f
 
-    fun currentSpeedScale(): Float = _currentSpeedPercent.value / 100f
+    	// Normalizes the raw motor percentage into a 0-100 display value relative
+    	// to the Min/Max range — e.g. Min=30, Max=100: raw 30% displays as 0%,
+    	// raw 100% displays as 100%. Does not affect actual motor output.
+    	fun displaySpeedPercent(): Int {
+    	    val range = _maxSpeedPercent.value - _minSpeedPercent.value
+            if (range <= 0) return 0
+            return (((_currentSpeedPercent.value - _minSpeedPercent.value) * 100) / range).coerceIn(0, 100)
+    }
 
-    fun increaseSpeed() {
+
+fun increaseSpeed() {
         _currentSpeedPercent.value = (_currentSpeedPercent.value + 5).coerceAtMost(_maxSpeedPercent.value)
     }
 
