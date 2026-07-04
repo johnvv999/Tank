@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
             val speedLevel by vm.speedLevel.collectAsState()
             val minSpeedPercent by vm.minSpeedPercent.collectAsState()
             val maxSpeedPercent by vm.maxSpeedPercent.collectAsState()
+            val speedPercent = (vm.currentSpeedScale() * 100).toInt()
             val trimOffset by vm.trimOffset.collectAsState()
             val connectionStatus by tankWifiClient.status.collectAsState()
             val isRecording by vm.isRecording.collectAsState()
@@ -70,7 +71,7 @@ class MainActivity : ComponentActivity() {
                         leftSpeed = leftSpeed,
                         rightSpeed = rightSpeed,
                         connectionStatus = connectionStatus,
-                        speedLevel = speedLevel,
+                        speedPercent = speedPercent,
                         onJoystickMove = { x, y ->
                             val turboScale = if (turboEnabled) 1f else 0.5f
                             val speedScale = vm.currentSpeedScale()

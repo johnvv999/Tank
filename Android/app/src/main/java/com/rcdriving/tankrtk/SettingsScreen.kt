@@ -2,7 +2,9 @@ package com.rcdriving.tankrtk
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -33,6 +35,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0A2F0A))
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
         Row(
@@ -52,17 +55,6 @@ fun SettingsScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {
-                SpeedField("Min Speed (%)", minSpeedPercent, onMinSpeedChange)
-                Spacer(Modifier.height(12.dp))
-                SpeedField("Max Speed (%)", maxSpeedPercent, onMaxSpeedChange)
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-
         Text("Trim", color = Color.White, fontSize = 16.sp)
         Spacer(Modifier.height(8.dp))
         Row(
@@ -72,6 +64,17 @@ fun SettingsScreen(
             SmallButton("−", onTrimLeft)
             Text("$trimOffset", color = Color.White, fontSize = 20.sp)
             SmallButton("+", onTrimRight)
+        }
+
+        Spacer(Modifier.height(32.dp))
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.weight(1f))
+            Column(horizontalAlignment = Alignment.End) {
+                SpeedField("Min Speed (%)", minSpeedPercent, onMinSpeedChange)
+                Spacer(Modifier.height(12.dp))
+                SpeedField("Max Speed (%)", maxSpeedPercent, onMaxSpeedChange)
+            }
         }
     }
 }

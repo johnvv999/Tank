@@ -22,7 +22,7 @@ fun TankDriveScreen(
     leftSpeed: Int,
     rightSpeed: Int,
     connectionStatus: ConnectionStatus,
-    speedLevel: Int,
+    speedPercent: Int,
     onJoystickMove: (Float, Float) -> Unit,
     onStop: () -> Unit,
     turboEnabled: Boolean,
@@ -74,7 +74,7 @@ fun TankDriveScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     TinyButton("+", onIncreaseSpeed)
                     Spacer(Modifier.height(4.dp))
-                    Text("Lvl $speedLevel", color = Color.White, fontSize = 12.sp)
+                    Text("$speedPercent%", color = Color.White, fontSize = 14.sp)
                     Spacer(Modifier.height(4.dp))
                     TinyButton("−", onDecreaseSpeed)
                 }
@@ -134,10 +134,10 @@ fun TinyButton(text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-        modifier = Modifier.size(48.dp),
+        modifier = Modifier.size(64.dp),
         contentPadding = PaddingValues(0.dp)
     ) {
-        Text(text, fontSize = 18.sp)
+        Text(text, fontSize = 24.sp)
     }
 }
 
