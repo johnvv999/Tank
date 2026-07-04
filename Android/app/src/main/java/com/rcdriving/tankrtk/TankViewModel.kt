@@ -27,39 +27,48 @@ class TankViewModel : ViewModel() {
     private val _maxSpeedPercent = MutableStateFlow(100)
     val maxSpeedPercent: StateFlow<Int> = _maxSpeedPercent
 
-    // Current drive speed as a direct percentage, stepped by 5% per +/- tap,
-    // clamped to whatever Min/Max range is set on the Settings screen.
+    // Current drive speed as a direct percentage. Starts at 0 (full stop).
+    // The first "+" tap jumps straight to Min Speed (otherwise taps below
+    // Min would be invisible in the normalized display and on the tank).
+    // "-" steps down by 5% until it reaches Min, then the next tap drops
+    // straight to 0 rather than getting stuck oscillating at Min.
     private val _currentSpeedPercent = MutableStateFlow(0)
     val currentSpeedPercent: StateFlow<Int> = _currentSpeedPercent
 
     fun setMinSpeed(percent: Int) {
         _minSpeedPercent.value = percent.coerceIn(0, 100)
-        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(_minSpeedPercent.value, _maxSpeedPercent.value)
+        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(0, _maxSpeedPercent.value)
     }
 
     fun setMaxSpeed(percent: Int) {
         _maxSpeedPercent.value = percent.coerceIn(0, 100)
-        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(_minSpeedPercent.value, _maxSpeedPercent.value)
-    }
-    
-	fun currentSpeedScale(): Float = _currentSpeedPercent.value / 100f
-
-    	// Normalizes the raw motor percentage into a 0-100 display value relative
-    	// to the Min/Max range — e.g. Min=30, Max=100: raw 30% displays as 0%,
-    	// raw 100% displays as 100%. Does not affect actual motor output.
-    	fun displaySpeedPercent(): Int {
-    	    val range = _maxSpeedPercent.value - _minSpeedPercent.value
-            if (range <= 0) return 0
-            return (((_currentSpeedPercent.value - _minSpeedPercent.value) * 100) / range).coerceIn(0, 100)
+        _currentSpeedPercent.value = _currentSpeedPercent.value.coerceIn(0, _maxSpeedPercent.value)
     }
 
+    fun currentSpeedScale(): Float = _currentSpeedPercent.value / 100f
 
-fun increaseSpeed() {
-        _currentSpeedPercent.value = (_currentSpeedPercent.value + 5).coerceAtMost(_maxSpeedPercent.value)
+    // Normalizes the raw motor percentage into a 0-100 display value relative
+    // to the Min/Max range — e.g. Min=30, Max=100: raw 30% displays as 0%,
+    // raw 100% displays as 100%. Raw 0 (full stop) also displays as 0.
+    // Does not affect actual motor output.
+    fun displaySpeedPercent(): Int {
+        val current = _currentSpeedPercent.value
+        if (current <= 0) return 0
+        val range = _maxSpeedPercent.value - _minSpeedPercent.value
+        if (range <= 0) return 0
+        return (((current - _minSpeedPercent.value) * 100) / range).coerceIn(0, 100)
+    }
+
+    fun increaseSpeed() {
+        val min = _minSpeedPercent.value
+        val current = _currentSpeedPercent.value
+        _currentSpeedPercent.value = if (current < min) min else (current + 5).coerceAtMost(_maxSpeedPercent.value)
     }
 
     fun decreaseSpeed() {
-        _currentSpeedPercent.value = (_currentSpeedPercent.value - 5).coerceAtLeast(_minSpeedPercent.value)
+        val min = _minSpeedPercent.value
+        val current = _currentSpeedPercent.value
+        _currentSpeedPercent.value = if (current <= min) 0 else (current - 5).coerceAtLeast(min)
     }
 
     // Trim: steering bias to correct drift, split between motors, doesn't change overall speed.
