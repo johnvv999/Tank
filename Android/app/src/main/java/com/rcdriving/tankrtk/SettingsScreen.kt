@@ -2,8 +2,6 @@ package com.rcdriving.tankrtk
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,8 +18,7 @@ fun SettingsScreen(
     connectionStatus: ConnectionStatus,
     onTrimLeft: () -> Unit,
     onTrimRight: () -> Unit,
-    onSpeed: () -> Unit,
-    onBack: () -> Unit
+    onSpeed: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -53,15 +50,6 @@ fun SettingsScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             SmallButton("◀ TRIM", onTrimLeft)
             SmallButton("TRIM ▶", onTrimRight)
-        }
-
-        Spacer(Modifier.height(48.dp))
-
-        Button(
-            onClick = onBack,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-        ) {
-            Text("BACK TO DRIVE")
         }
     }
 }
