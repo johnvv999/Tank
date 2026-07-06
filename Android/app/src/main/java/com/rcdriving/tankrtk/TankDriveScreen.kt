@@ -1,4 +1,4 @@
-package com.rcdriving.tankrtk.ui.screens
+package com.rcdriving.tankrtk.ui.screens  // <-- change if your folder path differs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +9,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,9 +28,8 @@ fun TankDriveScreen(
     modifier: Modifier = Modifier,
     onSpeedChange: (Int) -> Unit = {},
     onModeChange: (Boolean) -> Unit = {}, // true = TURBO, false = TURTLE
-    onJoystickMove: (Float, Float) -> Unit = { _, _ -> },
 ) {
-    val speedState = remember { mutableStateOf(0) }
+    val speedState = remember { mutableIntStateOf(0) }
     val isTurboState = remember { mutableStateOf(true) }
 
     Surface(
@@ -45,7 +45,7 @@ fun TankDriveScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            SpeedWindow(speed = speedState.value)
+            SpeedWindow(speed = speedState.intValue)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -54,22 +54,19 @@ fun TankDriveScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 LeftControls(
-                    speed = speedState.value,
                     isTurbo = isTurboState.value,
                     onTurboToggle = {
                         isTurboState.value = !isTurboState.value
                         onModeChange(isTurboState.value)
                     },
                     onSpeedChange = { delta ->
-                        val newSpeed = (speedState.value + delta).coerceIn(0, 100)
-                        speedState.value = newSpeed
+                        val newSpeed = (speedState.intValue + delta).coerceIn(0, 100)
+                        speedState.intValue = newSpeed
                         onSpeedChange(newSpeed)
                     }
                 )
 
-                RightJoystick(
-                    onJoystickMove = onJoystickMove
-                )
+                RightJoystick()
             }
         }
     }
@@ -158,7 +155,6 @@ private fun SpeedWindow(speed: Int) {
 
 @Composable
 private fun LeftControls(
-    speed: Int,
     isTurbo: Boolean,
     onTurboToggle: () -> Unit,
     onSpeedChange: (Int) -> Unit
@@ -244,9 +240,7 @@ private fun IconButtonCircle(
 }
 
 @Composable
-private fun RightJoystick(
-    onJoystickMove: (Float, Float) -> Unit
-) {
+private fun RightJoystick() {
     Box(
         modifier = Modifier
             .fillMaxHeight()
