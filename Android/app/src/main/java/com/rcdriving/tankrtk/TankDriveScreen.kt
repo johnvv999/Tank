@@ -44,8 +44,10 @@ fun TankDriveScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color(0xFF20252B)
-    ) {
+     //   color = Color(0xFF20252B)
+        color = Color(0xFFFF0000)  // bright red — just for testing
+
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
