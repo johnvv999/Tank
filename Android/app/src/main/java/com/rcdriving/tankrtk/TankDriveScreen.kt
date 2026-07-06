@@ -26,8 +26,18 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TankDriveScreen(
     modifier: Modifier = Modifier,
+    leftSpeed: Int = 0,
+    rightSpeed: Int = 0,
+    connectionStatus: String = "",
+    speedPercent: Int = 0,
+    onJoystickMove: (Float, Float) -> Unit = { _, _ -> },
+    onStop: () -> Unit = {},
+    turboEnabled: Boolean = true,
+    onToggleTurbo: () -> Unit = {},
+    onIncreaseSpeed: () -> Unit = {},
+    onDecreaseSpeed: () -> Unit = {},
     onSpeedChange: (Int) -> Unit = {},
-    onModeChange: (Boolean) -> Unit = {}, // true = TURBO, false = TURTLE
+    onModeChange: (Boolean) -> Unit = {},
 ) {
     val speedState = remember { mutableIntStateOf(0) }
     val isTurboState = remember { mutableStateOf(true) }
@@ -57,12 +67,14 @@ fun TankDriveScreen(
                     isTurbo = isTurboState.value,
                     onTurboToggle = {
                         isTurboState.value = !isTurboState.value
+                        onToggleTurbo()
                         onModeChange(isTurboState.value)
                     },
                     onSpeedChange = { delta ->
                         val newSpeed = (speedState.intValue + delta).coerceIn(0, 100)
                         speedState.intValue = newSpeed
                         onSpeedChange(newSpeed)
+                        if (delta > 0) onIncreaseSpeed() else onDecreaseSpeed()
                     }
                 )
 
