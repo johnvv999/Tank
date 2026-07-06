@@ -2,110 +2,141 @@ package com.rcdriving.tankrtk
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun SettingsScreen(
-    minSpeedPercent: Int,
-    maxSpeedPercent: Int,
-    trimOffset: Int,
-    connectionStatus: ConnectionStatus,
-    onMinSpeedChange: (Int) -> Unit,
-    onMaxSpeedChange: (Int) -> Unit,
-    onTrimLeft: () -> Unit,
-    onTrimRight: () -> Unit
+    viewModel: TankViewModel,
+    connected: Boolean,
+    onMain: () -> Unit,
+    onRecord: () -> Unit,
+    onSettings: () -> Unit
 ) {
-    Box(
+    var minSpeedText by remember { mutableStateOf(viewModel.speedMin.toString()) }
+    var maxSpeedText by remember { mutableStateOf(viewModel.speedMax.toString()) }
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A2F0A))
-            .padding(16.dp)
+            .background(satinGunmetal)
     ) {
-        Column(modifier = Modifier.align(Alignment.TopStart)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                ConnectionStatusIndicator(connectionStatus, showLabel = true)
-            }
 
-            Spacer(Modifier.height(4.dp))
+        // ------------------------------------------------------------
+        // TOP BAR
+        // ------------------------------------------------------------
+        TopBar(
+            connected = connected,
+            selectedTab = TopTab.SETTINGS,
+            signalStrength = viewModel.signalStrength,
+            onMain = onMain,
+            onRecord = onRecord,
+            onSettings = onSettings
+        )
+
+        // ------------------------------------------------------------
+        // SETTINGS CONTENT
+        // ------------------------------------------------------------
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
 
             Text(
-                text = "Access Point: $TANK_AP_SSID",
-                color = Color.White,
-                fontSize = 14.sp
+                text = "Speed Range",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
             )
 
-            Spacer(Modifier.height(24.dp))
-
-            Text("Trim", color = Color.White, fontSize = 16.sp)
-            Spacer(Modifier.height(8.dp))
+            // ------------------------------------------------------------
+            // MIN SPEED INPUT
+            // ------------------------------------------------------------
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                SmallButton("−", onTrimLeft)
-                Text("$trimOffset", color = Color.White, fontSize = 20.sp)
-                SmallButton("+", onTrimRight)
+                Text(
+                    text = "Min:",
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
+
+                TextField(
+                    value = minSpeedText,
+                    onValueChange = { minSpeedText = it },
+                    modifier = Modifier
+                        .width(120.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(8.dp)),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = Color.White,
+                        fontSize = 20.sp
+                    )
+                )
+            }
+
+            // ------------------------------------------------------------
+            // MAX SPEED INPUT
+            // ------------------------------------------------------------
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Max:",
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
+
+                TextField(
+                    value = maxSpeedText,
+                    onValueChange = { maxSpeedText = it },
+                    modifier = Modifier
+                        .width(120.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(8.dp)),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        color = Color.White,
+                        fontSize = 20.sp
+                    )
+                )
+            }
+
+            // ------------------------------------------------------------
+            // APPLY BUTTON
+            // ------------------------------------------------------------
+            Button(
+                onClick = {
+                    val minVal = minSpeedText.toIntOrNull() ?: viewModel.speedMin
+                    val maxVal = maxSpeedText.toIntOrNull() ?: viewModel.speedMax
+                    viewModel.setSpeedRange(minVal, maxVal)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4A90E2)
+                )
+            ) {
+                Text(
+                    text = "Apply",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
-
-        Column(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            horizontalAlignment = Alignment.End
-        ) {
-            SpeedField("Min Speed (%)", minSpeedPercent, onMinSpeedChange)
-            Spacer(Modifier.height(12.dp))
-            SpeedField("Max Speed (%)", maxSpeedPercent, onMaxSpeedChange)
-        }
-    }
-}
-
-@Composable
-private fun SpeedField(label: String, value: Int, onValueChange: (Int) -> Unit) {
-    var text by remember(value) { mutableStateOf(value.toString()) }
-    Column(horizontalAlignment = Alignment.End) {
-        Text(label, color = Color.White, fontSize = 14.sp)
-        TextField(
-            value = text,
-            onValueChange = { new ->
-                text = new
-                new.toIntOrNull()?.let { onValueChange(it.coerceIn(0, 100)) }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.width(80.dp),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF145214),
-                unfocusedContainerColor = Color(0xFF145214),
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
-            )
-        )
-    }
-}
-
-@Composable
-fun ConnectionStatusIndicator(status: ConnectionStatus, showLabel: Boolean = false) {
-    val (color, label) = when (status) {
-        ConnectionStatus.CONNECTED -> Color(0xFF4CAF50) to "Connected"
-        ConnectionStatus.CONNECTING -> Color.Yellow to "Connecting..."
-        ConnectionStatus.FAILED -> Color.Red to "Connection Failed"
-        ConnectionStatus.DISCONNECTED -> Color.Gray to "Disconnected"
-    }
-    if (showLabel) {
-        Text(label, color = color, fontSize = 16.sp)
     }
 }
