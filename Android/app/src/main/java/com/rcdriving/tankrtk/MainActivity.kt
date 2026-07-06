@@ -1,68 +1,57 @@
 package com.rcdriving.tankrtk
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 
-class MainActivity : ComponentActivity() {
+@Composable
+fun TankDriveScreen(
+    viewModel: TankViewModel,
+    connected: Boolean,
+    onMain: () -> Unit,
+    onRecord: () -> Unit,
+    onSettings: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        TopBar(
+            connected = connected,
+            signalStrength = viewModel.signalStrength,
+            onMain = onMain,
+            onRecord = onRecord,
+            onSettings = onSettings
+        )
 
-        val viewModel = TankViewModel()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        setContent {
+            SpeedDisplay(viewModel.speedCurrent)
 
-            // ------------------------------------------------------------
-            // GLOBAL APP STATE
-            // ------------------------------------------------------------
-            var connected by remember { mutableStateOf(false) }
-            var currentTab by remember { mutableStateOf(TopTab.MAIN) }
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // ------------------------------------------------------------
-            // ROOT CONTAINER
-            // ------------------------------------------------------------
-            androidx.compose.foundation.layout.Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            ) {
+            TurboButton(
+                active = viewModel.turboActive,
+                onClick = { viewModel.activateTurbo() }
+            )
 
-                // ------------------------------------------------------------
-                // SCREEN SWITCHER
-                // ------------------------------------------------------------
-                when (currentTab) {
+            Spacer(modifier = Modifier.height(20.dp))
 
-                    TopTab.MAIN -> TankDriveScreen(
-                        viewModel = viewModel,
-                        connected = connected,
-                        onMain = { currentTab = TopTab.MAIN },
-                        onRecord = { currentTab = TopTab.RECORD },
-                        onSettings = { currentTab = TopTab.SETTINGS }
-                    )
-
-                    TopTab.RECORD -> RecordScreen(
-                        viewModel = viewModel,
-                        connected = connected,
-                        onMain = { currentTab = TopTab.MAIN },
-                        onRecord = { currentTab = TopTab.RECORD },
-                        onSettings = { currentTab = TopTab.SETTINGS }
-                    )
-
-                    TopTab.SETTINGS -> SettingsScreen(
-                        viewModel = viewModel,
-                        connected = connected,
-                        onMain = { currentTab = TopTab.MAIN },
-                        onRecord = { currentTab = TopTab.RECORD },
-                        onSettings = { currentTab = TopTab.SETTINGS }   // ⭐ FIXED
-                    )
-                }
-            }
+            JoystickControl(
+                angle = viewModel.angle,
+                onAngleChanged = { viewModel.updateDirection(it) }
+            )
         }
     }
 }
