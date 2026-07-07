@@ -3,6 +3,7 @@ package com.rcdriving.tankrtk
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -58,7 +59,7 @@ fun SettingsScreen(
                 text = "Speed Range",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color(0xFF1A1A1A)
             )
 
             // ------------------------------------------------------------
@@ -71,7 +72,7 @@ fun SettingsScreen(
                 Text(
                     text = "Min:",
                     fontSize = 20.sp,
-                    color = Color.White
+                    color = Color(0xFF1A1A1A)
                 )
 
                 TextField(
@@ -97,7 +98,7 @@ fun SettingsScreen(
                 Text(
                     text = "Max:",
                     fontSize = 20.sp,
-                    color = Color.White
+                    color = Color(0xFF1A1A1A)
                 )
 
                 TextField(

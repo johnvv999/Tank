@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -21,6 +22,7 @@ fun Joystick(
     onMove: (Float, Float) -> Unit
 ) {
     val radius = with(LocalDensity.current) { size.toPx() / 2 }
+    val travel = radius * 0.35f
     var handleX by remember { mutableStateOf(0f) }
     var handleY by remember { mutableStateOf(0f) }
 
@@ -31,10 +33,10 @@ fun Joystick(
                 detectDragGestures(
                     onDrag = { change, dragAmount ->
                         change.consume()
-                        handleX = (handleX + dragAmount.x).coerceIn(-radius, radius)
-                        handleY = (handleY + dragAmount.y).coerceIn(-radius, radius)
-                        val normX = handleX / radius
-                        val normY = -handleY / radius
+                        handleX = (handleX + dragAmount.x).coerceIn(-travel, travel)
+                        handleY = (handleY + dragAmount.y).coerceIn(-travel, travel)
+                        val normX = handleX / travel
+                        val normY = -handleY / travel
                         onMove(normX, normY)
                     },
                     onDragEnd = {
@@ -45,11 +47,37 @@ fun Joystick(
                 )
             }
     ) {
-        drawCircle(color = Color.DarkGray, radius = radius, center = center)
+        val knobRadius = radius * 0.9f
+        val knobCenter = Offset(center.x + handleX, center.y + handleY)
+        val highlightOffset = Offset(knobCenter.x - knobRadius * 0.35f, knobCenter.y - knobRadius * 0.35f)
+
+        // Glossy black dome
         drawCircle(
-            color = Color.Green,
-            radius = radius / 4,
-            center = Offset(center.x + handleX, center.y + handleY)
+            brush = Brush.radialGradient(
+                colors = listOf(
+                    Color(0xFF55575A),
+                    Color(0xFF1A1B1C),
+                    Color(0xFF000000)
+                ),
+                center = highlightOffset,
+                radius = knobRadius * 1.7f
+            ),
+            radius = knobRadius,
+            center = knobCenter
+        )
+
+        // Specular highlight (glossy reflection)
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(
+                    Color.White.copy(alpha = 0.45f),
+                    Color.White.copy(alpha = 0.0f)
+                ),
+                center = highlightOffset,
+                radius = knobRadius * 0.6f
+            ),
+            radius = knobRadius * 0.5f,
+            center = highlightOffset
         )
     }
 }

@@ -2,6 +2,8 @@ package com.rcdriving.tankrtk
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -15,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TurboButton(onClick: () -> Unit) {
+fun TurboButton(active: Boolean, onClick: () -> Unit) {
 
     // Outer metallic frame (matches reference image)
     val turboFrame = Brush.linearGradient(
@@ -26,20 +28,29 @@ fun TurboButton(onClick: () -> Unit) {
         )
     )
 
-    // Inner glowing blue panel
-    val turboGlow = Brush.radialGradient(
-        colors = listOf(
-            Color(0xFF4A90E2),
-            Color(0xFF003366)
+    // Inner glowing blue panel (brighter when active)
+    val turboGlow = if (active) {
+        Brush.radialGradient(
+            colors = listOf(
+                Color(0xFF6AB4FF),
+                Color(0xFF0055AA)
+            )
         )
-    )
+    } else {
+        Brush.radialGradient(
+            colors = listOf(
+                Color(0xFF4A90E2),
+                Color(0xFF003366)
+            )
+        )
+    }
 
     Box(
         modifier = Modifier
             .width(200.dp)
             .height(70.dp)
             .background(turboFrame, RoundedCornerShape(14.dp))
-            .border(2.dp, Color(0xFF4A4F52), RoundedCornerShape(14.dp)),
+            .border(2.dp, if (active) Color(0xFF9AD0FF) else Color(0xFF4A4F52), RoundedCornerShape(14.dp)),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -61,12 +72,9 @@ fun TurboButton(onClick: () -> Unit) {
 }
 
 // No‑ripple clickable modifier (keeps metallic look clean)
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.Modifier
-
 fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier =
     this.clickable(
         indication = null,
-        interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
+        interactionSource = MutableInteractionSource(),
         onClick = onClick
     )

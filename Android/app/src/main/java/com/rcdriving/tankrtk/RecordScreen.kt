@@ -33,9 +33,10 @@ fun RecordScreen(
             // ------------------------------------------------------------
             // TOP METALLIC TAB STRIP
             // ------------------------------------------------------------
-            TopStrip(
+            TopBar(
                 connected = connected,
                 selectedTab = TopTab.RECORD,
+                signalStrength = viewModel.signalStrength,
                 onMain = onMain,
                 onRecord = {},
                 onSettings = onSettings
