@@ -22,9 +22,6 @@ fun TankDriveScreen(
             .background(Color.Black)
     ) {
 
-        // ------------------------------------------------------------
-        // TOP BAR
-        // ------------------------------------------------------------
         TopBar(
             connected = connected,
             signalStrength = viewModel.signalStrength,
@@ -33,9 +30,6 @@ fun TankDriveScreen(
             onSettings = onSettings
         )
 
-        // ------------------------------------------------------------
-        // MAIN DRIVE UI
-        // ------------------------------------------------------------
         Column(
             modifier = Modifier
                 .fillMaxSize()
