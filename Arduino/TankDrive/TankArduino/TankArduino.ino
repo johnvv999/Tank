@@ -10,8 +10,11 @@
 #include <WiFiUdp.h>
 
 // ── WiFi credentials ────────────────────────────────────────
-const char* SSID     = "YOUR_SSID";
-const char* PASSWORD = "YOUR_PASSWORD";
+//   The board hosts its OWN WiFi network (access point mode).
+//   Connect your phone/controller directly to this network —
+//   no home WiFi router needed.
+const char* AP_SSID     = "tankdrive";
+const char* AP_PASSWORD = "tankdrive";   // WPA2 requires 8+ characters
 
 // ── UDP ports ───────────────────────────────────────────────
 const uint16_t PORT_TELEM = 5005;   // outbound telemetry
@@ -87,19 +90,23 @@ void setup() {
   pinMode(RIGHT_LPWM, OUTPUT);
   motorsStop();
 
-  // WiFi
-  Serial.print("Connecting to ");
-  Serial.println(SSID);
-  WiFi.begin(SSID, PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print('.');
+  // WiFi — start as an access point (board hosts its own network)
+  Serial.print("Starting access point: ");
+  Serial.println(AP_SSID);
+  int apStatus = WiFi.beginAP(AP_SSID, AP_PASSWORD);
+  if (apStatus != WL_AP_LISTENING) {
+    Serial.println("Failed to start access point! Halting.");
+    while (true) delay(1000);
   }
-  Serial.print("\nIP: ");
+  delay(1000);   // give the AP a moment to come fully online
+
+  Serial.print("AP IP address: ");
   Serial.println(WiFi.localIP());
 
   udp.begin(PORT_CMD);
-  Serial.println("TankCoPilot ready");
+  Serial.print("TankCoPilot ready — connect to WiFi \"");
+  Serial.print(AP_SSID);
+  Serial.println("\" and send commands to the IP printed above");
 }
 
 // ============================================================
