@@ -2,23 +2,38 @@
 //  TankCoPilot.ino
 //  Dual-motor RC tank · Arduino UNO R4 WiFi
 //  IBT-2 x2 (differential drive) + ZED-F9P RTK GPS (NMEA)
-//  Commands via JSON-over-UDP (port 5006)
-//  Telemetry via JSON-over-UDP (port 5005)
+//
+//  Commands: plain-text TCP, port 9000 — "L<val> R<val>\n"
+//    (matches Android/app/.../TankWifiClient.kt + TankViewModel.kt)
+//  Telemetry: JSON-over-UDP, port 5005 — sent to whichever
+//    device is currently connected via TCP (not read by the
+//    app today, but available for future use)
+//
+//  WiFi: board hosts its own access point.
+//    Values below MUST match Android/app/.../Config.kt
 // ============================================================
 
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
 
-// ── WiFi credentials ────────────────────────────────────────
-//   The board hosts its OWN WiFi network (access point mode).
-//   Connect your phone/controller directly to this network —
-//   no home WiFi router needed.
-const char* AP_SSID     = "tankdrive";
-const char* AP_PASSWORD = "tankdrive";   // WPA2 requires 8+ characters
+// ── WiFi credentials (access point) ──────────────────────────
+const char* AP_SSID     = "TankAP";
+const char* AP_PASSWORD = "tankdrive";        // WPA2 requires 8+ characters
+IPAddress   AP_IP(192, 168, 4, 1);            // matches Config.TANK_HOST
 
-// ── UDP ports ───────────────────────────────────────────────
-const uint16_t PORT_TELEM = 5005;   // outbound telemetry
-const uint16_t PORT_CMD   = 5006;   // inbound commands
+// ── TCP command server ───────────────────────────────────────
+const uint16_t CMD_PORT = 9000;               // matches Config.TANK_PORT
+WiFiServer cmdServer(CMD_PORT);
+WiFiClient cmdClient;
+
+char    lineBuf[64];
+uint8_t lineIdx = 0;
+
+// ── UDP telemetry (optional; sent to the connected TCP client) ─
+const uint16_t PORT_TELEM = 5005;
+WiFiUDP   telemUdp;
+IPAddress remoteIP;
+bool      remoteKnown = false;
 
 // ── IBT-2 pin assignments ────────────────────────────────────
 //   Each IBT-2 needs RPWM + LPWM.
@@ -58,13 +73,7 @@ struct GpsState {
   char     utcTime[12] = "";   // hhmmss.ss
 } gps;
 
-// ── Network objects ───────────────────────────────────────────
-WiFiUDP udp;
-IPAddress remoteIP;
-bool remoteKnown = false;
-
 // ── Buffers ───────────────────────────────────────────────────
-char rxBuf[256];
 char nmeaBuf[128];
 uint8_t nmeaIdx = 0;
 
@@ -90,7 +99,8 @@ void setup() {
   pinMode(RIGHT_LPWM, OUTPUT);
   motorsStop();
 
-  // WiFi — start as an access point (board hosts its own network)
+  // WiFi — host our own access point, matching Config.kt on the app side
+  WiFi.config(AP_IP);
   Serial.print("Starting access point: ");
   Serial.println(AP_SSID);
   int apStatus = WiFi.beginAP(AP_SSID, AP_PASSWORD);
@@ -103,10 +113,15 @@ void setup() {
   Serial.print("AP IP address: ");
   Serial.println(WiFi.localIP());
 
-  udp.begin(PORT_CMD);
+  cmdServer.begin();
+  telemUdp.begin(PORT_TELEM);
+
   Serial.print("TankCoPilot ready — connect to WiFi \"");
   Serial.print(AP_SSID);
-  Serial.println("\" and send commands to the IP printed above");
+  Serial.print("\", then TCP to ");
+  Serial.print(WiFi.localIP());
+  Serial.print(":");
+  Serial.println(CMD_PORT);
 }
 
 // ============================================================
@@ -114,7 +129,8 @@ void setup() {
 // ============================================================
 void loop() {
   readGps();
-  readUdpCommands();
+  acceptClient();
+  readTcpCommands();
   checkWatchdog();
 
   if (millis() - lastTelemMs >= TELEM_INTERVAL_MS) {
@@ -160,14 +176,29 @@ void motorsStop() {
   rightSpeed = 0;
 }
 
-// ── Differential drive helpers ────────────────────────────────
-//   throttle: -255…+255 (forward/back)
-//   steering: -255…+255 (left/right)
-void setDrive(int16_t throttle, int16_t steering) {
-  int16_t L = constrain(throttle + steering, -PWM_MAX, PWM_MAX);
-  int16_t R = constrain(throttle - steering, -PWM_MAX, PWM_MAX);
-  setLeftMotor(L);
-  setRightMotor(R);
+// ============================================================
+//  Client connection management
+// ============================================================
+void acceptClient() {
+  // Drop a client that has disconnected
+  if (cmdClient && !cmdClient.connected()) {
+    Serial.println("Client disconnected");
+    motorsStop();
+    cmdClient.stop();
+  }
+
+  if (!cmdClient || !cmdClient.connected()) {
+    WiFiClient newClient = cmdServer.available();
+    if (newClient) {
+      cmdClient   = newClient;
+      remoteIP    = cmdClient.remoteIP();
+      remoteKnown = true;
+      lastCmdMs   = millis();
+      lineIdx     = 0;
+      Serial.print("Client connected: ");
+      Serial.println(remoteIP);
+    }
+  }
 }
 
 // ============================================================
@@ -180,50 +211,69 @@ void checkWatchdog() {
 }
 
 // ============================================================
-//  UDP command parsing  (JSON)
+//  TCP command parsing
 //
-//  Expected packet format (matches CoPilot Android app):
-//  { "type":"CMD", "throttle":<-255..255>, "steering":<-255..255> }
-//  or
-//  { "type":"HELLO" }
-//  or
-//  { "type":"STOP" }
+//  Expected line format (matches TankViewModel.kt / formatTankCommand):
+//    "L<val> R<val>\n"   e.g.  "L0 R0\n"  or  "L-60 R80\n"
+//  <val> is a signed PERCENT value in range -100..100 (the app's
+//  arcade-mix output), scaled up to PWM range in percentToPwm() below.
 // ============================================================
-void readUdpCommands() {
-  int pktSize = udp.parsePacket();
-  if (pktSize <= 0) return;
+void readTcpCommands() {
+  if (!cmdClient || !cmdClient.connected()) return;
 
-  remoteIP    = udp.remoteIP();
-  remoteKnown = true;
+  while (cmdClient.available()) {
+    char c = (char)cmdClient.read();
 
-  int len = udp.read(rxBuf, sizeof(rxBuf) - 1);
-  if (len <= 0) return;
-  rxBuf[len] = '\0';
+    if (c == '\n' || c == '\r') {
+      if (lineIdx > 0) {
+        lineBuf[lineIdx] = '\0';
+        parseCommandLine(lineBuf);
+        lineIdx = 0;
+      }
+      continue;
+    }
 
-  // -- very lightweight JSON field extraction --
-  // type
-  char typeVal[16] = "";
-  extractJsonStr(rxBuf, "type", typeVal, sizeof(typeVal));
+    if (lineIdx < sizeof(lineBuf) - 1) {
+      lineBuf[lineIdx++] = c;
+    } else {
+      lineIdx = 0;   // overflow — discard malformed line
+    }
+  }
+}
 
-  if (strcmp(typeVal, "HELLO") == 0) {
-    lastCmdMs = millis();
-    sendAck("HELLO_ACK");
+void parseCommandLine(const char* line) {
+  Serial.print("RX: [");
+  Serial.print(line);
+  Serial.println("]");
+
+  const char* lp = strchr(line, 'L');
+  const char* rp = strchr(line, 'R');
+  if (!lp || !rp) {
+    Serial.println("  -> malformed, ignored");
     return;
   }
 
-  if (strcmp(typeVal, "STOP") == 0) {
-    motorsStop();
-    lastCmdMs = millis();
-    return;
-  }
+  // The app sends percent values (-100..+100 — see TankViewModel.kt's
+  // computeMotorOutputs, which clamps to that range), not raw PWM. Scale
+  // up to the full -255..+255 PWM range here so "100%" actually reaches
+  // full motor power. Without this scaling, every command topped out at
+  // ~39% duty cycle (100/255) — fine for driving straight, but weak
+  // enough that a diagonal turn's already-reduced inner-track value
+  // (e.g. ~37% of that already-capped range) could drop below the
+  // motors' real-world stall torque and barely move at all.
+  int16_t lPercent = (int16_t)atoi(lp + 1);
+  int16_t rPercent = (int16_t)atoi(rp + 1);
 
-  if (strcmp(typeVal, "CMD") == 0) {
-    int16_t thr = (int16_t)extractJsonInt(rxBuf, "throttle");
-    int16_t str = (int16_t)extractJsonInt(rxBuf, "steering");
-    setDrive(thr, str);
-    lastCmdMs = millis();
-    return;
-  }
+  setLeftMotor(percentToPwm(lPercent));
+  setRightMotor(percentToPwm(rPercent));
+  lastCmdMs = millis();
+}
+
+// Converts a -100..+100 percent command from the app into a -255..+255
+// PWM value for the motor drivers.
+int16_t percentToPwm(int16_t percent) {
+  int32_t pwm = ((int32_t)percent * PWM_MAX) / 100;
+  return (int16_t)constrain(pwm, -PWM_MAX, PWM_MAX);
 }
 
 // ============================================================
@@ -252,18 +302,9 @@ void sendTelemetry() {
     leftSpeed, rightSpeed
   );
 
-  udp.beginPacket(remoteIP, PORT_TELEM);
-  udp.write((uint8_t*)buf, strlen(buf));
-  udp.endPacket();
-}
-
-void sendAck(const char* msg) {
-  if (!remoteKnown) return;
-  char buf[64];
-  snprintf(buf, sizeof(buf), "{\"type\":\"%s\"}", msg);
-  udp.beginPacket(remoteIP, PORT_TELEM);
-  udp.write((uint8_t*)buf, strlen(buf));
-  udp.endPacket();
+  telemUdp.beginPacket(remoteIP, PORT_TELEM);
+  telemUdp.write((uint8_t*)buf, strlen(buf));
+  telemUdp.endPacket();
 }
 
 // ============================================================
@@ -382,30 +423,4 @@ void splitNmea(const char* s, char fields[][20], uint8_t maxFields) {
   }
   if (fi < maxFields) fields[fi][ci] = '\0';
   for (uint8_t i = fi + 1; i < maxFields; i++) fields[i][0] = '\0';
-}
-
-// ============================================================
-//  Minimal JSON helpers (no library dependency)
-// ============================================================
-
-// Extract a string value: "key":"value"
-void extractJsonStr(const char* json, const char* key, char* out, uint8_t outLen) {
-  char needle[32];
-  snprintf(needle, sizeof(needle), "\"%s\":\"", key);
-  const char* p = strstr(json, needle);
-  if (!p) { out[0] = '\0'; return; }
-  p += strlen(needle);
-  uint8_t i = 0;
-  while (*p && *p != '"' && i < outLen - 1) out[i++] = *p++;
-  out[i] = '\0';
-}
-
-// Extract an integer value: "key":number
-long extractJsonInt(const char* json, const char* key) {
-  char needle[32];
-  snprintf(needle, sizeof(needle), "\"%s\":", key);
-  const char* p = strstr(json, needle);
-  if (!p) return 0;
-  p += strlen(needle);
-  return strtol(p, nullptr, 10);
 }

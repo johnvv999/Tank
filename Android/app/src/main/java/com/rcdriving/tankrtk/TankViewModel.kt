@@ -3,9 +3,6 @@ package com.rcdriving.tankrtk
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
 
 class TankViewModel {
 
@@ -42,6 +39,21 @@ class TankViewModel {
         speedCurrent = (speedCurrent - 5).coerceIn(speedMin, speedMax)
         computeMotorOutputs()
     }
+
+    // speedCurrent is the throttle "dial" (persists whether or not the
+    // joystick is touched, since it's set separately via +/-). What the
+    // main screen should actually show is: 0 whenever the joystick is
+    // centered (nothing being commanded right now), and otherwise
+    // speedCurrent expressed as a percentage of the configured min-max
+    // range — i.e. speedMin reads as 0%, speedMax reads as 100%, not
+    // speedCurrent's raw absolute value.
+    val speedPercentDisplay: Int
+        get() {
+            val touching = joystickX != 0f || joystickY != 0f
+            if (!touching) return 0
+            val range = (speedMax - speedMin).coerceAtLeast(1)
+            return (((speedCurrent - speedMin) * 100) / range).coerceIn(0, 100)
+        }
 
     // ------------------------------------------------------------
     // SIGNAL STRENGTH (0–4 bars)
@@ -96,47 +108,44 @@ class TankViewModel {
     }
 
     // ------------------------------------------------------------
-    // TURBO BOOST (momentary: press = boost, release = restore)
+    // TRIM — persistent left/right bias to correct for the tank
+    // pulling to one side when driving "straight" (steer = 0).
+    // Added to the left tread and subtracted from the right, so a
+    // positive trim shifts power toward the left side.
     // ------------------------------------------------------------
-    var turboActive by mutableStateOf(false)
-    private var preTurboSpeed = 0
+    var trim by mutableStateOf(0)
+        private set
 
-    fun turboPressed() {
-        if (turboActive) return
-        turboActive = true
-        preTurboSpeed = speedCurrent
-        speedCurrent = (speedCurrent + 20).coerceIn(speedMin, speedMax)
+    private val trimRange = -30..30
+
+    fun increaseTrim() {
+        trim = (trim + 1).coerceIn(trimRange.first, trimRange.last)
         computeMotorOutputs()
     }
 
-    // Backward-compatible tap version used by TankDriveScreen's TurboButton:
-    // gives a 20% boost for the next command, then restores speed.
-    fun activateTurbo() {
-        turboPressed()
-        turboReleased()
-    }
-
-    fun turboReleased() {
-        if (!turboActive) return
-        turboActive = false
-        speedCurrent = preTurboSpeed
+    fun decreaseTrim() {
+        trim = (trim - 1).coerceIn(trimRange.first, trimRange.last)
         computeMotorOutputs()
     }
 
     // ------------------------------------------------------------
-    // JOYSTICK DIRECTION (angle only)
+    // JOYSTICK POSITION — normalized -1..1 on each axis.
+    //   joystickY: throttle  (+1 = full forward, -1 = full reverse)
+    //   joystickX: steering  (+1 = full right,   -1 = full left)
+    // Using the actual stick displacement (not just its angle) matters:
+    // a small nudge should give a small, proportional command. The old
+    // angle-only version always used the full unit-circle decomposition
+    // regardless of how far the stick was pushed, so any direction more
+    // "sideways" than "forward" (e.g. a gentle forward-right nudge) could
+    // immediately drive one tread backward instead of just slowing it —
+    // that's what caused the right tread reversing on a forward-right turn.
     // ------------------------------------------------------------
-    var angle by mutableStateOf(0f)
+    var joystickX by mutableStateOf(0f)
+    var joystickY by mutableStateOf(0f)
 
-    fun updateDirection(newAngle: Float) {
-        angle = newAngle
-        computeMotorOutputs()
-    }
-
-    fun updateDirectionFromTouch(x: Float, y: Float, centerX: Float, centerY: Float) {
-        val dx = x - centerX
-        val dy = y - centerY
-        angle = atan2(dy, dx)
+    fun updateJoystick(normX: Float, normY: Float) {
+        joystickX = normX.coerceIn(-1f, 1f)
+        joystickY = normY.coerceIn(-1f, 1f)
         computeMotorOutputs()
     }
 
@@ -145,30 +154,37 @@ class TankViewModel {
     // ------------------------------------------------------------
     fun stopMotors() {
         speedCurrent = speedMin
+        joystickX = 0f
+        joystickY = 0f
         sendToTank(0, 0)
     }
 
     // ------------------------------------------------------------
-    // MOTOR MIXING (forward + turn)
+    // MOTOR MIXING (arcade drive: throttle ± steering ± trim)
     // ------------------------------------------------------------
     private fun computeMotorOutputs() {
-        val dirX = cos(angle)
-        val dirY = sin(angle)
+        val throttle = joystickY * speedCurrent
+        val steer    = joystickX * speedCurrent
 
-        val forward = dirY * speedCurrent
-        val turn = dirX * speedCurrent
-
-        val left = (forward + turn).toInt().coerceIn(-100, 100)
-        val right = (forward - turn).toInt().coerceIn(-100, 100)
+        val left  = (throttle + steer + trim).toInt().coerceIn(-100, 100)
+        val right = (throttle - steer - trim).toInt().coerceIn(-100, 100)
 
         sendToTank(left, right)
     }
 
     // ------------------------------------------------------------
+    // LAST COMMAND — shown in the UI in place of the old turbo button
+    // ------------------------------------------------------------
+    var lastCommand by mutableStateOf("L0 R0")
+        private set
+
+    // ------------------------------------------------------------
     // SEND TO TANK — firmware parses "L<val> R<val>\n" on port 9000
     // ------------------------------------------------------------
     private fun sendToTank(left: Int, right: Int) {
-        wifi.send(formatTankCommand(left, right))
+        val cmd = formatTankCommand(left, right)
+        lastCommand = cmd.trim()
+        wifi.send(cmd)
 
         if (isRecording) {
             val now = System.currentTimeMillis()

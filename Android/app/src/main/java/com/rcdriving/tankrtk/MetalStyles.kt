@@ -173,7 +173,14 @@ fun MetalJoystickBase(
 ) {
     Box(
         modifier = modifier
-            .size(size)
+            // requiredSize (not size) forces this exact width AND height
+            // regardless of what the parent Row/BoxWithConstraints offers.
+            // Plain .size() gets coerced down by tighter incoming
+            // constraints — since the joystick's row often has less
+            // available width than height (or vice versa), that coercion
+            // was squashing this into an ellipse once the joystick was
+            // sized larger than its nominal layout slot.
+            .requiredSize(size)
             .clip(CircleShape)
             .background(buttonMetal)
             .border(3.dp, Color(0xFF9A9C9E), CircleShape),
