@@ -10,6 +10,17 @@ import kotlin.math.sin
 class TankViewModel {
 
     // ------------------------------------------------------------
+    // WIFI / TCP CLIENT (firmware: TankAP @ 192.168.4.1:9000)
+    // ------------------------------------------------------------
+    val wifi = TankWifiClient(Config.TANK_HOST, Config.TANK_PORT)
+
+    fun connect() = wifi.connect()
+    fun disconnect() {
+        stopMotors()
+        wifi.disconnect()
+    }
+
+    // ------------------------------------------------------------
     // SPEED RANGE (0–100%)
     // ------------------------------------------------------------
     var speedMin by mutableStateOf(0)
@@ -42,28 +53,74 @@ class TankViewModel {
     }
 
     // ------------------------------------------------------------
-    // RECORDING STATE
+    // RECORDING (odometry-based dead reckoning)
     // ------------------------------------------------------------
+    private val odometry = OdometryTracker()
+    private var lastSampleMs = 0L
+
     var isRecording by mutableStateOf(false)
+    var recordedPath by mutableStateOf<Path?>(null)
+        private set
 
     fun startRecording() {
+        odometry.reset()
+        lastSampleMs = System.currentTimeMillis()
         isRecording = true
     }
 
     fun stopRecording() {
         isRecording = false
+        recordedPath = Path(odometry.points)
     }
 
     // ------------------------------------------------------------
-    // TURBO BOOST
+    // PLAYBACK
+    // ------------------------------------------------------------
+    private val replayer = PathReplayer(wifi)
+
+    var isReplaying by mutableStateOf(false)
+        private set
+    var replayProgress by mutableStateOf(0)
+        private set
+
+    // Call from a coroutine, e.g. scope.launch { viewModel.replayRecorded() }
+    suspend fun replayRecorded() {
+        val path = recordedPath ?: return
+        if (isReplaying || path.size < 2) return
+        isReplaying = true
+        try {
+            replayer.replay(path) { replayProgress = it }
+        } finally {
+            isReplaying = false
+        }
+    }
+
+    // ------------------------------------------------------------
+    // TURBO BOOST (momentary: press = boost, release = restore)
     // ------------------------------------------------------------
     var turboActive by mutableStateOf(false)
+    private var preTurboSpeed = 0
 
-    fun activateTurbo() {
+    fun turboPressed() {
+        if (turboActive) return
         turboActive = true
+        preTurboSpeed = speedCurrent
         speedCurrent = (speedCurrent + 20).coerceIn(speedMin, speedMax)
         computeMotorOutputs()
+    }
+
+    // Backward-compatible tap version used by TankDriveScreen's TurboButton:
+    // gives a 20% boost for the next command, then restores speed.
+    fun activateTurbo() {
+        turboPressed()
+        turboReleased()
+    }
+
+    fun turboReleased() {
+        if (!turboActive) return
         turboActive = false
+        speedCurrent = preTurboSpeed
+        computeMotorOutputs()
     }
 
     // ------------------------------------------------------------
@@ -84,6 +141,14 @@ class TankViewModel {
     }
 
     // ------------------------------------------------------------
+    // STOP
+    // ------------------------------------------------------------
+    fun stopMotors() {
+        speedCurrent = speedMin
+        sendToTank(0, 0)
+    }
+
+    // ------------------------------------------------------------
     // MOTOR MIXING (forward + turn)
     // ------------------------------------------------------------
     private fun computeMotorOutputs() {
@@ -93,18 +158,23 @@ class TankViewModel {
         val forward = dirY * speedCurrent
         val turn = dirX * speedCurrent
 
-        val left = (forward + turn).toInt()
-        val right = (forward - turn).toInt()
+        val left = (forward + turn).toInt().coerceIn(-100, 100)
+        val right = (forward - turn).toInt().coerceIn(-100, 100)
 
         sendToTank(left, right)
     }
 
     // ------------------------------------------------------------
-    // SEND TO TANK (replace with your WiFi/UDP logic)
+    // SEND TO TANK — firmware parses "L<val> R<val>\n" on port 9000
     // ------------------------------------------------------------
     private fun sendToTank(left: Int, right: Int) {
-        // TODO: Insert your socket/UDP/WiFi send logic here
-        // Example:
-        // tankSocket.send("$left,$right")
+        wifi.send(formatTankCommand(left, right))
+
+        if (isRecording) {
+            val now = System.currentTimeMillis()
+            val dt = (now - lastSampleMs) / 1000.0
+            lastSampleMs = now
+            if (dt > 0) odometry.sample(left, right, dt)
+        }
     }
 }

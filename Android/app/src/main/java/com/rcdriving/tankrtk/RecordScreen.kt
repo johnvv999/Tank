@@ -15,7 +15,9 @@ fun RecordScreen(
     viewModel: TankViewModel,
     connected: Boolean,
     onMain: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    onRecord: () -> Unit,
+
 ) {
     MetalPanel(
         modifier = Modifier

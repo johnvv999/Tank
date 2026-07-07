@@ -15,9 +15,10 @@ import androidx.compose.ui.unit.sp
 enum class TopTab { MAIN, RECORD, SETTINGS }
 
 @Composable
-fun TopStrip(
+fun TopBar(
     connected: Boolean,
     selectedTab: TopTab,
+    signalStrength: Int,
     onMain: () -> Unit,
     onRecord: () -> Unit,
     onSettings: () -> Unit
@@ -31,23 +32,27 @@ fun TopStrip(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        // ------------------------------------------------------------
-        // CONNECTION INDICATOR (matches reference image)
-        // ------------------------------------------------------------
-        val color = if (connected) Color(0xFF00FF6A) else Color(0xFFFF4A4A)
-        val label = if (connected) "CONNECTED" else "DISCONNECTED"
-
-        Text(
-            text = label,
-            color = color,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+        // LEFT SIDE: Connection + Signal Strength
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(start = 20.dp)
-        )
+        ) {
+            val color = if (connected) Color(0xFF00FF6A) else Color(0xFFFF4A4A)
+            val label = if (connected) "CONNECTED" else "DISCONNECTED"
 
-        // ------------------------------------------------------------
-        // TAB BUTTONS (MAIN / RECORD / SETTINGS)
-        // ------------------------------------------------------------
+            Text(
+                text = label,
+                color = color,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            // ⭐ NEW: Signal Strength Meter
+            SignalStrengthMeter(signalStrength)
+        }
+
+        // RIGHT SIDE: Tabs
         Row(
             horizontalArrangement = Arrangement.spacedBy(30.dp),
             verticalAlignment = Alignment.CenterVertically,

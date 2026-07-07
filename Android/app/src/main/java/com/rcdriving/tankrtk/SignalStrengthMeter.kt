@@ -10,14 +10,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SignalStrengthMeter(level: Int) {
-    // level = 0–4 bars
-
     val barColor = when (level) {
-        0 -> Color(0xFFFF4A4A)   // red
-        1 -> Color(0xFFFFA64A)   // orange
-        2 -> Color(0xFFFFE14A)   // yellow
-        3 -> Color(0xFF7CFF4A)   // light green
-        else -> Color(0xFF00FF6A) // strong green
+        0 -> Color(0xFFFF4A4A)
+        1 -> Color(0xFFFFA64A)
+        2 -> Color(0xFFFFE14A)
+        3 -> Color(0xFF7CFF4A)
+        else -> Color(0xFF00FF6A)
     }
 
     Row(
