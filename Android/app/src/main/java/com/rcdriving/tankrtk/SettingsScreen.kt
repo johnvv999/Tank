@@ -50,9 +50,10 @@ fun SettingsScreen(
         val maxVal = maxSpeedText.toIntOrNull() ?: viewModel.speedMax
         viewModel.setSpeedRange(minVal, maxVal)
 
-        // setSpeedRange clamps to 0-100 (100 = full motor power, so
-        // there's no such thing as "200"). Without this, the text field
-        // kept showing whatever was typed (e.g. "200") until the screen
+        // setSpeedRange clamps to 0-255 (Min/Max are raw PWM values sent
+        // straight to the motor drivers — 255 is the hardware's absolute
+        // ceiling, so there's no such thing as "300"). Without this, the
+        // text field kept showing whatever was typed until the screen
         // was left and re-entered, which made the clamp look like a
         // delayed, unexplained reset. Syncing here shows the real,
         // clamped value immediately instead.

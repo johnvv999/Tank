@@ -6,6 +6,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
 fun TankDriveScreen(
@@ -16,9 +17,30 @@ fun TankDriveScreen(
     onSettings: () -> Unit
 ) {
     // Full device screen height (not just this row's local height) — used
-    // to shift the joystick up by a fixed 10% of the whole screen.
+    // to shift the joystick (and now the spin arrows above it) up by a
+    // fixed fraction of the whole screen. Raised from 0.10 to 0.16 to
+    // move the whole joystick/arrows block further up the screen.
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val joystickUpwardOffset = screenHeight * 0.10f
+    val joystickUpwardOffset = screenHeight * 0.16f
+
+    // How far outside the joystick's rim each arrow sits horizontally
+    // (measured at the height where the arrow overlaps the joystick —
+    // see overlapDepth/chordHalfWidth below), so the arrow traces just
+    // outside the joystick's curve instead of touching/covering it.
+    val arrowJoystickGap = 10.dp
+
+    // Flash the current speed setting on the main display for 1 second
+    // after every +/- press, even if the joystick is centered (where the
+    // display would otherwise just show 0). Re-keying on
+    // speedChangeTrigger means a fresh press restarts the 1-second
+    // window instead of letting an in-flight one cut it short.
+    LaunchedEffect(viewModel.speedChangeTrigger) {
+        if (viewModel.speedChangeTrigger > 0) {
+            viewModel.showSpeedSetting = true
+            delay(1000)
+            viewModel.showSpeedSetting = false
+        }
+    }
 
     MetalPanel(
         modifier = Modifier.fillMaxSize()
@@ -87,6 +109,28 @@ fun TankDriveScreen(
                 // layout slot.
                 val buttonDisplaySize = buttonSize * 2f
 
+                // To read as concentric rings hugging the joystick's rim,
+                // the arrows need to dip DOWN past the joystick's topmost
+                // point and sit right along its curve, not float above it.
+                // overlapDepth is how far below that top point the arrow's
+                // bottom edge sits; at that height the joystick's circle
+                // has a certain half-width (basic circle geometry — a
+                // chord at distance (radius - overlapDepth) from center),
+                // and placing the arrow just outside that half-width is
+                // what makes it trace the same curve outward, concentric
+                // with the joystick instead of just floating nearby.
+                val joystickRadius = joystickDisplaySize / 2
+                val joystickTopY = -(joystickUpwardOffset + joystickDisplaySize)
+                val overlapDepth = joystickRadius * 0.3f
+                val heightFromCenter = joystickRadius - overlapDepth
+                val chordHalfWidthValue = kotlin.math.sqrt(
+                    joystickRadius.value * joystickRadius.value - heightFromCenter.value * heightFromCenter.value
+                )
+                val chordHalfWidth = chordHalfWidthValue.dp
+
+                val arrowBottomY = joystickTopY + overlapDepth
+                val arrowXOffset = chordHalfWidth + arrowJoystickGap
+
                 Row(
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -114,15 +158,48 @@ fun TankDriveScreen(
                         )
                     }
 
-                    MetalJoystickBase(
-                        size = joystickDisplaySize,
-                        modifier = Modifier.offset(y = -joystickUpwardOffset)
+                    // Spin arrows + joystick, all sharing one center point.
+                    // Each is independently positioned via BottomCenter +
+                    // an explicit offset (rather than being stacked in an
+                    // auto-sized Column) so the joystick's bottom edge is
+                    // computed exactly the same way as the +/- stack's —
+                    // guaranteed to line up — while the arrows orbit that
+                    // same center at a fixed radius.
+                    Box(
+                        modifier = Modifier.fillMaxHeight()
                     ) {
-                        Joystick(
-                            size = joystickDisplaySize * 0.5f,
-                            onMove = { normX, normY ->
-                                viewModel.updateJoystick(normX, normY)
-                            }
+                        MetalJoystickBase(
+                            size = joystickDisplaySize,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = -joystickUpwardOffset)
+                        ) {
+                            Joystick(
+                                size = joystickDisplaySize * 0.5f,
+                                onMove = { normX, normY ->
+                                    viewModel.updateJoystick(normX, normY)
+                                }
+                            )
+                        }
+
+                        SpinArrowButton(
+                            clockwise = false,
+                            onPressStart = { viewModel.startSpin(clockwise = false) },
+                            onPressEnd = { viewModel.stopSpin() },
+                            size = buttonDisplaySize,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(x = -arrowXOffset, y = arrowBottomY)
+                        )
+
+                        SpinArrowButton(
+                            clockwise = true,
+                            onPressStart = { viewModel.startSpin(clockwise = true) },
+                            onPressEnd = { viewModel.stopSpin() },
+                            size = buttonDisplaySize,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(x = arrowXOffset, y = arrowBottomY)
                         )
                     }
                 }

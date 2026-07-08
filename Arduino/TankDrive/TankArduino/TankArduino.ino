@@ -214,9 +214,10 @@ void checkWatchdog() {
 //  TCP command parsing
 //
 //  Expected line format (matches TankViewModel.kt / formatTankCommand):
-//    "L<val> R<val>\n"   e.g.  "L0 R0\n"  or  "L-60 R80\n"
-//  <val> is a signed PERCENT value in range -100..100 (the app's
-//  arcade-mix output), scaled up to PWM range in percentToPwm() below.
+//    "L<val> R<val>\n"   e.g.  "L0 R0\n"  or  "L-180 R220\n"
+//  <val> is a signed raw PWM value in range -255..255 — the app's
+//  Min/Max speed settings are PWM values directly (see TankViewModel.kt's
+//  speedMin/speedMax), so no scaling happens here, just a clamp.
 // ============================================================
 void readTcpCommands() {
   if (!cmdClient || !cmdClient.connected()) return;
@@ -253,27 +254,17 @@ void parseCommandLine(const char* line) {
     return;
   }
 
-  // The app sends percent values (-100..+100 — see TankViewModel.kt's
-  // computeMotorOutputs, which clamps to that range), not raw PWM. Scale
-  // up to the full -255..+255 PWM range here so "100%" actually reaches
-  // full motor power. Without this scaling, every command topped out at
-  // ~39% duty cycle (100/255) — fine for driving straight, but weak
-  // enough that a diagonal turn's already-reduced inner-track value
-  // (e.g. ~37% of that already-capped range) could drop below the
-  // motors' real-world stall torque and barely move at all.
-  int16_t lPercent = (int16_t)atoi(lp + 1);
-  int16_t rPercent = (int16_t)atoi(rp + 1);
+  // The app's Min/Max speed settings are raw PWM values directly (see
+  // TankViewModel.kt's speedMin/speedMax, defaults 30-250), so the L/R
+  // values received here are already in PWM units — no scaling needed,
+  // just parse and hand off to the motors (which clamp to ±255 on their
+  // own via setLeftMotor/setRightMotor's constrain() call).
+  int16_t l = (int16_t)atoi(lp + 1);
+  int16_t r = (int16_t)atoi(rp + 1);
 
-  setLeftMotor(percentToPwm(lPercent));
-  setRightMotor(percentToPwm(rPercent));
+  setLeftMotor(l);
+  setRightMotor(r);
   lastCmdMs = millis();
-}
-
-// Converts a -100..+100 percent command from the app into a -255..+255
-// PWM value for the motor drivers.
-int16_t percentToPwm(int16_t percent) {
-  int32_t pwm = ((int32_t)percent * PWM_MAX) / 100;
-  return (int16_t)constrain(pwm, -PWM_MAX, PWM_MAX);
 }
 
 // ============================================================

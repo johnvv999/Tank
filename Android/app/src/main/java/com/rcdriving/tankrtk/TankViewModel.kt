@@ -18,41 +18,69 @@ class TankViewModel {
     }
 
     // ------------------------------------------------------------
-    // SPEED RANGE (0–100%)
+    // SPEED RANGE — Min/Max are raw PWM values sent straight to the
+    // motor drivers (0-255 hardware ceiling), not a percentage; the
+    // firmware no longer rescales incoming L/R values, it just clamps
+    // them to ±255 (see TankArduino.ino's setLeftMotor/setRightMotor).
+    // Defaults: 0 to 250 (just under the hardware's absolute 255 max).
     // ------------------------------------------------------------
     var speedMin by mutableStateOf(0)
-    var speedMax by mutableStateOf(100)
-    var speedCurrent by mutableStateOf(0)
+    var speedMax by mutableStateOf(250)
+
+    // The throttle "dial" is a step index (0..SPEED_STEPS), not a raw
+    // value — every +/- press moves exactly one step, i.e. exactly 10%
+    // of (speedMax - speedMin), and the main-screen display always
+    // reads a clean multiple of 10%. Deriving both the actual PWM-scale
+    // value AND the displayed percent from this same integer index
+    // guarantees they can never drift out of sync with each other via
+    // rounding, the way separately-tracked values could.
+    private val SPEED_STEPS = 10
+    var speedStepIndex by mutableStateOf(0)
+        private set
+
+    // The actual value fed into motor mixing, in speedMin..speedMax.
+    val speedCurrent: Int
+        get() = speedMin + ((speedMax - speedMin) * speedStepIndex) / SPEED_STEPS
 
     fun setSpeedRange(min: Int, max: Int) {
-        speedMin = min.coerceIn(0, 100)
-        speedMax = max.coerceIn(0, 100)
-        speedCurrent = speedCurrent.coerceIn(speedMin, speedMax)
+        speedMin = min.coerceIn(0, 255)
+        speedMax = max.coerceIn(0, 255)
+        speedStepIndex = speedStepIndex.coerceIn(0, SPEED_STEPS)
     }
 
+    // Bumped on every +/- press — TankDriveScreen watches this to flash
+    // the new setting on the main-screen display for 1 second, even if
+    // the joystick isn't currently being driven.
+    var speedChangeTrigger by mutableStateOf(0)
+        private set
+
     fun increaseSpeed() {
-        speedCurrent = (speedCurrent + 5).coerceIn(speedMin, speedMax)
+        speedStepIndex = (speedStepIndex + 1).coerceIn(0, SPEED_STEPS)
+        speedChangeTrigger++
         computeMotorOutputs()
     }
 
     fun decreaseSpeed() {
-        speedCurrent = (speedCurrent - 5).coerceIn(speedMin, speedMax)
+        speedStepIndex = (speedStepIndex - 1).coerceIn(0, SPEED_STEPS)
+        speedChangeTrigger++
         computeMotorOutputs()
     }
 
-    // speedCurrent is the throttle "dial" (persists whether or not the
-    // joystick is touched, since it's set separately via +/-). What the
-    // main screen should actually show is: 0 whenever the joystick is
-    // centered (nothing being commanded right now), and otherwise
-    // speedCurrent expressed as a percentage of the configured min-max
-    // range — i.e. speedMin reads as 0%, speedMax reads as 100%, not
-    // speedCurrent's raw absolute value.
+    // Set by TankDriveScreen for 1 second after a +/- press, so the
+    // speed setting is visible even while the joystick is centered.
+    var showSpeedSetting by mutableStateOf(false)
+
+    // speedStepIndex is the throttle "dial" (persists whether or not the
+    // joystick is touched, since it's set separately via +/-). Normally
+    // the main screen shows 0 whenever the joystick is centered (nothing
+    // being commanded right now) and otherwise the dial's percent — but
+    // right after a +/- press, showSpeedSetting overrides that so the
+    // new setting is visible for a moment regardless of joystick state.
     val speedPercentDisplay: Int
         get() {
             val touching = joystickX != 0f || joystickY != 0f
-            if (!touching) return 0
-            val range = (speedMax - speedMin).coerceAtLeast(1)
-            return (((speedCurrent - speedMin) * 100) / range).coerceIn(0, 100)
+            if (!touching && !showSpeedSetting) return 0
+            return speedStepIndex * 10
         }
 
     // ------------------------------------------------------------
@@ -153,21 +181,66 @@ class TankViewModel {
     // STOP
     // ------------------------------------------------------------
     fun stopMotors() {
-        speedCurrent = speedMin
+        speedStepIndex = 0
         joystickX = 0f
         joystickY = 0f
         sendToTank(0, 0)
     }
 
     // ------------------------------------------------------------
+    // SPIN-IN-PLACE — driven only by the dedicated spin-arrow buttons,
+    // completely separate from joystick state/computeMotorOutputs. This
+    // is the ONLY way to make both treads spin in opposite directions;
+    // the joystick itself can never do this (see computeMotorOutputs'
+    // no-spin cap below).
+    // ------------------------------------------------------------
+    fun startSpin(clockwise: Boolean) {
+        val magnitude = speedCurrent
+        val left  = if (clockwise) magnitude else -magnitude
+        val right = if (clockwise) -magnitude else magnitude
+        sendToTank(left.coerceIn(-255, 255), right.coerceIn(-255, 255))
+    }
+
+    fun stopSpin() {
+        sendToTank(0, 0)
+    }
+
+    // ------------------------------------------------------------
     // MOTOR MIXING (arcade drive: throttle ± steering ± trim)
+    // Clamped to ±255 now that speedCurrent is a raw PWM-scale value
+    // (was ±100 back when it was a percent).
+    //
+    // Steering can never create a spin on its own: steer is capped to
+    // the current throttle's magnitude, so left/right always share
+    // throttle's sign (or are both zero) — pushing the stick straight
+    // sideways with no forward/back component produces no movement at
+    // all, rather than a pivot. That's intentional: spinning in place
+    // is only available via startSpin()/the dedicated arrow buttons.
+    //
+    // Only once the stick is more than 10% off straight forward/back
+    // (|joystickX| > 0.1 — a small dead band around dead-straight) does
+    // the minimum-gap rule below kick in. That, plus enough throttle to
+    // allow it without breaking the no-spin cap, pushes left and right
+    // to differ by at least 10 (diff = 2*steer, so steer's magnitude
+    // needs to be at least 5) so a deliberate turn always produces a
+    // perceptible difference between the two treads rather than two
+    // nearly-identical values. Within that 10% band, or dead straight,
+    // left and right are free to be equal.
     // ------------------------------------------------------------
     private fun computeMotorOutputs() {
         val throttle = joystickY * speedCurrent
-        val steer    = joystickX * speedCurrent
+        val throttleMag = kotlin.math.abs(throttle)
 
-        val left  = (throttle + steer + trim).toInt().coerceIn(-100, 100)
-        val right = (throttle - steer - trim).toInt().coerceIn(-100, 100)
+        var steer = (joystickX * speedCurrent).coerceIn(-throttleMag, throttleMag)
+
+        val steerDeadBand = 0.1f
+        val minSteerMagnitude = 5f
+        if (kotlin.math.abs(joystickX) > steerDeadBand && throttleMag >= minSteerMagnitude) {
+            steer = if (steer >= 0f) steer.coerceAtLeast(minSteerMagnitude) else steer.coerceAtMost(-minSteerMagnitude)
+        }
+
+        val left  = (throttle + steer + trim).toInt().coerceIn(-255, 255)
+        val right = (throttle - steer - trim).toInt().coerceIn(-255, 255)
 
         sendToTank(left, right)
     }
