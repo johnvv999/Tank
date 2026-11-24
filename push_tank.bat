@@ -1,5 +1,5 @@
 @echo off
-cd /d E:\Tank
+cd /d E:\Projects\Tank_Working
 git add .
 set /p msg="Commit message: "
 git commit -m "%msg%"
