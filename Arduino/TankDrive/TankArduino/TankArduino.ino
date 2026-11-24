@@ -51,6 +51,25 @@ const uint8_t PWM_MIN   = 0;
 const uint8_t PWM_MAX   = 255;
 const uint8_t PWM_DEADBAND = 10;  // below this → coast
 
+// ── Motor power cap (battery vs motor voltage) ───────────────
+//   The tank runs on a Ryobi 18 V pack (~20 V fully charged), but the
+//   chassis DC motors are rated ~12 V. The IBT-2 passes the battery
+//   voltage straight through, so the average motor voltage is roughly
+//   battery V x (PWM / 255). Capping PWM at 153 gives ~12 V from a
+//   full 20 V pack.
+//
+//   The full command range from the app (-255..+255) is SCALED into
+//   -MOTOR_PWM_LIMIT..+MOTOR_PWM_LIMIT, so the whole joystick travel
+//   still gives smooth control; full stick = the cap, not a clip.
+//
+//   To change the cap, edit MOTOR_PWM_LIMIT (1..255):
+//     255 = no cap (full battery voltage)
+//     153 = ~60 %  (~12 V from 20 V)  <- default
+//     128 = ~50 %  (~10 V from 20 V)
+const uint8_t MOTOR_PWM_LIMIT = 153;
+static_assert(MOTOR_PWM_LIMIT > 0 && MOTOR_PWM_LIMIT <= 255,
+              "MOTOR_PWM_LIMIT must be 1..255");
+
 // ── Safety watchdog ──────────────────────────────────────────
 const uint32_t CMD_TIMEOUT_MS = 500;   // stop if no command for 500 ms
 uint32_t lastCmdMs = 0;
@@ -154,18 +173,26 @@ void setRightMotor(int16_t speed) {
   applyIBT2(RIGHT_RPWM, RIGHT_LPWM, rightSpeed);
 }
 
+// Scale a commanded speed (-255..255) into -MOTOR_PWM_LIMIT..MOTOR_PWM_LIMIT.
+int16_t scaleToMotorLimit(int16_t speed) {
+  return (int16_t)(((int32_t)speed * MOTOR_PWM_LIMIT) / PWM_MAX);
+}
+
+// speed is the commanded value (-255..255); the deadband is checked on
+// the command, then the value is scaled down to the motor power cap.
 void applyIBT2(uint8_t rpwm, uint8_t lpwm, int16_t speed) {
   if (abs(speed) < PWM_DEADBAND) {
     analogWrite(rpwm, 0);
     analogWrite(lpwm, 0);
     return;
   }
-  if (speed > 0) {
-    analogWrite(rpwm, (uint8_t)speed);
+  int16_t out = scaleToMotorLimit(speed);
+  if (out > 0) {
+    analogWrite(rpwm, (uint8_t)out);
     analogWrite(lpwm, 0);
   } else {
     analogWrite(rpwm, 0);
-    analogWrite(lpwm, (uint8_t)(-speed));
+    analogWrite(lpwm, (uint8_t)(-out));
   }
 }
 
@@ -217,7 +244,8 @@ void checkWatchdog() {
 //    "L<val> R<val>\n"   e.g.  "L0 R0\n"  or  "L-180 R220\n"
 //  <val> is a signed raw PWM value in range -255..255 — the app's
 //  Min/Max speed settings are PWM values directly (see TankViewModel.kt's
-//  speedMin/speedMax), so no scaling happens here, just a clamp.
+//  speedMin/speedMax). Here it is only clamped; applyIBT2() then scales
+//  it down to MOTOR_PWM_LIMIT for the 18 V battery.
 // ============================================================
 void readTcpCommands() {
   if (!cmdClient || !cmdClient.connected()) return;
@@ -256,9 +284,9 @@ void parseCommandLine(const char* line) {
 
   // The app's Min/Max speed settings are raw PWM values directly (see
   // TankViewModel.kt's speedMin/speedMax, defaults 30-250), so the L/R
-  // values received here are already in PWM units — no scaling needed,
-  // just parse and hand off to the motors (which clamp to ±255 on their
-  // own via setLeftMotor/setRightMotor's constrain() call).
+  // values received here are already in PWM units. Parse and hand off to
+  // the motors, which clamp to ±255 (setLeftMotor/setRightMotor) and then
+  // scale down to MOTOR_PWM_LIMIT (applyIBT2).
   int16_t l = (int16_t)atoi(lp + 1);
   int16_t r = (int16_t)atoi(rp + 1);
 
