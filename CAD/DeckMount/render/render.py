@@ -32,6 +32,11 @@ M = {
  "uno": mat("pcb_teal", (0.0, 0.32, 0.36), 0.35),
  "uno_parts": mat("chrome", (0.8, 0.8, 0.82), 0.2, 1.0),
  "gps": mat("pcb_red2", (0.55, 0.03, 0.03), 0.4),
+ "h_hitch": mat("hitch", (0.035, 0.037, 0.042), 0.42, coat=0.15),
+ "h_servo": mat("servo", (0.02, 0.02, 0.02), 0.5),
+ "h_links": mat("steel", (0.7, 0.71, 0.73), 0.3, 1.0),
+ "h_tool": mat("tool", (0.05, 0.053, 0.06), 0.45, coat=0.15),
+ "h_trailer": mat("trailer", (0.12, 0.3, 0.08), 0.5),
  "lead_red": mat("lead_r", (0.6, 0.02, 0.02), 0.45),
  "lead_black": mat("lead_k", (0.02, 0.02, 0.02), 0.45),
 }
@@ -70,10 +75,12 @@ r = area((0.1, 0.7, 0.5), 7, 0.5, (0,0,0)); aim(r, tgt)
 views = {"front34": ((-0.42, -0.42, 0.28), (0.07, 0.06, 0.03)),
          "rear34": ((0.55, 0.45, 0.3), (0.07, 0.06, 0.04)),
          "side":   ((0.07, -0.62, 0.18), (0.07, 0.06, 0.05)),
-         "swap":   ((-0.5, -0.56, 0.5), (0.07, 0.06, 0.15))}
+         "swap":   ((-0.5, -0.56, 0.5), (0.07, 0.06, 0.15)),
+         "hitch":  ((0.74, -0.50, 0.22), (0.21, 0.06, -0.01)),
+         "trailer": ((1.05, -0.85, 0.55), (0.30, 0.06, -0.04))}
 loc, t = views[view]
 bpy.ops.object.camera_add(location=loc); cam = bpy.context.object; aim(cam, t)
-cam.data.lens = 50 if view != "swap" else 42; sc.camera = cam
+cam.data.lens = {"swap": 42, "trailer": 40}.get(view, 50); sc.camera = cam
 cam.data.dof.use_dof = True; cam.data.dof.focus_distance = (Vector(loc) - Vector(t)).length; cam.data.dof.aperture_fstop = 8
 sc.render.filepath = out
 bpy.ops.render.render(write_still=True)

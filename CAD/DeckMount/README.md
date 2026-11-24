@@ -34,6 +34,39 @@ The chassis, tracks, battery and boards in the renders are stand-ins for context
 
 Reverse to refit. The hood's two lips drop into seats on the front and rear covers, which is what holds the covers down.
 
+## Rear hitch (trailers and the sand rake)
+
+![](images/09_hitch_rake_down.png)
+
+| | |
+|---|---|
+| ![](images/10_hitch_rake_up.png) | ![](images/11_hitch_trailer.png) |
+
+Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by pulling 3 pins:
+
+- **Two lower pins** (M4 x 30 with R-clips) at the back of the hitch head, 60 mm apart. A tool or a trailer drawbar hangs on them and can pivot up and down.
+- **One lift point.** A DS3235 servo (35 kg·cm, metal gear) lies in the hitch head and swings a lift arm. A short link pins from the arm to the tool's mast.
+- **Sand rake:** 230 mm wide, 4 mm tines 28 mm long. It runs from 8° deeper than resting down to 28° raised, where the tines are about 25 mm clear of the ground, for turns. The servo sets the depth. At full drag (about 20 N, which is about all the tracks can pull) it needs about half the servo's torque.
+- **Trailer:** the drawbar hangs on the same two pins and is held level by the link. A 6 mm vertical swivel pin at its back end takes the trailer's tongue eye. The mower trailer in the render is a stand-in.
+
+**Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 16 go down through the cradle floor, the rear tray's tongue and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
+
+**Servo cable:** it runs from the servo pocket in a channel along the top of the beam, which the rear tray floor closes. It then comes up through the rear tray's wire slot to the UNO (D3). No wire shows.
+
+| STL | Qty | Notes |
+|---|---|---|
+| `hitch_hitch.stl` | 1 | Clamp, beam and head in one piece, printed upright (flat bottom). The clamp wings have 45° undersides. Use 6 walls and 40% infill |
+| `hitch_lid.stl` | 1 | Servo pocket lid, 2x M3 |
+| `hitch_lift_arm.stl` | 1 | Bolts to the servo's round metal horn |
+| `hitch_link.stl` | 1 | Arm to tool mast, M4 pins |
+| `hitch_rake_frame.stl`, `hitch_rake_bar.stl` | 1 each | Rake. The bar prints tines-up. Join them with 2x M3 |
+| `hitch_drawbar.stl` | 1 | Trailer adapter |
+
+**Check before printing the hitch:**
+- The position of the plate's rear slots. I traced them from the photo at about 11 mm in from the rear edge.
+- That nothing on the chassis sits under the plate's rear edge, or directly behind it below the rear tray, down to 30 mm below the plate.
+- The plate thickness. I assumed 2 mm.
+
 ## Wire routing (only the adapter's leads show)
 
 - **Adapter leads** come out of the top of the adapter. They loop over and drop down inside the hood's tower, which has a 12 mm gap in front of the adapter for them. Inside, they cross the battery top to a side lane and run forward to the IBT-2s. Because the leads sit inside the tower opening, the hood still lifts straight off over them, and you don't unplug anything to change the battery. Leave about 150 mm of slack so the adapter can be set beside the tank.
@@ -122,7 +155,7 @@ Every dimension is a named variable at the top of `tank_deck_mount.scad`:
 openscad -D 'part="front_tray"' -o stl/deck_mount_front_tray.stl tank_deck_mount.scad
 ```
 
-`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover` or `rear_cover`. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
+`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover` or `rear_cover`. In `hitch.scad` it can be `hitch`, `lid`, `lift_arm`, `link`, `rake_frame`, `rake_bar`, `drawbar` or `hitch_asm`, plus `tool` and `rake_lift` for the pictures. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
 
 Realistic renders: `render/parts.scad` exports the scene meshes, and `render/render.py` renders them with Blender's Python module (`pip install bpy`):
 

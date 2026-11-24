@@ -42,6 +42,11 @@ plate_r  = 4;
 // 140 x 120 outline. APPROXIMATE: measure and correct before printing.
 hole_x   = [12.0, 128.2];
 hole_y   = [7.0, 112.9];
+// Rear hitch (hitch.scad) bolts up through the plate's two long rear slots
+// (traced from the scan: about 11 mm in from the rear edge). APPROXIMATE.
+hitch_bolt_x = 131;
+hitch_bolt_y = [26, 48, 72, 94];
+m3_csk = 6.4;      // countersunk M3 head
 
 /* ---------- battery + adapter ---------- */
 bat_L = 135; bat_W = 80;          // P108 footprint (Archive/Battery+VR.f3d)
@@ -120,6 +125,11 @@ module base() {
             translate([lap_L + 6, y, -1]) rrect(plate_L - 2*lap_L - 12, bay_y0 - wall_t - 8, 2, floor_t + 2);
         // corner screws
         for (x = hole_x, y = hole_y) translate([x, y, -1]) cylinder(d = m3, h = floor_t + 2);
+        // rear hitch bolts: countersunk flush, the battery stands on them
+        for (y = hitch_bolt_y) translate([hitch_bolt_x, y, -1]) {
+            cylinder(d = m3, h = floor_t + 2);
+            translate([0, 0, floor_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
+        }
         // finger scoops in the side walls to grip the battery
         for (y = [bay_y0 - wall_t - 1, bay_y0 + bay_W - 1])
             translate([plate_L/2, y, wall_h]) rotate([-90, 0, 0]) cylinder(d = 34, h = wall_t + 2);
@@ -226,7 +236,13 @@ module rear_tray_unmirrored() {
                 radial_standoff(p, [gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2], 7);
         }
         for (p = uno_pts()) translate([p[0], p[1], -1]) cylinder(d = m3, h = tray_t + standoff_h + 2);
-        // wire pass-through between the UNO and the GPS
+        // rear hitch: bolts through the tongue, and two countersunk M3 that tie the tray floor to the hitch beam
+        for (y = hitch_bolt_y) translate([plate_L - hitch_bolt_x, y, -1]) cylinder(d = m3, h = lap_t + 2);
+        for (x = [-20, -60]) translate([x, 62.5, -1]) {
+            cylinder(d = m3, h = tray_t + 2);
+            translate([0, 0, tray_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
+        }
+        // wire pass-through between the UNO and the GPS (the hitch servo cable comes up here too)
         translate([-10, plate_W/2, -1]) rotate([0, 0, 90]) slot(30, 7, tray_t + 2);
         for (p = sq_holes(gps_pos, gps_board, gps_holes))
             radial_slot(p, [gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2]);
