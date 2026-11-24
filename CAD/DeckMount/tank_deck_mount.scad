@@ -87,6 +87,10 @@ rim_r    = 1.2;   // tower top rim: the 2.4 mm wall can only take a 1.2 mm round
 lead_gap = 10;    // extra room in front of the adapter tower for its leads (they come out the top)
 lane_w   = 13;    // hidden wire lanes between the cradle walls and the hood sides
 hook_w   = 50;    // cover hook width
+/* ---------- GPS antenna pod on the rear cover (antenna_pod.scad) ---------- */
+ant_c    = [-62, 60];   // pod centre in rear-cover coordinates (= 62 mm behind the plate's rear edge)
+ant_exit = [-62, 86];   // cable down into the rear tray, right above the GPS board
+ant_screw_r = 44; ant_screw_a = [90, 210, 330];
 $fn = 40;
 
 bay_L  = bat_L + 2*end_clear;  bay_W = bat_W + 2*side_clear;
@@ -367,10 +371,12 @@ module rear_cover_unmirrored() {
         cover_body(rear_ovh, rear_hook_y);
         // USB-C + barrel jack window, from the bottom edge up
         translate([-rear_ovh - 1, uno_pos[1] + 1, tray_t + bump_h - 1]) cube([case_t + 2, uno_W - 2, 16]);
-        // GPS antenna cable hole (SMA bulkhead fits 6.5 mm) above the GPS board
-        translate([gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2, case_top - 5]) cylinder(d = 6.6, h = 10);
-        // vents over the UNO
-        for (i = [0:4]) translate([uno_pos[0] + uno_L/2, uno_pos[1] + 10 + i*8, case_top - 5]) slot(40, 3.2, 10);
+        // antenna cable comes down from the pod here (an SMA plug passes a 10 mm hole)
+        translate([ant_exit[0], ant_exit[1], case_top - 5]) cylinder(d = 10, h = 10);
+        // 3x M3 holding the antenna pod (nuts inside the cover)
+        for (a = ant_screw_a) translate([ant_c[0] + ant_screw_r*cos(a), ant_c[1] + ant_screw_r*sin(a), case_top - 5]) cylinder(d = m3, h = 10);
+        // vents moved to the side next to the UNO (the pod covers the top)
+        for (i = [0:5]) translate([-rear_ovh + 14 + i*9, ty0 - 1, tray_t + bump_h + 12]) cube([3.2, case_t + 2, 24]);
     }
 }
 module rear_cover() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) rear_cover_unmirrored(); }

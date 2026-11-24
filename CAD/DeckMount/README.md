@@ -67,6 +67,28 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 - That nothing on the chassis sits under the plate's rear edge, or directly behind it below the rear tray, down to 30 mm below the plate.
 - The plate thickness. I assumed 2 mm.
 
+## GPS antenna pod
+
+![](images/12_antenna_pod.png)
+
+Source: `antenna_pod.scad`. A round pod sits on top of the rear cover, held by 3x M3 with nuts inside the cover:
+
+- **Antenna:** the magnetic antenna sits on your 102 mm steel plate. A 1/4-20 x 1/2" button-head bolt comes up through the pod lid into the plate's welded nut. A 1 mm lip around the plate keeps it centred.
+- **Cord storage:** under the lid is a cup with a 40 mm hub. Wind the spare antenna cable round the hub; 40 mm is gentle enough for RG174. The cable drops through a 10 mm hole into the rear tray, right above the GPS board, so an SMA plug fits through.
+- **Lid:** twists off with a 3-lug bayonet. Turn it so the notch in its rim faces the cable coming out of the antenna. That short piece from the antenna to the notch is the only bit of antenna cable that shows.
+- **Clearances:** the pod starts 8 mm behind the hood's lip, so the hood still lifts straight off. It sits about 70 mm above the hitch, clear of the lift arm. The antenna's top is about 110 mm above the plate, below the adapter's top.
+
+| STL | Notes |
+|---|---|
+| `antenna_pod_cup.stl` | Print floor down |
+| `antenna_pod_lid.stl` | Print flat, lugs down |
+
+## Power: no DC-DC converter needed
+
+- **IBT-2:** the BTS7960 motor supply runs up to about 27 V, and the Ryobi pack is 18 V nominal, about 20 V full. Feed the IBT-2's logic VCC from the UNO's 5 V, never from the battery.
+- **UNO R4 WiFi:** VIN accepts 6 to 24 V, so it runs straight from the pack.
+- **Motors:** check their rated voltage. If they're 12 V motors, cap the PWM at about 60% in the sketch, or feed the IBT-2s from a 12 V buck converter sized for the motor current.
+
 ## Wire routing (only the adapter's leads show)
 
 - **Adapter leads** come out of the top of the adapter. They loop over and drop down inside the hood's tower, which has a 12 mm gap in front of the adapter for them. Inside, they cross the battery top to a side lane and run forward to the IBT-2s. Because the leads sit inside the tower opening, the hood still lifts straight off over them, and you don't unplug anything to change the battery. Leave about 150 mm of slack so the adapter can be set beside the tank.
@@ -94,7 +116,7 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 
 - **Hood:** located by its tower around the adapter (2.5 mm clearance) and by its own weight. It just lifts off.
 - **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
-- **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, vents, and a 6.6 mm hole above the GPS for an SMA antenna bulkhead. The hood has wire passages at both bottom ends into the trays
+- **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, side vents next to the UNO, and a 10 mm hole under the antenna pod for the antenna cable. The hood has wire passages at both bottom ends into the trays
 
 ## Parts
 
@@ -155,7 +177,7 @@ Every dimension is a named variable at the top of `tank_deck_mount.scad`:
 openscad -D 'part="front_tray"' -o stl/deck_mount_front_tray.stl tank_deck_mount.scad
 ```
 
-`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover` or `rear_cover`. In `hitch.scad` it can be `hitch`, `lid`, `lift_arm`, `link`, `rake_frame`, `rake_bar`, `drawbar` or `hitch_asm`, plus `tool` and `rake_lift` for the pictures. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
+`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover` or `rear_cover`. In `antenna_pod.scad` it can be `pod_cup`, `pod_lid` or `pod_asm`. In `hitch.scad` it can be `hitch`, `lid`, `lift_arm`, `link`, `rake_frame`, `rake_bar`, `drawbar` or `hitch_asm`, plus `tool` and `rake_lift` for the pictures. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
 
 Realistic renders: `render/parts.scad` exports the scene meshes, and `render/render.py` renders them with Blender's Python module (`pip install bpy`):
 
