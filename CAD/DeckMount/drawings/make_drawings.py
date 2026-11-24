@@ -35,13 +35,15 @@ BL, BW = 135.0, 80.0             # P108 body footprint (Archive/Battery+VR.f3d)
 TOTAL_H = 150.0                  # battery + adapter, measured by John
 AD_L, AD_W, AD_H = 84.0, 75.0, 90.0   # Power Wheel adapter (listing photo)
 BODY_H = TOTAL_H - AD_H          # battery top surface (where the adapter base sits)
-FLOOR = 3.0                      # cradle floor
+FLOOR = 4.0                      # cradle floor
 WALL, WALL_H, END_WALL, END_H = 2.4, 22.0, 1.6, 12.0
 BAY_L, BAY_W = BL + 1.5, BW + 2.0
-STANDOFF, LIP_H = 6.0, 6.0
+STANDOFF, LIP_H = 11.0, 10.0
 # trays (match tank_deck_mount.scad)
-FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 74, 116, 26.0, 1.5
-IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3 - 50)]
+FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 26.0, 2.0
+TRAY_T = 5.0
+CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 63.0, 50.0, 44 + 5 + 4.8, FLOOR + 146.0
+IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3.5), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3.5 - 50)]
 
 BLUE, GREY, ORANGE, YEL, RED = "#3b5bdb", "#868e96", "#f08c00", "#c0d000", "#e03131"
 
@@ -127,12 +129,12 @@ def fit_drawing():
     for (x, y) in IBT_POS:
         ax.add_patch(Rectangle((x, y), 50, 50, fc="#495057", ec="k", alpha=0.85))
         ax.text(x + 25, y + 25, "IBT-2\n50 x 50\nheatsink up", color="white", ha="center", va="center", fontsize=9)
-    ux, uy = PL + REAR_OVH - 3 - 68.6, ty0 + 3
+    ux, uy = PL + REAR_OVH - 6 - 68.6, ty0 + 3.5
     ax.add_patch(Rectangle((ux, uy), 68.6, 53.3, fc="#0b7285", ec="k", alpha=0.85))
     ax.text(ux + 34, uy + 26, "UNO R4 WiFi\n68.6 x 53.3", color="white", ha="center", va="center", fontsize=9)
-    ax.annotate("USB-C faces\nthe rear", xy=(PL + REAR_OVH - 3, uy + 30), xytext=(PL + REAR_OVH + 6, uy + 26),
+    ax.annotate("USB-C faces\nthe rear", xy=(PL + REAR_OVH - 6, uy + 30), xytext=(PL + REAR_OVH + 6, uy + 26),
                 fontsize=9, arrowprops=dict(arrowstyle="->", lw=0.8))
-    gx, gy = PL + REAR_OVH - 10 - 43.2, PW - ty0 - 4 - 43.2
+    gx, gy = PL + REAR_OVH - 12 - 43.2, PW - ty0 - 7 - 43.2
     ax.add_patch(Rectangle((gx, gy), 43.2, 43.2, fc=RED, ec="k", alpha=0.8))
     ax.text(gx + 21.6, gy + 21.6, "GPS\n43 x 43", color="white", ha="center", va="center", fontsize=9)
     for x in (0, PL):
@@ -162,35 +164,44 @@ def fit_drawing():
     for x0 in (0, PL - LAP_L):
         ax.add_patch(Rectangle((x0, LAP_T), LAP_L, FLOOR - LAP_T, fc=BLUE, ec="k", alpha=0.7))
     ax.add_patch(Rectangle((-FRONT_OVH, 0), FRONT_OVH + LAP_L, LAP_T, fc="#74c0fc", ec="k"))
-    ax.add_patch(Rectangle((-FRONT_OVH, LAP_T), FRONT_OVH, FLOOR - LAP_T, fc="#74c0fc", ec="k"))
+    ax.add_patch(Rectangle((-FRONT_OVH, LAP_T), FRONT_OVH, TRAY_T - LAP_T, fc="#74c0fc", ec="k"))
     ax.add_patch(Rectangle((PL - LAP_L, 0), REAR_OVH + LAP_L, LAP_T, fc="#74c0fc", ec="k"))
-    ax.add_patch(Rectangle((PL, LAP_T), REAR_OVH, FLOOR - LAP_T, fc="#74c0fc", ec="k"))
+    ax.add_patch(Rectangle((PL, LAP_T), REAR_OVH, TRAY_T - LAP_T, fc="#74c0fc", ec="k"))
     for x0, L in ((-FRONT_OVH, FRONT_OVH), (PL, REAR_OVH)):
-        ax.add_patch(Rectangle((x0, FLOOR), L, LIP_H, fc="none", ec=BLUE, lw=1, ls=":"))
+        ax.add_patch(Rectangle((x0, TRAY_T), L, LIP_H, fc="none", ec=BLUE, lw=1, ls=":"))
+    # casing outline
+    hx = [0, 0, PL / 2 - TOWER_OUT / 2, PL / 2 - TOWER_OUT / 2, PL / 2 + TOWER_OUT / 2, PL / 2 + TOWER_OUT / 2, PL, PL]
+    hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP, HOOD_TOP, CASE_TOP + SHOULDER, CASE_TOP, FLOOR]
+    ax.plot(hx, hz, color="#212529", lw=2.2)
+    for x0, x1 in ((-FRONT_OVH, 0), (PL + REAR_OVH, PL)):
+        sgn = 1 if x1 > x0 else -1
+        ax.plot([x0, x0, x0 + sgn * 6, x1], [TRAY_T + LIP_H, CASE_TOP - 6, CASE_TOP, CASE_TOP], color="#212529", lw=2.2)
+    ax.text(PL / 2 + 34, CASE_TOP + SHOULDER + 8, "casing (hood lifts off)", fontsize=9)
     ax.add_patch(Rectangle((bx0, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
     ax.add_patch(Rectangle((PL / 2 - 22, FLOOR + BODY_H + 8), 44, AD_H - 8, fc=YEL, ec="k"))
-    zb = FLOOR + STANDOFF
+    zb = TRAY_T + STANDOFF
     ax.add_patch(Rectangle((-FRONT_OVH + 6, zb), 50, 43, fc="#495057", ec="k", alpha=0.85))
     ax.text(-FRONT_OVH + 31, zb + 21, "IBT-2", color="white", ha="center", va="center", fontsize=9)
     ax.add_patch(Rectangle((PL + REAR_OVH - 71.6, zb), 68.6, 12, fc="#0b7285", ec="k", alpha=0.85))
     ax.text(PL + REAR_OVH - 37, zb + 20, "UNO + GPS", ha="center", fontsize=9)
     ax.annotate("lift straight up", xy=(PL / 2, FLOOR + TOTAL_H + 26), xytext=(PL / 2, FLOOR + TOTAL_H + 2),
                 ha="center", fontsize=10, arrowprops=dict(arrowstyle="-|>", lw=2, color="#2b8a3e"))
-    dim(ax, (PL, FLOOR), (PL, FLOOR + TOTAL_H), "150", off=10, side=-1)
+    dim(ax, (PL, FLOOR), (PL, FLOOR + TOTAL_H), "150", off=26, side=-1)
     dim(ax, (-FRONT_OVH, zb), (-FRONT_OVH, zb + 43), "≈43", off=8, fs=9)
-    ax.text(PL / 2, -14, "tray tongue (1.5) slides under the cradle's stepped floor; the kit's corner screws clamp both",
+    ax.text(PL / 2, -14, "tray tongue (2) slides under the cradle's stepped floor; the kit's corner screws clamp both",
             ha="center", fontsize=9, color="#495057")
-    ax.set_title("Side view (mm), front on the left", fontsize=13, loc="left")
+    ax.set_title("Side view (mm), front on the left. Black line = casing", fontsize=13, loc="left")
     ax.set_xlim(-FRONT_OVH - 22, PL + REAR_OVH + 30); ax.set_ylim(-22, FLOOR + TOTAL_H + 34)
     ax.set_aspect("equal"); ax.axis("off")
 
     ax = fig.add_axes([0.66, 0.02, 0.33, 0.36]); ax.axis("off")
     ax.text(0, 0.98, "Balance and clearance", fontsize=13, weight="bold", va="top")
     ax.text(0, 0.88,
+            "Casing about 250 g, roughly symmetric.\n"
             "Front: 2 x IBT-2, about 130 g, centre about 100 mm\n"
             "ahead of the plate centre.\n"
-            "Rear: UNO + GPS, about 40 g, about 107 mm behind it.\n"
+            "Rear: UNO + GPS, about 40 g, about 110 mm behind it.\n"
             "Battery + adapter (about 1 kg) stay centred.\n\n"
             "The mount's centre of mass ends up about 6 to 7 mm\n"
             "ahead of the plate centre. With the motors and tracks\n"
@@ -198,7 +209,7 @@ def fit_drawing():
             "Please check on the real chassis:\n"
             "  1. Nothing sticks up past the 120 mm ends at plate\n"
             "     height (side frames, the front slope, the rear\n"
-            "     rake). The trays sit 0 to 19 mm above the plate.\n"
+            "     rake). Trays to 15 mm, covers to 67 mm.\n"
             "  2. Which 120 mm end is the front.\n"
             "  3. The corner-hole spacing (about 116 x 106).\n"
             "  4. The battery length (cradle takes up to 136.5).",
