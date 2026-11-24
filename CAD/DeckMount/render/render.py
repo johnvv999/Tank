@@ -32,6 +32,8 @@ M = {
  "uno": mat("pcb_teal", (0.0, 0.32, 0.36), 0.35),
  "uno_parts": mat("chrome", (0.8, 0.8, 0.82), 0.2, 1.0),
  "gps": mat("pcb_red2", (0.55, 0.03, 0.03), 0.4),
+ "lead_red": mat("lead_r", (0.6, 0.02, 0.02), 0.45),
+ "lead_black": mat("lead_k", (0.02, 0.02, 0.02), 0.45),
 }
 for k in M:
     p = os.path.join(src, k + ".stl")

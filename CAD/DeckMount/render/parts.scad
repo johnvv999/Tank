@@ -36,3 +36,12 @@ if (what == "ibt_sink") for (o = ibt_pos) translate([o[0] + 5, o[1] + 5, tray_t 
 if (what == "uno") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_t + standoff_h]) cube([uno_L, uno_W, 1.6]);
 if (what == "uno_parts") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_t + standoff_h + 1.6]) { translate([-1, 32, 0]) cube([8, 9, 3.3]); translate([-2, 3, 0]) cube([14, 9, 11]); translate([20, 2, 0]) cube([45, 2.5, 8.5]); translate([15, 49, 0]) cube([50, 2.5, 8.5]); }
 if (what == "gps") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([gps_pos[0], gps_pos[1], tray_t + standoff_h]) cube([gps_board, gps_board, 1.6]);
+// the adapter's leads: out of the top, a short loop, then down inside the hood in front of the adapter
+module lead(dy) {
+    zt = floor_t + bat_cap_h + cap_lift;
+    pts = [[plate_L/2 + 4, plate_W/2 + dy, zt - 2], [plate_L/2 + 2, plate_W/2 + dy, zt + 10], [plate_L/2 - 12, plate_W/2 + dy, zt + 14],
+           [plate_L/2 - 25, plate_W/2 + dy, zt + 6], [plate_L/2 - 26, plate_W/2 + dy, zt - 30], [plate_L/2 - 27, plate_W/2 + dy, floor_t + 75]];
+    for (i = [0 : len(pts) - 2]) hull() { translate(pts[i]) sphere(d = 4.5, $fn = 16); translate(pts[i + 1]) sphere(d = 4.5, $fn = 16); }
+}
+if (what == "lead_red") lead(-3);
+if (what == "lead_black") lead(3);

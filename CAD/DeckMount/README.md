@@ -22,6 +22,7 @@ The chassis, tracks, battery and boards in the renders are stand-ins for context
 
 ## Drawings
 
+![](images/08_wiring.png)
 ![](images/07_layout.png)
 ![](images/06_mounting_plate.png)
 
@@ -33,11 +34,34 @@ The chassis, tracks, battery and boards in the renders are stand-ins for context
 
 Reverse to refit. The hood's two lips drop into seats on the front and rear covers, which is what holds the covers down.
 
+## Wire routing (only the adapter's leads show)
+
+- **Adapter leads** come out of the top of the adapter. They loop over and drop down inside the hood's tower, which has a 12 mm gap in front of the adapter for them. Inside, they cross the battery top to a side lane and run forward to the IBT-2s. Because the leads sit inside the tower opening, the hood still lifts straight off over them, and you don't unplug anything to change the battery. Leave about 150 mm of slack so the adapter can be set beside the tank.
+- **Hidden side lanes:** two 13 mm channels run the length of the plate between the cradle walls and the hood's sides. Passages in both ends of the hood lead into the trays, and notches in each tray's rib let the wires pass under the boards.
+- **Motor wires** come up from the chassis through the plate's edge slots, which are under the hood, and run forward along the lanes to the IBT-2 motor terminals (left motor to the left driver).
+- **Signals** (UNO to both IBT-2s) and a thin 18 V feed to the UNO's VIN run along the right lane between the trays. The GPS wiring stays inside the rear cover.
+- The USB-C port is reached through the window in the rear cover and is only used for programming.
+
+## Rounded edges (5 mm)
+
+All outside edges of the hood, the covers and the tray bumper corners have a 5 mm radius. Exceptions, where 5 mm doesn't fit:
+
+| Where | Radius | Why |
+|---|---|---|
+| Hood tower top rim | 1.2 mm | The wall is only 2.4 mm thick |
+| Hood lip tips | 2.5 mm | The lip tip is 3 mm thick |
+| Hood bottom edge, cover bottom edges, tray wall tops | square | Mating faces, so the seams close flush |
+| Cover ends against the hood | square | Mating face with the hood's end wall |
+| Bottom edges on the print bed (trays, base, hood) | square | A radius on the bed edge would be an unsupported overhang |
+| Cover top edges, last 1.5 mm | 45° chamfer blended into the 5 mm round | The covers print top down, so this keeps the bed edge printable. It looks the same as the full round |
+| Inside corners of the shells | 2.6 mm | 5 mm outside minus the 2.4 mm wall |
+| Base cradle | 5 mm on the outside corners only | It's hidden under the hood |
+
 ## How the casing stays on
 
 - **Hood:** located by its tower around the adapter (2.5 mm clearance) and by its own weight. It just lifts off.
 - **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
-- **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, vents, and a 6.6 mm hole above the GPS for an SMA antenna bulkhead. The hood has wire passages at both bottom ends into the trays and a 16 mm slot at the back of the tower for the adapter's lead.
+- **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, vents, and a 6.6 mm hole above the GPS for an SMA antenna bulkhead. The hood has wire passages at both bottom ends into the trays
 
 ## Parts
 
@@ -65,18 +89,18 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 | P108 battery footprint | 135 x 80 mm | `Archive/Battery+VR.f3d` |
 | Battery + adapter height | 150 mm | Measured by John |
 | Power Wheel adapter | 84 x 75 mm base, 90 mm tall, 250 mm lead | Listing photo |
-| Adapter tower | 44 x 40 mm (casing opening 49 x 45) | Listing photo. **Please measure** |
+| Adapter tower | 41 x 34 mm, 90 mm above the battery, leads out the top (casing opening 56 x 39, with a 12 mm lead gap in front) | Measured by John |
 | IBT-2 | 50 x 50 board, 40 x 40 holes, about 43 tall | `Archive/MotorBox.f3d` |
 | GPS | 43.2 board, 38.1 holes (SparkFun GPS-RTK2) | `Archive/GPSBox.f3d` |
 | UNO R4 WiFi | Standard UNO pattern | Arduino datasheet |
 
 ### Check before printing
 
-1. **Clearance past the 120 mm ends.** The trays sit 0 to 15 mm above the plate, the covers reach 67 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
+1. **Clearance past the 120 mm ends.** The trays sit 0 to 15 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
 2. **Which end is the front.** The drawings assume the IBT-2s go at the front (closer to the motors). Swap the trays if not; the tongues are the same.
 3. **Corner-hole spacing.** Print the base first and test-fit it.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
-5. **Adapter tower size and where the switch and lead come out.** The hood opening is 49 x 45 mm and the lead slot is at the back of the tower.
+5. **Adapter tower orientation.** The model assumes the 41 mm side runs front to back. If it's the other way, swap `tower_L` and `tower_W`.
 
 ## Hardware
 

@@ -42,7 +42,9 @@ STANDOFF, LIP_H = 11.0, 10.0
 # trays (match tank_deck_mount.scad)
 FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 26.0, 2.0
 TRAY_T = 5.0
-CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 63.0, 50.0, 44 + 5 + 4.8, FLOOR + 146.0
+CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 50.0, 41 + 5 + 10 + 4.8, FLOOR + 146.0
+TW_CX = PL / 2 - 5           # tower opening shifted forward 5 mm: lead channel in front of the adapter
+LANE_W = 13.0
 IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3.5), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3.5 - 50)]
 
 BLUE, GREY, ORANGE, YEL, RED = "#3b5bdb", "#868e96", "#f08c00", "#c0d000", "#e03131"
@@ -170,7 +172,7 @@ def fit_drawing():
     for x0, L in ((-FRONT_OVH, FRONT_OVH), (PL, REAR_OVH)):
         ax.add_patch(Rectangle((x0, TRAY_T), L, LIP_H, fc="none", ec=BLUE, lw=1, ls=":"))
     # casing outline
-    hx = [0, 0, PL / 2 - TOWER_OUT / 2, PL / 2 - TOWER_OUT / 2, PL / 2 + TOWER_OUT / 2, PL / 2 + TOWER_OUT / 2, PL, PL]
+    hx = [0, 0, TW_CX - TOWER_OUT / 2, TW_CX - TOWER_OUT / 2, TW_CX + TOWER_OUT / 2, TW_CX + TOWER_OUT / 2, PL, PL]
     hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP, HOOD_TOP, CASE_TOP + SHOULDER, CASE_TOP, FLOOR]
     ax.plot(hx, hz, color="#212529", lw=2.2)
     for x0, x1 in ((-FRONT_OVH, 0), (PL + REAR_OVH, PL)):
@@ -179,7 +181,7 @@ def fit_drawing():
     ax.text(PL / 2 + 34, CASE_TOP + SHOULDER + 8, "casing (hood lifts off)", fontsize=9)
     ax.add_patch(Rectangle((bx0, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((PL / 2 - 22, FLOOR + BODY_H + 8), 44, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PL / 2 - 20.5, FLOOR + BODY_H + 8), 41, AD_H - 8, fc=YEL, ec="k"))
     zb = TRAY_T + STANDOFF
     ax.add_patch(Rectangle((-FRONT_OVH + 6, zb), 50, 43, fc="#495057", ec="k", alpha=0.85))
     ax.text(-FRONT_OVH + 31, zb + 21, "IBT-2", color="white", ha="center", va="center", fontsize=9)
@@ -209,7 +211,7 @@ def fit_drawing():
             "Please check on the real chassis:\n"
             "  1. Nothing sticks up past the 120 mm ends at plate\n"
             "     height (side frames, the front slope, the rear\n"
-            "     rake). Trays to 15 mm, covers to 67 mm.\n"
+            "     rake). Trays to 15 mm, covers to 69 mm.\n"
             "  2. Which 120 mm end is the front.\n"
             "  3. The corner-hole spacing (about 116 x 106).\n"
             "  4. The battery length (cradle takes up to 136.5).",
@@ -220,7 +222,111 @@ def fit_drawing():
     plt.close(fig)
 
 
+
+def wiring_drawing():
+    """Where the wires run so only the adapter's leads show outside the casing."""
+    fig = plt.figure(figsize=(17, 12))
+    ax = fig.add_axes([0.02, 0.33, 0.96, 0.6])
+    ty0 = (PW - TRAY_W) / 2
+    bx0, by0 = (PL - BL) / 2, (PW - BW) / 2
+    for x0, x1 in ((-FRONT_OVH, 0), (PL, PL + REAR_OVH)):
+        ax.add_patch(FancyBboxPatch((x0, ty0), x1 - x0, TRAY_W, boxstyle="round,pad=0,rounding_size=5",
+                                    fc="#e7f5ff", ec=BLUE, lw=1.4))
+    ax.add_patch(FancyBboxPatch((0, 0), PL, PW, boxstyle="round,pad=0,rounding_size=5", fc="#f1f3f5", ec="k", lw=1.4))
+    lanes = [(2.7, 2.7 + LANE_W), (PW - 2.7 - LANE_W, PW - 2.7)]
+    for y0, y1 in lanes:
+        ax.add_patch(Rectangle((0, y0), PL, y1 - y0, fc="#fff3bf", ec="#e8b100", lw=1, ls="--"))
+    for y in (by0 - 1 - WALL, by0 + BW + 1):
+        ax.add_patch(Rectangle((bx0 + 3, y), BAY_L - 8, WALL, fc=BLUE, ec="none", alpha=0.6))
+    ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.35))
+    ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.5))
+    ax.add_patch(Rectangle((PL / 2 - 20.5, PW / 2 - 17), 41, 34, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((TW_CX - 28, PW / 2 - 19.5), 56, 39, fc="none", ec="#212529", lw=1.6, ls=":"))
+    ax.text(PL / 2, PW / 2, "adapter\n41 x 34", ha="center", va="center", fontsize=9)
+    for (x, y) in IBT_POS:
+        ax.add_patch(Rectangle((x, y), 50, 50, fc="#495057", ec="k", alpha=0.75))
+    ax.text(-FRONT_OVH + 31, IBT_POS[0][1] + 25, "IBT-2\nleft motor", color="white", ha="center", va="center", fontsize=9)
+    ax.text(-FRONT_OVH + 31, IBT_POS[1][1] + 25, "IBT-2\nright motor", color="white", ha="center", va="center", fontsize=9)
+    ux, uy = PL + REAR_OVH - 6 - 68.6, ty0 + 3.5
+    ax.add_patch(Rectangle((ux, uy), 68.6, 53.3, fc="#0b7285", ec="k", alpha=0.75))
+    ax.text(ux + 34, uy + 26, "UNO R4", color="white", ha="center", va="center", fontsize=9)
+    gx, gy = PL + REAR_OVH - 12 - 43.2, PW - ty0 - 7 - 43.2
+    ax.add_patch(Rectangle((gx, gy), 43.2, 43.2, fc=RED, ec="k", alpha=0.6))
+    ax.text(gx + 21.6, gy + 21.6, "GPS", color="white", ha="center", va="center", fontsize=9)
+    # plate slots the motor wires come up through (approximate, from the plate scan)
+    for y in (6.0, PW - 6.0):
+        ax.add_patch(FancyBboxPatch((40, y - 1.4), 50, 2.8, boxstyle="round,pad=0,rounding_size=1.4", fc="white", ec="k", lw=0.8))
+    def path(pts, col, lw=3.2, ls="-"):
+        xs, ys = zip(*pts); ax.plot(xs, ys, color=col, lw=lw, ls=ls, solid_capstyle="round", solid_joinstyle="round")
+    PWR, MOT, SIG = "#e03131", "#f08c00", "#1c7ed6"
+    # power: adapter leads drop down in front of the adapter, cross the battery top to the left lane, forward to both IBT-2s
+    path([(TW_CX - 25, PW / 2 + 4), (TW_CX - 25, 12.5), (-8, 12.5), (-8, IBT_POS[0][1] + 12), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 12)], PWR)
+    path([(-8, 12.5), (-8, PW / 2), (-16, PW / 2), (-16, IBT_POS[1][1] + 12), (IBT_POS[1][0] + 44, IBT_POS[1][1] + 12)], PWR, lw=2.6)
+    # thin 18 V feed to the UNO VIN along the right lane
+    path([(-12, PW / 2 + 2), (-4, PW / 2 + 2), (-4, PW - 6), (PL + 10, PW - 6), (PL + 10, uy + 40), (ux + 60, uy + 40)], PWR, lw=1.6)
+    # motor wires: up through the plate slots, along the lanes, into the IBT-2 motor terminals
+    path([(65, 6.0), (65, 6.5), (-3, 6.5), (-3, IBT_POS[0][1] + 40), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 40)], MOT)
+    path([(65, PW - 6.0), (60, PW - 9.5), (-1, PW - 9.5), (-1, IBT_POS[1][1] + 40), (IBT_POS[1][0] + 44, IBT_POS[1][1] + 40)], MOT)
+    # signals: UNO pins along the right lane to both IBT-2 headers
+    path([(ux + 50, uy + 48), (PL + 6, uy + 48), (PL + 6, PW - 12.5), (-6, PW - 12.5), (-6, PW / 2 + 10), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 30)], SIG, lw=2)
+    path([(-6, PW / 2 + 10), (-6, IBT_POS[1][1] + 25), (IBT_POS[1][0] + 44, IBT_POS[1][1] + 25)], SIG, lw=2)
+    path([(ux + 20, uy + 50), (gx + 10, gy + 5)], SIG, lw=2)
+    ax.annotate("adapter leads leave its top and drop down\ninside the hood, in the 12 mm gap in front\nof the adapter (dotted = hood opening)",
+                xy=(TW_CX - 25, PW / 2 + 4), xytext=(TW_CX - 60, PW + 22), fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.annotate("hidden wire lanes under the hood\n(13 mm wide, between the cradle walls\nand the hood sides)", xy=(110, PW - 9), xytext=(150, PW + 22),
+                fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.annotate("motor wires come up from the chassis\nthrough the plate's edge slots", xy=(80, 6), xytext=(60, -30),
+                fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.annotate("lanes continue into the trays through\npassages in the hood ends and notches\nin the tray rib, under the boards", xy=(-3, 9), xytext=(-FRONT_OVH - 10, -30),
+                fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.annotate("USB-C: only for programming", xy=(PL + REAR_OVH, uy + 30), xytext=(PL + REAR_OVH + 4, uy + 8), fontsize=9,
+                arrowprops=dict(arrowstyle="->", lw=0.8))
+    from matplotlib.lines import Line2D
+    ax.legend(handles=[Line2D([], [], color=PWR, lw=3, label="18 V power (adapter leads), thin branch to UNO VIN"),
+                       Line2D([], [], color=MOT, lw=3, label="motor wires"),
+                       Line2D([], [], color=SIG, lw=2, label="signals: UNO to IBT-2s and GPS")],
+              loc="upper right", bbox_to_anchor=(1.0, 1.08), fontsize=10, frameon=False)
+    ax.set_title("Top view with the casing removed (mm). Front on the left.", fontsize=13, loc="left")
+    ax.set_xlim(-FRONT_OVH - 25, PL + REAR_OVH + 70); ax.set_ylim(-48, PW + 40); ax.set_aspect("equal"); ax.axis("off")
+
+    # side detail: the adapter leads
+    ax = fig.add_axes([0.05, 0.02, 0.45, 0.3])
+    top = FLOOR + TOTAL_H
+    ax.add_patch(Rectangle((0, FLOOR), PL, BODY_H, fc=ORANGE, ec="k", alpha=0.35))
+    ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PL / 2 - 20.5, FLOOR + BODY_H + 8), 41, AD_H - 8, fc=YEL, ec="k"))
+    hx = [0, 0, TW_CX - TOWER_OUT / 2, TW_CX - TOWER_OUT / 2]
+    hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP]
+    ax.plot(hx, hz, color="#212529", lw=2.2)
+    ax.plot([PL - x for x in hx][::-1] + [], hz[::-1], color="#212529", lw=2.2) if False else ax.plot([PL, PL, TW_CX + TOWER_OUT / 2, TW_CX + TOWER_OUT / 2], hz, color="#212529", lw=2.2)
+    lx = PL / 2 - 20.5
+    ax.plot([PL / 2 - 5, PL / 2 - 5, lx - 5, lx - 6, lx - 6, 14, 14, 14], [top - 1, top + 12, top + 12, top - 6, FLOOR + BODY_H + 12, FLOOR + BODY_H + 4, 30, FLOOR + 3],
+            color=PWR, lw=3, solid_joinstyle="round")
+    ax.text(PL / 2 + 6, top + 14, "only this loop of the adapter leads is outside", fontsize=10, color=PWR)
+    ax.text(16, 34, "down the side of the battery\ninto the wire lane", fontsize=9, color=PWR)
+    ax.text(PL + 6, CASE_TOP, "hood", fontsize=10)
+    ax.set_title("Adapter leads, side view", fontsize=12, loc="left")
+    ax.set_xlim(-10, PL + 70); ax.set_ylim(-4, top + 26); ax.set_aspect("equal"); ax.axis("off")
+
+    ax = fig.add_axes([0.55, 0.02, 0.43, 0.27]); ax.axis("off")
+    ax.text(0, 0.98, "Why it's routed this way", fontsize=13, weight="bold", va="top")
+    ax.text(0, 0.86,
+            "The adapter's leads go down inside the hood's tower, in front of the adapter.\n"
+            "So the hood still lifts straight off over the adapter and its leads, and you\n"
+            "don't have to unplug anything to change the battery.\n\n"
+            "Everything else stays inside the casing. Motor wires come up from the chassis\n"
+            "through the plate's edge slots under the hood. All runs between the trays use\n"
+            "the two hidden side lanes, and they pass under the boards in the trays.\n\n"
+            "Leave about 150 mm of slack in the adapter leads so the adapter can be set\n"
+            "beside the tank while the battery comes out.",
+            fontsize=10.5, va="top")
+    fig.suptitle("Wire routing: only the adapter's leads show outside the casing", fontsize=16, x=0.02, ha="left", y=0.995)
+    fig.savefig(os.path.join(OUT, "08_wiring.png"), dpi=110, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     plate_drawing()
     fit_drawing()
+    wiring_drawing()
     print("wrote", OUT)

@@ -20,6 +20,7 @@
 //    front/rear cover - hook under the tray bumper at the outer end, held
 //                  at the plate end by the hood's lips.
 //  Battery change: lift the hood, lift the adapter, lift the battery.
+//  The adapter's leads come out of its top, through the hood opening.
 //
 //  Render one part at a time:  openscad -D 'part="base"' -o base.stl ...
 //  part = "assembly" | "base" | "front_tray" | "rear_tray" | "hood"
@@ -69,13 +70,17 @@ gus      = 10;    // corner gussets inside the bumper
 /* ---------- casing ---------- */
 case_t   = 2.4;   // hood + cover walls
 hood_end = 1.6;   // hood end walls (between battery and plate edge)
-case_top = floor_t + bat_cap_h - cap_h + 3;   // top of covers / start of the hood shoulder
+case_top = floor_t + bat_cap_h - cap_h + 5;   // top of covers / start of the hood shoulder
 shoulder = 50;    // shoulder rise (>= 45 deg everywhere, prints without supports)
 tower_clear = 2.5;                // around the adapter's tower
-tower_L = 44; tower_W = 40;       // adapter tower (listing photo, please confirm)
+tower_L = 41; tower_W = 34;       // adapter tower, measured by John (41 along travel assumed)
 hood_top = floor_t + bat_cap_h - 4;   // top 4 mm of the adapter shows
 lip_L    = 6;     // hood lips reaching over each cover
-cham     = 6;     // chamfer on the covers' top edges
+cham     = 6;     // lip inset from the covers' long sides
+rnd      = 5;     // outside edge radius (John: "round all edges by 5mm")
+rim_r    = 1.2;   // tower top rim: the 2.4 mm wall can only take a 1.2 mm round
+lead_gap = 10;    // extra room in front of the adapter tower for its leads (they come out the top)
+lane_w   = 13;    // hidden wire lanes between the cradle walls and the hood sides
 hook_w   = 50;    // cover hook width
 $fn = 40;
 
@@ -98,7 +103,7 @@ module base() {
         union() {
             // floor: full 3 mm in the middle, upper 1.5 mm only over the laps
             intersection() {
-                rrect(plate_L, plate_W, plate_r, floor_t);
+                rrect(plate_L, plate_W, rnd, floor_t);
                 union() {
                     translate([lap_L, -1, 0]) cube([plate_L - 2*lap_L, plate_W + 2, floor_t]);
                     translate([-1, -1, lap_t]) cube([plate_L + 2, plate_W + 2, floor_t]);
@@ -188,8 +193,9 @@ module tray_body(ovh, hook_y) {
         for (y = hole_y) translate([hole_x[0], y, -1]) cylinder(d = m3, h = 5);
         // cable-tie slots near the plate edge
         for (y = [plate_W/2 - 30, plate_W/2 + 30]) translate([-9, y, tray_t/2]) ziptie_pair(tray_t + 2);
-        // wire notch through the rib
+        // wire notches through the rib: middle, and the two hidden side lanes from under the hood
         translate([-6, plate_W/2 - 8, tray_t]) cube([6, 16, rib_h + 1]);
+        for (y = [ty0 + side_t, plate_W - ty0 - side_t - lane_w + 2]) translate([-6, y, tray_t]) cube([6, lane_w - 2, rib_h + 1]);
         hook_pocket(ovh, hook_y);
     }
 }
@@ -232,75 +238,88 @@ module rear_tray() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) rear_tray_unmi
 // =====================================================================
 //  CASING
 // =====================================================================
-// hood lip profile (x <= 0 side, in the X-Z plane): 45 deg underside, prints without supports
+// hood lip profile (x <= 0 side, in the X-Z plane): 45 deg underside, rounded tip
+lip_tip_r = 2.5;
 module lip_profile(c = 0) {
-    polygon([[c, case_top - lip_L - 3 - c], [-lip_L - c, case_top - 3 - c], [-lip_L - c, case_top + 0.01], [c, case_top + 0.01]]);
+    tx = -lip_L - c;
+    polygon(concat([[c, case_top - lip_L - 3 - c], [tx, case_top - 3 - c]],
+        [for (a = [180 : -10 : 90]) [tx + lip_tip_r + lip_tip_r*cos(a), case_top - lip_tip_r + lip_tip_r*sin(a)]],
+        [[c, case_top + 0.01]]));
 }
-module lip_solid(c = 0) {   // across the flat top of the covers
-    translate([0, ty0 + cham + c*0 , 0]) rotate([90, 0, 0]) mirror([0, 0, 1])
-        linear_extrude(tray_W - 2*cham) lip_profile(c);
-}
-// the hood's outer and inner solids (centred on the plate)
-module tower_box(l, w, r, z0, h) { translate([(plate_L - l)/2, (plate_W - w)/2, z0]) rrect(l, w, r, h); }
-tw_L = tower_L + 2*tower_clear;  tw_W = tower_W + 2*tower_clear;
-module hood_outer() {
-    hull() {
-        translate([0, 0, floor_t]) rrect(plate_L, plate_W, 6, case_top - floor_t);
-        tower_box(tw_L + 2*case_t, tw_W + 2*case_t, 5, case_top + shoulder, 0.01);
+module lip_solid(c = 0) {   // across the flat top of the covers, plan corners rounded
+    y0 = ty0 + cham - c;  y1 = ty0 + tray_W - cham + c;
+    intersection() {
+        translate([0, y0, 0]) rotate([90, 0, 0]) mirror([0, 0, 1]) linear_extrude(y1 - y0) lip_profile(c);
+        translate([0, 0, case_top - 20]) linear_extrude(30) hull() {
+            for (y = [y0 + rnd, y1 - rnd]) translate([-lip_L - c + rnd, y]) circle(r = rnd);
+            translate([0, y0]) square([1, y1 - y0]);
+        }
     }
-    tower_box(tw_L + 2*case_t, tw_W + 2*case_t, 5, case_top + shoulder - 1, hood_top - case_top - shoulder + 1);
 }
-module hood_inner() {
+// hood: built from hulls of spheres and cylinders so every outside edge has a 5 mm radius
+tw_L = tower_L + 2*tower_clear + lead_gap;  tw_W = tower_W + 2*tower_clear;
+tw_cx = plate_L/2 - lead_gap/2;   // tower opening shifted forward: the leads run down in front of the adapter
+module corners(x0, x1, y0, y1) { for (x = [x0, x1], y = [y0, y1]) translate([x, y, 0]) children(); }
+module hood_shell(o) {   // o = 0 outside, 1 inside
+    r  = o ? rnd - case_t : rnd;
+    ex = o ? hood_end : 0;  ey = o ? case_t : 0;   // inside faces
+    xo = rnd;  yo = rnd;                            // sphere centres shared by inside and outside on the sides
+    xi = o ? hood_end + r : rnd;                    // ends are thinner (1.6), so the inside centres move out
+    tlx = (tw_L + 2*case_t)/2 - rnd;  tly = (tw_W + 2*case_t)/2 - rnd;   // tower centres (outside)
     hull() {
-        translate([hood_end, case_t, floor_t - 1]) rrect(plate_L - 2*hood_end, plate_W - 2*case_t, 4, case_top - floor_t - 2);
-        tower_box(tw_L, tw_W, 3, case_top + shoulder - 3, 0.01);
+        corners(xi, plate_L - xi, yo, plate_W - yo) translate([0, 0, floor_t - o]) cylinder(r = r, h = 0.01);
+        corners(xi, plate_L - xi, yo, plate_W - yo) translate([0, 0, case_top - rnd]) sphere(r = r);
+        corners(tw_cx - tlx, tw_cx + tlx, plate_W/2 - tly, plate_W/2 + tly)
+            translate([0, 0, case_top + shoulder - rnd - (o ? 2 : 0)]) sphere(r = r);
     }
-    tower_box(tw_L, tw_W, 3, case_top + shoulder - 4, 100);
+    if (o == 0) hull() {   // tower sleeve with a rounded top rim
+        corners(tw_cx - tlx, tw_cx + tlx, plate_W/2 - tly, plate_W/2 + tly) {
+            translate([0, 0, case_top + shoulder - rnd]) cylinder(r = rnd, h = hood_top - rim_r - case_top - shoulder + rnd);
+            translate([0, 0, hood_top - rim_r]) rotate_extrude($fn = 40) translate([rnd - rim_r, 0]) circle(r = rim_r, $fn = 16);
+        }
+    }
+    else translate([tw_cx - tw_L/2, plate_W/2 - tw_W/2, case_top + shoulder - 8]) rrect(tw_L, tw_W, rnd - case_t, 200);
 }
 module hood() {
     difference() {
         union() {
-            hood_outer();
+            hood_shell(0);
             // lips that reach over the front and rear covers
             lip_solid();
             translate([plate_L, 0, 0]) mirror([1, 0, 0]) lip_solid();
         }
-        hood_inner();
-        // wire passages at the bottom of each end, into the trays
-        for (x = [-1, plate_L - hood_end - 1]) translate([x, plate_W/2 - 22, floor_t - 1]) cube([hood_end + 2, 44, 13]);
-        // the adapter's lead + switch: slot at the back of the tower opening
-        translate([plate_L/2 + tw_L/2 - 1, plate_W/2 - 8, hood_top - 14]) cube([case_t + 2, 16, 15]);
+        hood_shell(1);
+        // hidden wire lanes: passages at the bottom of both ends, on both sides (between hood and cradle walls)
+        for (x = [-1, plate_L - hood_end - 1], y = [case_t + 0.3, plate_W - case_t - 0.3 - lane_w])
+            translate([x, y, floor_t - 1]) cube([hood_end + 2, lane_w, 13]);
         // decorative grooves along the sides
         for (z = [case_top - 18, case_top - 26]) for (y = [-1, plate_W - 0.8])
-            translate([12, y, z]) cube([plate_L - 24, 1.8, 1.6]);
+            translate([14, y, z]) cube([plate_L - 28, 1.8, 1.6]);
     }
 }
 
 // covers, modelled at the front (x from -ovh to 0), open toward the plate
-module cover_outer(ovh) {
+// o = 0 outside, 1 inside.  Outer end corners and the top edges have a 5 mm radius; the plate end
+// (against the hood) and the bottom edge (sits on the tray wall) stay square.
+module cover_shell(ovh, o) {
+    r  = o ? rnd - case_t : rnd;
+    zb = tray_t + bump_h - o;
+    ya = ty0 + rnd;  yb = ty0 + tray_W - rnd;
     hull() {
-        translate([-ovh, ty0, tray_t + bump_h]) {
-            rrect(12, tray_W, 5, case_top - cham - tray_t - bump_h);
-            translate([ovh - 1, 0, 0]) cube([1, tray_W, case_top - cham - tray_t - bump_h]);
-        }
-        translate([-ovh + cham, ty0 + cham, case_top - 0.01]) {
-            rrect(12, tray_W - 2*cham, 3, 0.01);
-            translate([ovh - cham - 1, 0, 0]) cube([1, tray_W - 2*cham, 0.01]);
+        corners(-ovh + rnd, -ovh + rnd, ya, yb) translate([0, 0, zb]) cylinder(r = r, h = 0.01);
+        corners(-ovh + rnd, -ovh + rnd, ya, yb) translate([0, 0, case_top - rnd]) sphere(r = r);
+        for (y = [ya, yb]) translate([-1, y, case_top - rnd]) rotate([0, 90, 0]) cylinder(r = r, h = 1 + o);
+        translate([-1, ty0 + o*case_t, zb]) cube([1 + o, tray_W - 2*o*case_t, 0.01]);
+        // covers print top down: the last 1.5 mm of each top round becomes a 45 deg chamfer (no overhang on the bed)
+        if (o == 0) {
+            t = rnd*(sqrt(2) - 1);
+            corners(-ovh + rnd, -ovh + rnd, ya, yb) translate([0, 0, case_top - 0.01]) cylinder(r = t, h = 0.01);
+            translate([-1, ya - t, case_top - 0.01]) cube([1, yb - ya + 2*t, 0.01]);
         }
     }
 }
-module cover_inner(ovh) {
-    hull() {
-        translate([-ovh + case_t, ty0 + case_t, tray_t + bump_h - 1]) {
-            rrect(12, tray_W - 2*case_t, 4, case_top - cham - tray_t - bump_h + 1);
-            translate([ovh, 0, 0]) cube([1, tray_W - 2*case_t, case_top - cham - tray_t - bump_h + 1]);
-        }
-        translate([-ovh + cham + 1, ty0 + cham + 1, case_top - case_t]) {
-            rrect(12, tray_W - 2*cham - 2, 3, 0.01);
-            translate([ovh, 0, 0]) cube([1, tray_W - 2*cham - 2, 0.01]);
-        }
-    }
-}
+module cover_outer(ovh) { cover_shell(ovh, 0); }
+module cover_inner(ovh) { cover_shell(ovh, 1); }
 module cover_body(ovh, hook_y) {
     difference() {
         union() {
@@ -350,7 +369,7 @@ module battery_ghost() {
 module cap_ghost() {
     color("yellowgreen", 0.95) translate([(plate_L - cap_L)/2, (plate_W - cap_W)/2, floor_t + bat_cap_h - cap_h]) {
         cube([cap_L, cap_W, 8]);
-        translate([cap_L/2 - 22, cap_W/2 - 20, 0]) cube([44, 40, cap_h]);
+        translate([cap_L/2 - tower_L/2, cap_W/2 - tower_W/2, 0]) cube([tower_L, tower_W, cap_h]);
     }
 }
 module boards_ghost() {
