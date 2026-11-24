@@ -25,8 +25,10 @@ hole_y    = [7.9, 127.3];    // corner screw holes, from left edge
 /* ---------- Ryobi ONE+ battery (footprint from Archive/Battery+VR.f3d) ---- */
 bat_L     = 135;      // length (slide direction, along X)
 bat_W     = 80;       // width
-stack_h   = 95;       // MEASURE: battery height lying rails-up WITH the
-                      // clip-on power adapter fitted (4 Ah ~ 90-95, 2 Ah ~ 80)
+bat_cap_h = 150;      // battery standing rails-up WITH its cap fitted
+                      // (measured by John, 2026-11-24)
+cap_L     = 148;      // cap footprint, from Archive/RyobiBatteryHolder v7.f3d
+cap_W     = 110;      // (the posts must clear this; see the assert below)
 bat_clear = 1.0;      // clearance per side in the bay
 
 /* ---------- general ---------- */
@@ -35,13 +37,17 @@ wall_t    = 2.4;      // cradle wall thickness
 wall_h    = 22;       // cradle wall height
 deck_t    = 3.0;      // top deck thickness
 lip_h     = 5;        // stiffening lip around top deck (points up)
-gap_top   = 3;        // space between adapter top and deck underside (3 mm foam pad)
+gap_top   = 0.5;      // cap top to deck underside (the cap bolts to the deck)
 m3        = 3.4;      // M3 clearance hole
 m3_head   = 6.5;      // M3 socket head clearance
 m3_nut    = 6.0;      // M3 nut across flats + clearance
-post_s    = 12;       // post cross-section
+post_x    = 14;       // post size along X
+post_y    = 9.6;      // post size along Y (thin: it has to fit beside the cap)
+post_xs   = [35, 151.6 - 35];   // post centres along X (clear of the corner screws)
 cup_clear = 0.4;      // post-to-cup clearance
 cup_h     = 14;       // socket cup height
+cup_wall  = 2.4;      // cup walls front/back/inside
+cup_out   = 1.0;      // cup wall on the outer edge of the plate
 $fn = 40;
 
 /* ---------- derived ---------- */
@@ -50,14 +56,19 @@ bay_L   = bat_L + 2*bat_clear;           // 137
 bay_y0  = (plate_W - bay_W)/2;           // 26.65
 bay_x0  = 5 + wall_t;                    // inner front face of bay
 bay_x1  = bay_x0 + bay_L;                // rear opening
-cup_o   = post_s + 2*cup_clear + 2*wall_t;  // cup outside size
-post_L  = stack_h + gap_top;             // cup floor to deck underside
+post_L  = bat_cap_h + gap_top;           // cup floor to deck underside
 deck_z  = floor_t + post_L;              // deck underside height
 chan_w  = bay_y0 - wall_t - 11;          // side wire-channel window width
+cup_ox  = post_x + 2*cup_clear + 2*cup_wall;          // cup size along X
+cup_oy  = cup_out + post_y + 2*cup_clear + cup_wall;  // cup size along Y
 
-// cup / post centres: on the corner holes, nudged in so cups stay on the plate
-function cx(i) = max(cup_o/2, min(plate_L - cup_o/2, hole_x[i]));
-function cy(j) = max(cup_o/2, min(plate_W - cup_o/2, hole_y[j]));
+// post centres: along the two long edges of the plate
+function cx(i) = post_xs[i];
+function cy(j) = j == 0 ? cup_out + cup_clear + post_y/2
+                        : plate_W - (cup_out + cup_clear + post_y/2);
+post_inner = cup_out + cup_clear + post_y;   // inner face of the left posts
+assert(post_inner < (plate_W - cap_W)/2 - 1,
+       "posts collide with the battery cap: make post_y smaller");
 
 module rrect(l, w, r, h) {
     translate([r, r, 0]) linear_extrude(h)
@@ -84,10 +95,10 @@ module base() {
                 for (wx = [[bay_x0 + 8, 58], [bay_x0 + 74, 55]])
                     translate([wx[0], bay_y0 + 10, -1])
                         rrect(wx[1], bay_W - 20, 4, floor_t + 2);
-                // side wire channels (left and right of the bay)
+                // side wire channels (left and right of the bay, between the cups)
                 for (y = [3, plate_W - 3 - chan_w])
-                    translate([cup_o + 6, y, -1])
-                        rrect(plate_L - 2*cup_o - 12, chan_w, 3, floor_t + 2);
+                    translate([post_xs[0] + cup_ox/2 + 3, y, -1])
+                        rrect(post_xs[1] - post_xs[0] - cup_ox - 6, chan_w, 3, floor_t + 2);
             }
             // battery bay walls: front + two sides, rear left open for sliding
             translate([bay_x0 - wall_t, bay_y0 - wall_t, 0])
@@ -97,21 +108,23 @@ module base() {
             // rear gate pillars
             for (y = [bay_y0 - 7, bay_y0 + bay_W])
                 translate([bay_x1 - 1, y, 0]) cube([8, 7, wall_h]);
-            // corner socket cups for the deck posts
-            for (i = [0, 1], j = [0, 1])
-                translate([cx(i) - cup_o/2, cy(j) - cup_o/2, 0]) cube([cup_o, cup_o, cup_h]);
+            // socket cups for the deck posts, along the long edges
+            for (i = [0, 1]) {
+                translate([cx(i) - cup_ox/2, 0, 0]) cube([cup_ox, cup_oy, cup_h]);
+                translate([cx(i) - cup_ox/2, plate_W - cup_oy, 0]) cube([cup_ox, cup_oy, cup_h]);
+            }
         }
         // cup pockets
         for (i = [0, 1], j = [0, 1])
             translate([cx(i), cy(j), floor_t + cup_h/2])
-                cube([post_s + 2*cup_clear, post_s + 2*cup_clear, cup_h], center = true);
+                cube([post_x + 2*cup_clear, post_y + 2*cup_clear, cup_h], center = true);
         // chassis screw holes (true positions)
         for (i = [0, 1], j = [0, 1])
             translate([hole_x[i], hole_y[j], -1]) cylinder(d = m3, h = floor_t + 2);
         // cross-pin through the cups (along X), locks the posts in
         for (i = [0, 1], j = [0, 1])
             translate([cx(i), cy(j), floor_t + 6]) rotate([0, 90, 0])
-                cylinder(d = m3, h = cup_o + 2, center = true);
+                cylinder(d = m3, h = cup_ox + 2, center = true);
         // gate slots in the pillars (open at the top)
         for (y = [bay_y0 - 4, bay_y0 + bay_W])
             translate([bay_x1 + 2, y, floor_t + 2]) cube([2.8, 4, wall_h]);
@@ -125,7 +138,8 @@ module base() {
 }
 
 // =====================================================================
-//  REAR GATE  (drops into the pillar slots; stops the battery sliding out)
+//  REAR GATE  (optional: drops into the pillar slots; only needed if the
+//  cap has no latch of its own)
 // =====================================================================
 module gate() {
     gw = bay_W + 2*4 - 0.6;
@@ -143,15 +157,13 @@ module gate() {
 // =====================================================================
 module post() {
     difference() {
-        cube([post_s, post_s, post_L]);
-        // counterbore clears the chassis screw head in the cup
-        translate([post_s/2, post_s/2, -1]) cylinder(d = 9.5, h = 4.5);
-        // cross-pin hole (matches the cup)
-        translate([-1, post_s/2, 6]) rotate([0, 90, 0]) cylinder(d = m3, h = post_s + 2);
+        cube([post_x, post_y, post_L]);
+        // cross-pin hole (matches the cup, runs along X)
+        translate([-1, post_y/2, 6]) rotate([0, 90, 0]) cylinder(d = m3, h = post_x + 2);
         // top: M3 screw from the deck into a captive nut
-        translate([post_s/2, post_s/2, post_L - 16]) cylinder(d = m3, h = 17);
-        translate([post_s/2 - m3_nut/2, -1, post_L - 10])
-            cube([m3_nut, post_s/2 + 1 + m3_nut/2, 2.8]);      // nut slot from one side
+        translate([post_x/2, post_y/2, post_L - 16]) cylinder(d = m3, h = 17);
+        translate([-1, post_y/2 - m3_nut/2, post_L - 10])
+            cube([post_x/2 + 1 + m3_nut/2, m3_nut, 2.8]);      // nut slot from the end
     }
 }
 
@@ -203,13 +215,13 @@ module deck() {
             }
             // post landing pads
             for (i = [0, 1], j = [0, 1]) translate([cx(i), cy(j), 0])
-                cylinder(d = 14, h = deck_t + 1);
+                cylinder(d = 12, h = deck_t + 1);
             for (o = ibt_pos) for (p = sq_holes(o, ibt_board, ibt_holes))
                 radial_standoff_at(p, [o[0] + ibt_board/2, o[1] + ibt_board/2], 8);
             for (p = uno_pts()) standoff_at(p, 6.5);
             for (p = gps_pts) radial_standoff_at(p, [gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2], 7);
             // centre spine rib for stiffness
-            translate([cup_o, plate_W/2 - 1.2, 0]) cube([ibt_pos[0][0] + ibt_board - cup_o, 2.4, deck_t + 4]);
+            translate([14, plate_W/2 - 1.2, 0]) cube([ibt_pos[0][0] + ibt_board - 14, 2.4, deck_t + 4]);
         }
         // post screws (M3 x 12 from the top into the captive nut)
         for (i = [0, 1], j = [0, 1]) translate([cx(i), cy(j), -1]) cylinder(d = m3, h = 10);
@@ -225,6 +237,9 @@ module deck() {
         // GPS: radial slots
         gc = [gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2];
         for (p = gps_pts) radial_slot_at(p, gc);
+        // battery cap mounting: 4 slots for M3, 90 mm apart across, 20 mm long
+        for (x = [40, plate_L - 40], y = [plate_W/2 - 45, plate_W/2 + 45])
+            translate([x, y, -1]) slot(20, m3, deck_t + 2);
         // wire pass-throughs
         // front: motor leads come up here, right in front of the IBT-2 outputs
         for (y = [40, plate_W - 40]) translate([14, y, -1]) rotate([0, 0, 90]) slot(22, 9, deck_t + 2);
@@ -244,9 +259,9 @@ module deck() {
 // =====================================================================
 module ghost_parts() {
     color("orange", 0.6) translate([bay_x0 + bat_clear, bay_y0 + bat_clear, floor_t])
-        cube([bat_L, bat_W, stack_h - 20]);
-    color("orange", 0.6) translate([bay_x0 + 25, bay_y0 + 18, floor_t + stack_h - 20])
-        cube([bat_L - 40, bat_W - 36, 20]);
+        cube([bat_L, bat_W, bat_cap_h - 40]);
+    color("gold", 0.6) translate([(plate_L - cap_L)/2, (plate_W - cap_W)/2, floor_t + bat_cap_h - 40])
+        cube([cap_L, cap_W, 40]);
     z = deck_z + deck_t + standoff_h;
     for (o = ibt_pos) color("dimgray") translate([o[0], o[1], z]) cube([ibt_board, ibt_board, 43]);
     color("teal") translate([uno_pos[0], uno_pos[1], z]) cube([uno_L, uno_W, 12]);
@@ -258,7 +273,7 @@ module assembly() {
     color("royalblue") base();
     color("royalblue") translate([bay_x1 + 2.1, bay_y0 - 4 + 0.3, floor_t + 2]) rotate([90, 0, 90]) gate();
     for (i = [0, 1], j = [0, 1])
-        color("lightsteelblue") translate([cx(i) - post_s/2, cy(j) - post_s/2, floor_t]) post();
+        color("lightsteelblue") translate([cx(i) - post_x/2, cy(j) - post_y/2, floor_t]) post();
     color("lightblue") translate([0, 0, deck_z]) deck();
     ghost_parts();
 }
@@ -267,4 +282,4 @@ if (part == "assembly") assembly();
 else if (part == "base") base();
 else if (part == "deck") deck();
 else if (part == "gate") gate();
-else if (part == "post") rotate([0, 90, 0]) translate([-post_s, 0, 0]) post();  // lying on its side
+else if (part == "post") rotate([0, 90, 0]) translate([-post_x, 0, 0]) post();  // lying on its side
