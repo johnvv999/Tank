@@ -38,8 +38,10 @@ BODY_H = TOTAL_H - AD_H          # battery top surface (where the adapter base s
 FLOOR = 3.0                      # cradle floor
 WALL, WALL_H, END_WALL, END_H = 2.4, 22.0, 1.6, 12.0
 BAY_L, BAY_W = BL + 1.5, BW + 2.0
-POST_XS, POST_X, POST_Y = [35.0, 105.0], 14.0, 9.6
-GAP_TOP, DECK_T = 20.0, 3.0
+STANDOFF, LIP_H = 6.0, 6.0
+# trays (match tank_deck_mount.scad)
+FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 74, 116, 26.0, 1.5
+IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3 - 50)]
 
 BLUE, GREY, ORANGE, YEL, RED = "#3b5bdb", "#868e96", "#f08c00", "#c0d000", "#e03131"
 
@@ -89,102 +91,121 @@ def plate_drawing():
                 arrowprops=dict(arrowstyle="->", lw=0.8))
     ax.text(PL / 2, -34, "Outline 140 x 120 mm as measured by John.\n"
             "Cut-outs and hole positions are traced from Images/BasePlate.png and scaled to fit,\n"
-            "so they are approximate (±1 mm). Please measure the corner-hole spacing before printing.",
+            "so they are approximate (±1 mm). Please measure the corner-hole spacing before printing.\n"
+            "Shaded strips: where the tray tongues lie under the cradle. Which end is the front is assumed.",
             ha="center", va="top", fontsize=10, color="#495057")
+    ax.text(-8, PW / 2, "FRONT edge (120)\nfront tray hooks on here", rotation=90, ha="center", va="center",
+            fontsize=10, color=BLUE, weight="bold")
+    ax.text(PL + 44, PW / 2 + 20, "REAR edge (120)\nrear tray hooks on here", rotation=90, ha="center",
+            va="center", fontsize=10, color=BLUE, weight="bold")
+    for x0 in (0, PL - 26):
+        ax.add_patch(Rectangle((x0, 0), 26, PW, fc=BLUE, alpha=0.08, ec=BLUE, ls=":", lw=0.8))
     ax.set_title("Tank chassis mounting plate, top view (mm)", fontsize=15, loc="left", pad=14)
     ax.set_xlim(-30, PL + 62); ax.set_ylim(-58, PW + 30)
     ax.set_aspect("equal"); ax.axis("off")
-    fig.savefig(os.path.join(OUT, "07_mounting_plate.png"), dpi=130, bbox_inches="tight", facecolor="white")
+    fig.savefig(os.path.join(OUT, "06_mounting_plate.png"), dpi=130, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 
 def fit_drawing():
-    fig = plt.figure(figsize=(16, 11.5))
-    # ---------------- top view ------------------------------------------
-    ax = fig.add_axes([0.02, 0.36, 0.48, 0.58])
-    plate_outline(ax, fc="#e9ecef", cutouts=False)
+    """Top and side views of v5: battery in the middle, trays past the 120 mm ends."""
+    fig = plt.figure(figsize=(17, 12.5))
     bx0, by0 = (PL - BL) / 2, (PW - BW) / 2
-    # cradle walls
+    ty0 = (PW - TRAY_W) / 2
+    # ---------------- top view ------------------------------------------
+    ax = fig.add_axes([0.02, 0.40, 0.96, 0.53])
+    for x0, x1 in ((-FRONT_OVH, LAP_L), (PL - LAP_L, PL + REAR_OVH)):
+        ax.add_patch(FancyBboxPatch((x0, ty0), x1 - x0, TRAY_W, boxstyle="round,pad=0,rounding_size=2",
+                                    fc="#a5d8ff", ec=BLUE, lw=1.6, alpha=0.8))
+    plate_outline(ax, fc="#e9ecef", cutouts=False)
     ax.add_patch(Rectangle((bx0 - 0.75 - END_WALL, by0 - 1 - WALL), BAY_L + 2 * END_WALL, BAY_W + 2 * WALL,
-                           fc="none", ec=BLUE, lw=2.2, ls="-"))
-    ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.55, lw=1))
-    ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.85, lw=1))
-    for px in POST_XS:
-        for py in (1.2, PW - 1.2 - POST_Y):
-            ax.add_patch(Rectangle((px - POST_X / 2, py), POST_X, POST_Y, fc=GREY, ec="k", lw=0.8))
-    ax.text(PL / 2, PW / 2, "Power Wheel adapter\n84 x 75 base\n(sits on top of the battery)",
+                           fc="none", ec=BLUE, lw=2.2))
+    ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.55))
+    ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.85))
+    ax.text(PL / 2, PW / 2, "Power Wheel adapter\n84 x 75\non top of the P108\n(nothing above it)",
             ha="center", va="center", fontsize=10)
-    ax.text(bx0 + 12, PW / 2, "P108 battery\n135 x 80", ha="center", va="center", fontsize=10, rotation=90)
-    ax.text(PL / 2, PW - 8, "latch side", ha="center", fontsize=9, color="#495057")
-    ax.text(PL / 2, 4, "hinge side", ha="center", fontsize=9, color="#495057")
-    dim(ax, (0, 0), (PL, 0), "plate 140", off=12, side=-1)
-    dim(ax, (bx0, PW), (bx0 + BL, PW), "battery 135", off=10)
-    dim(ax, (PL, 0), (PL, PW), "plate 120", off=12, side=-1)
-    dim(ax, (bx0, by0), (bx0, by0 + BW), "80", off=7)
-    dim(ax, (bx0 + BL, 0), (bx0 + BL, by0), "20", off=-8, side=-1, fs=9)
-    ax.text(PL / 2, -26, "Battery runs along the 140 side: 2.5 mm spare at each end, 20 mm each side.\n"
-            "Grey = deck posts (hinge side at the bottom, latch side at the top).",
-            ha="center", va="top", fontsize=10, color="#495057")
-    ax.set_title("Top view: fits with no overhang", fontsize=14, loc="left", color="#2b8a3e")
-    ax.set_xlim(-14, PL + 30); ax.set_ylim(-46, PW + 30); ax.set_aspect("equal"); ax.axis("off")
+    for (x, y) in IBT_POS:
+        ax.add_patch(Rectangle((x, y), 50, 50, fc="#495057", ec="k", alpha=0.85))
+        ax.text(x + 25, y + 25, "IBT-2\n50 x 50\nheatsink up", color="white", ha="center", va="center", fontsize=9)
+    ux, uy = PL + REAR_OVH - 3 - 68.6, ty0 + 3
+    ax.add_patch(Rectangle((ux, uy), 68.6, 53.3, fc="#0b7285", ec="k", alpha=0.85))
+    ax.text(ux + 34, uy + 26, "UNO R4 WiFi\n68.6 x 53.3", color="white", ha="center", va="center", fontsize=9)
+    ax.annotate("USB-C faces\nthe rear", xy=(PL + REAR_OVH - 3, uy + 30), xytext=(PL + REAR_OVH + 6, uy + 26),
+                fontsize=9, arrowprops=dict(arrowstyle="->", lw=0.8))
+    gx, gy = PL + REAR_OVH - 10 - 43.2, PW - ty0 - 4 - 43.2
+    ax.add_patch(Rectangle((gx, gy), 43.2, 43.2, fc=RED, ec="k", alpha=0.8))
+    ax.text(gx + 21.6, gy + 21.6, "GPS\n43 x 43", color="white", ha="center", va="center", fontsize=9)
+    for x in (0, PL):
+        ax.plot([x, x], [-4, PW + 4], color="k", lw=1.2, ls="--")
+    ax.text(-FRONT_OVH / 2, PW + 12, "FRONT TRAY", ha="center", fontsize=12, weight="bold", color=BLUE)
+    ax.text(PL + REAR_OVH / 2, PW + 12, "REAR TRAY", ha="center", fontsize=12, weight="bold", color=BLUE)
+    ax.text(PL / 2, PW + 12, "BATTERY CRADLE on the plate", ha="center", fontsize=12, weight="bold", color=BLUE)
+    ax.annotate("", xy=(-FRONT_OVH - 22, PW / 2), xytext=(-FRONT_OVH - 4, PW / 2),
+                arrowprops=dict(arrowstyle="-|>", lw=2.5, color="k"))
+    ax.text(-FRONT_OVH - 14, PW / 2 + 7, "travel", ha="center", fontsize=10)
+    dim(ax, (-FRONT_OVH, 0), (0, 0), "%d past the plate" % FRONT_OVH, off=10, side=-1)
+    dim(ax, (0, 0), (PL, 0), "plate 140", off=10, side=-1)
+    dim(ax, (PL, 0), (PL + REAR_OVH, 0), "%d past the plate" % REAR_OVH, off=10, side=-1)
+    dim(ax, (-FRONT_OVH, -16), (PL + REAR_OVH, -16), "overall %d" % (FRONT_OVH + PL + REAR_OVH), off=12, side=-1)
+    dim(ax, (PL + REAR_OVH, ty0), (PL + REAR_OVH, ty0 + TRAY_W), "tray %d" % TRAY_W, off=36, side=-1)
+    dim(ax, (bx0 + BL, by0), (bx0 + BL, by0 + BW), "80", off=-9, side=-1)
+    ax.text(LAP_L / 2 + 2, 14, "tongue\nunder", ha="center", fontsize=8, color=BLUE)
+    ax.text(PL - LAP_L / 2 - 2, 14, "tongue\nunder", ha="center", fontsize=8, color=BLUE)
+    ax.set_title("Top view (mm). Dashed lines are the plate's 120 mm front and rear edges.", fontsize=13, loc="left")
+    ax.set_xlim(-FRONT_OVH - 30, PL + REAR_OVH + 50); ax.set_ylim(-48, PW + 22)
+    ax.set_aspect("equal"); ax.axis("off")
 
-    # ---------------- side view (looking at the 140 side) ----------------
-    ax = fig.add_axes([0.53, 0.36, 0.46, 0.58])
-    deck_z = FLOOR + TOTAL_H + GAP_TOP
+    # ---------------- side view -----------------------------------------
+    ax = fig.add_axes([0.02, 0.02, 0.62, 0.38])
     ax.add_patch(Rectangle((0, -2), PL, 2, fc="#adb5bd", ec="k"))
-    ax.add_patch(Rectangle((0, 0), PL, FLOOR, fc=BLUE, ec="k", alpha=0.7))
-    ax.add_patch(Rectangle(((PL - BL) / 2, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
+    ax.add_patch(Rectangle((LAP_L, 0), PL - 2 * LAP_L, FLOOR, fc=BLUE, ec="k", alpha=0.7))
+    for x0 in (0, PL - LAP_L):
+        ax.add_patch(Rectangle((x0, LAP_T), LAP_L, FLOOR - LAP_T, fc=BLUE, ec="k", alpha=0.7))
+    ax.add_patch(Rectangle((-FRONT_OVH, 0), FRONT_OVH + LAP_L, LAP_T, fc="#74c0fc", ec="k"))
+    ax.add_patch(Rectangle((-FRONT_OVH, LAP_T), FRONT_OVH, FLOOR - LAP_T, fc="#74c0fc", ec="k"))
+    ax.add_patch(Rectangle((PL - LAP_L, 0), REAR_OVH + LAP_L, LAP_T, fc="#74c0fc", ec="k"))
+    ax.add_patch(Rectangle((PL, LAP_T), REAR_OVH, FLOOR - LAP_T, fc="#74c0fc", ec="k"))
+    for x0, L in ((-FRONT_OVH, FRONT_OVH), (PL, REAR_OVH)):
+        ax.add_patch(Rectangle((x0, FLOOR), L, LIP_H, fc="none", ec=BLUE, lw=1, ls=":"))
+    ax.add_patch(Rectangle((bx0, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
     ax.add_patch(Rectangle((PL / 2 - 22, FLOOR + BODY_H + 8), 44, AD_H - 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle(((PL - BAY_L) / 2 - END_WALL, FLOOR), END_WALL, END_H, fc=BLUE, ec="k"))
-    ax.add_patch(Rectangle(((PL + BAY_L) / 2, FLOOR), END_WALL, END_H, fc=BLUE, ec="k"))
-    for px in POST_XS:
-        ax.add_patch(Rectangle((px - POST_X / 2, FLOOR), POST_X, deck_z - FLOOR, fc=GREY, ec="k", alpha=0.35))
-    ax.add_patch(Rectangle((0, deck_z), PL, DECK_T, fc="#a5d8ff", ec="k"))
-    ax.plot([PL / 2 + 22, PL / 2 + 40, PL / 2 + 40], [FLOOR + TOTAL_H - 4, FLOOR + TOTAL_H - 4, deck_z - 2],
-            color=RED, lw=2)
-    ax.text(PL / 2 + 42, FLOOR + TOTAL_H + 6, "adapter leads\n(250 mm)", fontsize=9, color=RED)
-    dim(ax, (PL, FLOOR), (PL, FLOOR + TOTAL_H), "150 battery + adapter", off=14, side=-1)
-    dim(ax, (0, FLOOR + BODY_H), (0, FLOOR + TOTAL_H), "90 adapter", off=12)
-    dim(ax, (0, FLOOR), (0, FLOOR + BODY_H), "≈60", off=12)
-    dim(ax, (PL, FLOOR + TOTAL_H), (PL, deck_z), "20 cable space", off=14, side=-1, fs=9)
-    ax.text(PL / 2, deck_z + 9, "hinged electronics deck", ha="center", fontsize=10)
-    ax.text(POST_XS[0], deck_z - 14, "posts\n(at the\nplate edges)", ha="center", va="top", fontsize=8, color="#495057")
-    ax.text(PL / 2, -12, "plate + 3 mm cradle floor", ha="center", fontsize=9, color="#495057")
-    ax.set_title("Side view (mm)", fontsize=14, loc="left")
-    ax.set_xlim(-40, PL + 75); ax.set_ylim(-20, deck_z + 22); ax.set_aspect("equal"); ax.axis("off")
+    zb = FLOOR + STANDOFF
+    ax.add_patch(Rectangle((-FRONT_OVH + 6, zb), 50, 43, fc="#495057", ec="k", alpha=0.85))
+    ax.text(-FRONT_OVH + 31, zb + 21, "IBT-2", color="white", ha="center", va="center", fontsize=9)
+    ax.add_patch(Rectangle((PL + REAR_OVH - 71.6, zb), 68.6, 12, fc="#0b7285", ec="k", alpha=0.85))
+    ax.text(PL + REAR_OVH - 37, zb + 20, "UNO + GPS", ha="center", fontsize=9)
+    ax.annotate("lift straight up", xy=(PL / 2, FLOOR + TOTAL_H + 26), xytext=(PL / 2, FLOOR + TOTAL_H + 2),
+                ha="center", fontsize=10, arrowprops=dict(arrowstyle="-|>", lw=2, color="#2b8a3e"))
+    dim(ax, (PL, FLOOR), (PL, FLOOR + TOTAL_H), "150", off=10, side=-1)
+    dim(ax, (-FRONT_OVH, zb), (-FRONT_OVH, zb + 43), "≈43", off=8, fs=9)
+    ax.text(PL / 2, -14, "tray tongue (1.5) slides under the cradle's stepped floor; the kit's corner screws clamp both",
+            ha="center", fontsize=9, color="#495057")
+    ax.set_title("Side view (mm), front on the left", fontsize=13, loc="left")
+    ax.set_xlim(-FRONT_OVH - 22, PL + REAR_OVH + 30); ax.set_ylim(-22, FLOOR + TOTAL_H + 34)
+    ax.set_aspect("equal"); ax.axis("off")
 
-    # ---------------- the other way round: overhang ----------------------
-    ax = fig.add_axes([0.02, 0.02, 0.48, 0.31])
-    plate_outline(ax, fc="#e9ecef", cutouts=False)
-    bx0, by0 = (PL - BW) / 2, (PW - BL) / 2
-    ax.add_patch(Rectangle((bx0, by0), BW, BL, fc=ORANGE, ec="k", alpha=0.45))
-    for yy in (by0, PW):
-        ax.add_patch(Rectangle((bx0, yy), BW, 7.5, fc=RED, ec=RED, alpha=0.6, hatch="///"))
-    ax.text(bx0 + BW + 6, PW + 2, "7.5 overhang", color=RED, fontsize=10)
-    ax.text(bx0 + BW + 6, by0 + 1, "7.5 overhang", color=RED, fontsize=10)
-    ax.set_title("Turned 90°: battery overhangs the 120 side by 7.5 mm each end", fontsize=12,
-                 loc="left", color=RED)
-    ax.set_xlim(-10, PL + 60); ax.set_ylim(by0 - 6, PW + 14); ax.set_aspect("equal"); ax.axis("off")
-
-    ax = fig.add_axes([0.53, 0.02, 0.46, 0.31]); ax.axis("off")
-    ax.text(0, 0.95, "If the battery turns out longer than 136 mm", fontsize=13, weight="bold", va="top")
-    ax.text(0, 0.80,
-            "The plate fits a battery up to about 136.5 mm long (140 minus the 1.6 mm end walls).\n"
-            "Options if your P108 is longer:\n\n"
-            "  A.  Drop the two low end walls. The side walls still locate it,\n"
-            "       and it fits up to 140 mm.\n"
-            "  B.  Let it overhang the ends by a few mm. Nothing is in the way\n"
-            "       at deck-plate height, but it has to clear the tracks.\n"
-            "  C.  Turn it 90° (left). That needs a 15 mm wider cradle with\n"
-            "       ledges past the plate edge, so it's the last resort.\n\n"
-            "Home Depot's 7.16 x 3.39 x 6.5 in is the packaging, not the battery.\n"
-            "135 x 80 comes from your Battery+VR model. A ruler check of the\n"
-            "battery's length is the one number to confirm.",
-            fontsize=10.5, va="top", family="DejaVu Sans")
-    fig.suptitle("How the Ryobi P108 battery and Power Wheel adapter fit on the 140 x 120 plate",
+    ax = fig.add_axes([0.66, 0.02, 0.33, 0.36]); ax.axis("off")
+    ax.text(0, 0.98, "Balance and clearance", fontsize=13, weight="bold", va="top")
+    ax.text(0, 0.88,
+            "Front: 2 x IBT-2, about 130 g, centre about 100 mm\n"
+            "ahead of the plate centre.\n"
+            "Rear: UNO + GPS, about 40 g, about 107 mm behind it.\n"
+            "Battery + adapter (about 1 kg) stay centred.\n\n"
+            "The mount's centre of mass ends up about 6 to 7 mm\n"
+            "ahead of the plate centre. With the motors and tracks\n"
+            "included it's smaller still, so you won't notice it.\n\n"
+            "Please check on the real chassis:\n"
+            "  1. Nothing sticks up past the 120 mm ends at plate\n"
+            "     height (side frames, the front slope, the rear\n"
+            "     rake). The trays sit 0 to 19 mm above the plate.\n"
+            "  2. Which 120 mm end is the front.\n"
+            "  3. The corner-hole spacing (about 116 x 106).\n"
+            "  4. The battery length (cradle takes up to 136.5).",
+            fontsize=10.5, va="top")
+    fig.suptitle("How everything fits: battery in the middle, electronics past the front and rear edges",
                  fontsize=16, x=0.02, ha="left", y=0.995)
-    fig.savefig(os.path.join(OUT, "08_battery_fit.png"), dpi=120, bbox_inches="tight", facecolor="white")
+    fig.savefig(os.path.join(OUT, "07_layout.png"), dpi=115, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 
