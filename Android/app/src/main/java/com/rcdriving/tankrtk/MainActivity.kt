@@ -25,10 +25,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var connectivityManager: ConnectivityManager
     private var tankNetworkCallback: ConnectivityManager.NetworkCallback? = null
 
+    // Kept so onStop() can stop the motors when the app leaves the screen.
+    private var tankViewModel: TankViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val viewModel = TankViewModel()
+        tankViewModel = viewModel
 
         // Phone's own WiFi radio — used to show real signal strength to
         // the tank's access point (see the polling loop below). RSSI does
@@ -217,6 +221,14 @@ class MainActivity : ComponentActivity() {
         android.util.Log.d("TankRTK", "requestTankNetwork: calling connectivityManager.requestNetwork")
         connectivityManager.requestNetwork(request, callback)
         android.util.Log.d("TankRTK", "requestTankNetwork: requestNetwork call returned (result is async)")
+    }
+
+    // App going to the background (home button, screen off, call): stop
+    // the tank. With the command heartbeat running, the last command would
+    // otherwise keep being re-sent while nobody is looking at the controls.
+    override fun onStop() {
+        super.onStop()
+        tankViewModel?.stopMotors()
     }
 
     override fun onDestroy() {

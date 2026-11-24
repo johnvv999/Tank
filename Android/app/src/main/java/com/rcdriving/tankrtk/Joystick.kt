@@ -90,6 +90,16 @@ fun Joystick(
                         rawX = 0f
                         rawY = 0f
                         onMove(0f, 0f)
+                    },
+                    // A drag can be CANCELLED instead of ended (incoming
+                    // call, app switch, notification shade). Without this
+                    // the last drive command stayed active, and the app's
+                    // heartbeat would keep re-sending it. Treat it as a
+                    // release: re-center and stop.
+                    onDragCancel = {
+                        rawX = 0f
+                        rawY = 0f
+                        onMove(0f, 0f)
                     }
                 )
             }

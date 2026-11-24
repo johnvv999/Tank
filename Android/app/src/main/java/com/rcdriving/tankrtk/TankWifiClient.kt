@@ -25,6 +25,16 @@ class TankWifiClient(
     // command is worse than useless — always send the latest one.
     private val outbox = ArrayBlockingQueue<String>(1)
 
+    // HEARTBEAT: the firmware stops both motors if it hears nothing for
+    // 500 ms (CMD_TIMEOUT_MS in TankArduino.ino). The joystick only calls
+    // send() when its position CHANGES, so holding the stick steady used
+    // to go silent and the tank would stutter/stop. The writer now re-sends
+    // the last command every HEARTBEAT_MS while connected. This also
+    // covers PathReplayer/WaypointFollower, which send one command and
+    // then wait. Keep this well under 500 ms.
+    private val heartbeatMs = 150L
+    @Volatile private var lastCmd: String? = null
+
     // Bumped on every connect()/disconnect() call. Lets an in-flight
     // retry loop notice it's been superseded (e.g. the user tapped
     // Disconnect mid-retry) and quietly stop instead of clobbering
@@ -58,6 +68,7 @@ class TankWifiClient(
 
                     socket = s
                     out = s.getOutputStream()
+                    lastCmd = null   // never resume a command from a previous session
                     _status.value = ConnectionStatus.CONNECTED
                     startWriter()
                     return@thread
@@ -87,7 +98,12 @@ class TankWifiClient(
         writerThread = thread {
             try {
                 while (socket?.isConnected == true && !Thread.currentThread().isInterrupted) {
-                    val cmd = outbox.poll(500, TimeUnit.MILLISECONDS) ?: continue
+                    // New command if one arrives within heartbeatMs,
+                    // otherwise repeat the last one (heartbeat).
+                    val cmd = outbox.poll(heartbeatMs, TimeUnit.MILLISECONDS)
+                        ?: lastCmd
+                        ?: continue
+                    lastCmd = cmd
                     out?.write(cmd.toByteArray())
                     out?.flush()
                 }
@@ -108,6 +124,7 @@ class TankWifiClient(
         out = null
         socket = null
         outbox.clear()
+        lastCmd = null
         _status.value = ConnectionStatus.DISCONNECTED
     }
 }

@@ -310,21 +310,24 @@ void readGps() {
   while (Serial1.available()) {
     char c = (char)Serial1.read();
 
+    // NOTE: these must be `continue`, not `return`. `return` left the
+    // rest of Serial1's buffer unread until the next loop() pass, which
+    // can overflow the UART buffer at 38400 baud while WiFi is busy.
     if (c == '$') {
       nmeaIdx = 0;
       nmeaBuf[nmeaIdx++] = c;
-      return;
+      continue;
     }
 
-    if (nmeaIdx == 0) return;   // waiting for start
+    if (nmeaIdx == 0) continue;   // waiting for start
 
-    if (c == '\r') return;      // skip CR
+    if (c == '\r') continue;      // skip CR
 
     if (c == '\n') {
       nmeaBuf[nmeaIdx] = '\0';
       parseNmeaSentence(nmeaBuf);
       nmeaIdx = 0;
-      return;
+      continue;
     }
 
     if (nmeaIdx < (uint8_t)(sizeof(nmeaBuf) - 1)) {
