@@ -42,8 +42,9 @@ STANDOFF, LIP_H = 11.0, 10.0
 # trays (match tank_deck_mount.scad)
 FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 26.0, 2.0
 TRAY_T = 5.0
-CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 50.0, 30 + 5 + 14 + 4.8, FLOOR + 146.0
-TW_CX = PL / 2 - 7           # tower opening shifted forward 7 mm: lead, fuse and switch gap in front of the adapter
+CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 65.1, 30 + 5 + 14 + 4.8, FLOOR + 146.0
+TOWER_CX = (PL - BAY_L) / 2 + 0.8 + 80 + 15   # upright: switch face 80 mm behind the battery's front end (John)
+TW_CX = TOWER_CX - 7         # tower opening shifted forward 7 mm: lead, fuse and switch gap in front of the adapter
 LANE_W = 13.0
 IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3.5), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3.5 - 50)]
 
@@ -181,7 +182,7 @@ def fit_drawing():
     ax.text(PL / 2 + 34, CASE_TOP + SHOULDER + 8, "casing (hood lifts off)", fontsize=9)
     ax.add_patch(Rectangle((bx0, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((PL / 2 - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((TOWER_CX - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
     zb = TRAY_T + STANDOFF
     ax.add_patch(Rectangle((-FRONT_OVH + 6, zb), 50, 43, fc="#495057", ec="k", alpha=0.85))
     ax.text(-FRONT_OVH + 31, zb + 21, "IBT-2", color="white", ha="center", va="center", fontsize=9)
@@ -240,9 +241,9 @@ def wiring_drawing():
         ax.add_patch(Rectangle((bx0 + 3, y), BAY_L - 8, WALL, fc=BLUE, ec="none", alpha=0.6))
     ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.35))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.5))
-    ax.add_patch(Rectangle((PL / 2 - 15, PW / 2 - 15), 30, 30, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((TOWER_CX - 15, PW / 2 - 15), 30, 30, fc=YEL, ec="k"))
     ax.add_patch(Rectangle((TW_CX - 24.5, PW / 2 - 19.5), 49, 39, fc="none", ec="#212529", lw=1.6, ls=":"))
-    ax.text(PL / 2, PW / 2, "adapter\n30 x 30", ha="center", va="center", fontsize=9)
+    ax.text(TOWER_CX, PW / 2, "adapter\n30 x 30", ha="center", va="center", fontsize=9)
     for (x, y) in IBT_POS:
         ax.add_patch(Rectangle((x, y), 50, 50, fc="#495057", ec="k", alpha=0.75))
     ax.text(-FRONT_OVH + 31, IBT_POS[0][1] + 25, "IBT-2\nleft motor", color="white", ha="center", va="center", fontsize=9)
@@ -294,7 +295,7 @@ def wiring_drawing():
     top = FLOOR + TOTAL_H
     ax.add_patch(Rectangle((0, FLOOR), PL, BODY_H, fc=ORANGE, ec="k", alpha=0.35))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((PL / 2 - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((TOWER_CX - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
     hx = [0, 0, TW_CX - TOWER_OUT / 2, TW_CX - TOWER_OUT / 2]
     hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP]
     ax.plot(hx, hz, color="#212529", lw=2.2)
@@ -325,8 +326,51 @@ def wiring_drawing():
     plt.close(fig)
 
 
+def slot_measure_drawing():
+    """What John needs to measure for the hitch: the two long slots at the plate's rear edge."""
+    fig, ax = plt.subplots(figsize=(11, 10))
+    plate_outline(ax, fc="#e9ecef")
+    sl = [(132.3, 18.0, 55.7), (131.0, 64.5, 102.3)]   # traced: (x centre, y start, y end)
+    w = 3.7
+    for x, y0, y1 in sl:
+        ax.add_patch(FancyBboxPatch((x - w / 2, y0), w, y1 - y0, boxstyle="round,pad=0,rounding_size=1.8",
+                                    fc="#ffd8a8", ec=ORANGE, lw=2))
+    # A: rear edge to the slot centre line
+    dim(ax, (sl[0][0], 8), (PL, 8), "A", off=0, fs=15, color=RED)
+    dim(ax, (sl[1][0], 112), (PL, 112), "A2", off=0, fs=13, color=RED)
+    # B..E: from the left long edge (y = 0) to each slot end, along the slot
+    xs = PL + 10
+    for lab, y in [("B", sl[0][1]), ("C", sl[0][2]), ("D", sl[1][1]), ("E", sl[1][2])]:
+        ax.plot([sl[0][0] if lab in "BC" else sl[1][0], xs + (["B", "C", "D", "E"].index(lab)) * 9], [y, y], color=BLUE, lw=0.6, ls=":")
+    for i, (lab, y) in enumerate([("B", sl[0][1]), ("C", sl[0][2]), ("D", sl[1][1]), ("E", sl[1][2])]):
+        xx = xs + i * 9
+        ax.annotate("", xy=(xx, 0), xytext=(xx, y), arrowprops=dict(arrowstyle="<->", lw=1.0, color=BLUE))
+        ax.text(xx, y + 2.5, lab, ha="center", va="bottom", fontsize=14, color=BLUE, fontweight="bold")
+    ax.plot([PL - 4, xs + 32], [0, 0], color=BLUE, lw=0.8)
+    # W: slot width
+    ax.annotate("W", xy=(sl[1][0] + w / 2, 84), xytext=(sl[1][0] - 22, 84), fontsize=14, color=RED, fontweight="bold",
+                va="center", arrowprops=dict(arrowstyle="->", lw=1.0, color=RED))
+    ax.text(PL / 2 - 10, PW / 2 + 6, "FRONT", fontsize=13, color=GREY, ha="center")
+    ax.annotate("", xy=(PL / 2 - 40, PW / 2), xytext=(PL / 2 + 20, PW / 2), arrowprops=dict(arrowstyle="->", lw=1.5, color=GREY))
+    ax.annotate("REAR edge (hitch side)", xy=(PL, PW - 20), xytext=(PL - 30, PW + 7), fontsize=12, ha="left", arrowprops=dict(arrowstyle="->", lw=1.0))
+    ax.text(-2, -6, "measure B to E from this long edge", ha="left", va="top", fontsize=11, color=BLUE)
+    ax.text(PL / 2, -18,
+            "Please measure, in mm, on the top face of the metal plate:\n"
+            "A   rear edge to the centre line of the slots (A2 too, if the two slots are not in line)\n"
+            "B, C   that long edge to the near and far ends of the first slot\n"
+            "D, E   that long edge to the near and far ends of the second slot\n"
+            "W   slot width.        Already known: plate 140 x 120, 3 mm thick.\n"
+            "My traced guesses: A about 9, B 18, C 56, D 64, E 102, W 3.7.",
+            ha="center", va="top", fontsize=11.5, multialignment="left")
+    ax.set_xlim(-12, PL + 55); ax.set_ylim(-62, PW + 14); ax.set_aspect("equal"); ax.axis("off")
+    ax.set_title("Hitch: measurements needed for the plate's two rear slots (top view)", fontsize=15, loc="left")
+    fig.savefig(os.path.join(OUT, "15_measure_rear_slots.png"), dpi=120, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     plate_drawing()
     fit_drawing()
     wiring_drawing()
+    slot_measure_drawing()
     print("wrote", OUT)

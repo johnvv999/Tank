@@ -71,9 +71,9 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 | `hitch_drawbar.stl` | 1 | Trailer adapter |
 
 **Check before printing the hitch:**
-- The position of the plate's rear slots. I traced them from the photo at about 11 mm in from the rear edge.
+- The position of the plate's rear slots. I traced them from the photo at about 9 mm in from the rear edge. `images/15_measure_rear_slots.png` shows the measurements needed.
 - That nothing sits under the plate's rear 22 mm between the corner standoffs, above the lower chassis.
-- The plate thickness. I assumed 2 mm.
+- The plate thickness is 3 mm (measured).
 
 ## GPS antenna pod
 
@@ -152,7 +152,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 | P108 battery footprint | 136 x 75.6 mm, cell housing 53.1 tall. The pocket is 137.6 x 77.6 (1.6 mm play on the length, 2 mm on the width) | John, 2026-11-25 |
 | Battery + adapter height | 150 mm | Measured by John |
 | Power Wheel adapter | 84 x 75 mm base, 90 mm tall, 250 mm lead | Listing photo |
-| Adapter tower | 30 x 30 mm, 90 mm above the battery, leads out the top, rocker switch on one face about 40 mm below the top (casing opening 49 x 39, with a 16.5 mm gap in front) | Measured by John; switch height from his photo |
+| Adapter tower | 30 x 30 mm, 90 mm above the battery, leads out the top, rocker switch on its front face about 40 mm below the top. The switch face is 80 mm behind the battery's flat front end, so the upright sits 27 mm behind the middle (battery flat end forward, curved end back) (casing opening 49 x 39, with a 16.5 mm gap in front) | Measured by John; switch height from his photo |
 | Fuse holder | 35 x 10 x 35 mm, on the red lead | Measured by John |
 | IBT-2 | 50 x 50 board, 40 x 40 holes, about 43 tall | `Archive/MotorBox.f3d` |
 | GPS | 43.2 board, 38.1 holes (SparkFun GPS-RTK2) | `Archive/GPSBox.f3d` |
@@ -164,7 +164,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 2. **Which end is the front.** From John's photos, the rear is the end where the lower chassis runs on 100 mm past the plate; the hitch goes there. The IBT-2s go at the front. Swap the trays if not; the tongues are the same.
 3. **Corner holes are centred?** The spacing is measured (108 x 90); the design assumes the holes are centred on the plate. Print the base first and test-fit it.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
-5. **Switch direction.** The model assumes the adapter's switch faces the front of the tank, into the lead gap and the finger window. Set `sw_drop` if the switch sits at a different height.
+5. **Switch height.** The switch faces the front (John). Its height (`sw_drop`, 40 mm below the top) is from a photo.
 
 ## Hardware
 

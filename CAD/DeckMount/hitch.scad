@@ -29,7 +29,7 @@ tool = "rake";        // "rake" | "trailer" | "none" (renders)
 rake_lift = 0;        // rake angle about the lower pins (deg): -8 = 8 deg deeper, +28 = fully raised (max)
 
 /* ---------- interface ---------- */
-plate_t  = 2;          // metal plate thickness (check)
+plate_t  = 3;          // metal plate thickness (John measured)
 pin_d    = 4.2;        // lower pins / link pins: M4
 // Real chassis (John's photos, 2026-11-25): behind the plate's rear edge the lower
 // chassis runs on for 100 mm with its top 30 mm below the plate; the tracks end

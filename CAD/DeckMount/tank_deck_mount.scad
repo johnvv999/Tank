@@ -83,10 +83,10 @@ gus      = 10;    // corner gussets inside the bumper
 case_t   = 2.4;   // hood + cover walls
 hood_end = 1.2;   // hood end walls (between battery and plate edge): 3 lines at 0.4 mm, backed by the covers
 case_top = floor_t + bat_cap_h - cap_h + 5;   // top of covers / start of the hood shoulder
-shoulder = 50;    // shoulder rise (>= 45 deg everywhere, prints without supports)
 tower_clear = 2.5;                // around the adapter's tower
 tower_L = 30; tower_W = 30;       // adapter tower, measured by John (30 x 30)
 fuse_W  = 35; fuse_t = 10;        // inline fuse holder on the red lead, 35 x 10 x 35 (John): it must pass up through the tower opening
+sw_from_front = 80;   // battery's flat front end to the upright's switch face, along the top (John)
 sw_drop = 40;  sw_win_w = 24; sw_win_h = 30;   // rocker switch on the tower's front face, centre about 40 mm below its top (from John's photo)
 hood_top = floor_t + bat_cap_h - 4;   // top 4 mm of the adapter shows
 lip_L    = 6;     // hood lips reaching over each cover
@@ -287,7 +287,12 @@ module lip_solid(c = 0) {   // across the flat top of the covers, plan corners r
 }
 // hood: built from hulls of spheres and cylinders so every outside edge has a 5 mm radius
 tw_L = tower_L + 2*tower_clear + lead_gap;  tw_W = max(tower_W + 2*tower_clear, fuse_W + 4);
-tw_cx = plate_L/2 - lead_gap/2;   // tower opening shifted forward: the leads run down in front of the adapter
+tower_cx = bay_x0 + end_clear + sw_from_front + tower_L/2;   // the upright sits behind the battery's middle
+tw_cx = tower_cx - lead_gap/2;   // tower opening shifted forward: the leads run down in front of the adapter
+tlx_o = (tw_L + 2*case_t)/2 - rnd;
+// shoulder rise: at least 45 deg on both slopes, so the hood prints open side down without supports
+shoulder = max(50, (tw_cx - tlx_o) - rnd + 2, (plate_L - rnd) - (tw_cx + tlx_o) + 2);
+assert(case_top + shoulder < hood_top - 10, "tower too far from the middle: no room for the sleeve");
 module corners(x0, x1, y0, y1) { for (x = [x0, x1], y = [y0, y1]) translate([x, y, 0]) children(); }
 module hood_shell(o) {   // o = 0 outside, 1 inside
     r  = o ? rnd - case_t : rnd;
@@ -403,16 +408,17 @@ module battery_ghost() {
         cube([bat_L, bat_W, bat_cap_h - cap_h]);
 }
 module cap_ghost() {
-    color("yellowgreen", 0.95) translate([(plate_L - cap_L)/2, (plate_W - cap_W)/2, floor_t + bat_cap_h - cap_h]) {
+    // base: about 40 mm of it in front of the upright (from John's photo), curved end behind
+    color("yellowgreen", 0.95) translate([tower_cx - tower_L/2 - 40, (plate_W - cap_W)/2, floor_t + bat_cap_h - cap_h]) {
         cube([cap_L, cap_W, 8]);
-        translate([cap_L/2 - tower_L/2, cap_W/2 - tower_W/2, 0]) cube([tower_L, tower_W, cap_h]);
+        translate([40, cap_W/2 - tower_W/2, 0]) cube([tower_L, tower_W, cap_h]);
     }
 }
 module switch_ghost() {   // rocker switch on the tower's front face
-    translate([plate_L/2 - tower_L/2 - 4, plate_W/2 - 7.5, floor_t + bat_cap_h - sw_drop - 10]) cube([4, 15, 20]);
+    translate([tower_cx - tower_L/2 - 4, plate_W/2 - 7.5, floor_t + bat_cap_h - sw_drop - 10]) cube([4, 15, 20]);
 }
 module fuse_ghost() {     // inline fuse holder, hanging in the lead gap in front of the tower
-    translate([plate_L/2 - tower_L/2 - tower_clear - lead_gap + 2, plate_W/2 - fuse_W/2, floor_t + bat_cap_h - cap_h + 9]) cube([fuse_t, fuse_W, 35]);
+    translate([tower_cx - tower_L/2 - tower_clear - lead_gap + 2, plate_W/2 - fuse_W/2, floor_t + bat_cap_h - cap_h + 9]) cube([fuse_t, fuse_W, 35]);
 }
 module boards_ghost() {
     z = tray_z + tray_t + standoff_h;
@@ -422,7 +428,7 @@ module boards_ghost() {
         color("red") translate([gps_pos[0], gps_pos[1], z]) cube([gps_board, gps_board, 8]);
     }
 }
-module chassis_ghost() { color("silver", 0.6) translate([0, 0, -2]) rrect(plate_L, plate_W, plate_r, 2); }
+module chassis_ghost() { color("silver", 0.6) translate([0, 0, -3]) rrect(plate_L, plate_W, plate_r, 3); }   // 3 mm metal plate
 
 module assembly() {
     chassis_ghost();
