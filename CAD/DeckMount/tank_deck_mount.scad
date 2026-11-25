@@ -62,6 +62,10 @@ rear_ovh  = 80;    // rear tray reaches this far past the rear edge
 tray_W    = 116;   // narrower than the plate, to clear the side frames
 lap_L     = 26;    // tongue length under the cradle
 lap_t     = 2;     // tongue thickness (half of the 4 mm floor)
+// ribs under the cradle's laps reach the print bed, so the laps print as short bridges (no supports);
+// the tongues have matching slots open at their tips
+lap_ribs  = [[0, 3], [38, 42], [58, 62], [78, 82], [117, 120]];
+rib_clear = 0.3;
 
 /* ---------- general ---------- */
 floor_t = 4.0; wall_t = 2.4; wall_h = 22; end_t = 1.6;
@@ -122,6 +126,7 @@ module base() {
                 union() {
                     translate([lap_L, -1, 0]) cube([plate_L - 2*lap_L, plate_W + 2, floor_t]);
                     translate([-1, -1, lap_t]) cube([plate_L + 2, plate_W + 2, floor_t]);
+                    for (r = lap_ribs, x0 = [-1, plate_L - lap_L]) translate([x0, r[0], 0]) cube([lap_L + 1, r[1] - r[0], lap_t + 0.01]);
                 }
             }
             // side walls stop short of the corner screw heads
@@ -187,9 +192,13 @@ module tray_body(ovh, hook_y) {
                 translate([-ovh, ty0, 0]) rrect(12, tray_W, 5, tray_t);
                 translate([-1, ty0, 0]) cube([1, tray_W, tray_t]);
             }
-            intersection() {
-                rrect(plate_L, plate_W, plate_r, lap_t);
-                translate([-1, -1, 0]) cube([lap_L + 1, plate_W + 2, lap_t]);
+            difference() {
+                intersection() {
+                    rrect(plate_L, plate_W, plate_r, lap_t);
+                    translate([-1, -1, 0]) cube([lap_L + 1, plate_W + 2, lap_t]);
+                }
+                // slots for the cradle's lap ribs, open at the tongue tip
+                for (r = lap_ribs) translate([-0.01, r[0] - rib_clear, -1]) cube([lap_L + 1, r[1] - r[0] + 2*rib_clear, lap_t + 2]);
             }
             // bumper wall across the outer end + side walls, all 15 tall, rounded outer corners
             difference() {

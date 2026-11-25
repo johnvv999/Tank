@@ -7,7 +7,7 @@ A printable mount and casing for the full-metal tank chassis (plate 140 x 120 mm
 - **Rear tray** overhanging the rear 120 mm edge by 80 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
 - **Casing**: a hood over the battery that shows only the top of the adapter, and a cover over each tray. No tools needed.
 
-The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. Each tray has a 2 mm tongue that slides **under** the cradle's stepped floor ends (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate.
+The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. Each tray has a 2 mm tongue that slides **under** the cradle's stepped floor ends (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. Five ribs under each of the cradle's laps reach down to the plate, and the tongues have matching slots open at their tips. The ribs are there so the base prints flat with no supports: the laps print as short bridges between the ribs.
 
 Source: `tank_deck_mount.scad` (OpenSCAD, fully parametric). STLs are in `stl/`, pictures in `images/`, the 2-D drawings come from `drawings/make_drawings.py`, and the realistic renders from `render/` (Blender Cycles).
 
@@ -130,9 +130,9 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 
 | STL | Qty | Size (mm) | Print orientation |
 |---|---|---|---|
-| `deck_mount_base.stl` | 1 | 140 x 120 x 22 | Floor down |
-| `deck_mount_front_tray.stl` | 1 | 88 x 120 x 16 | Floor down |
-| `deck_mount_rear_tray.stl` | 1 | 106 x 120 x 16 | Floor down |
+| `deck_mount_base.stl` | 1 | 140 x 120 x 22 | Floor down, no supports (the laps bridge between ribs) |
+| `deck_mount_front_tray.stl` | 1 | 88 x 116 x 16 | Floor down |
+| `deck_mount_rear_tray.stl` | 1 | 106 x 116 x 16 | Floor down |
 | `deck_mount_hood.stl` | 1 | 152 x 120 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
 | `deck_mount_front_cover.stl` | 1 | 62 x 116 x 60 | Top down (the STL is already flipped) |
 | `deck_mount_rear_cover.stl` | 1 | 80 x 116 x 60 | Top down (the STL is already flipped) |
