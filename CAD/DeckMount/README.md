@@ -18,7 +18,9 @@ Source: `tank_deck_mount.scad` (OpenSCAD, fully parametric). STLs are in `stl/`,
 | ![](images/01_render_front.png) | ![](images/02_render_rear.png) |
 | ![](images/03_render_hood_off.png) | ![](images/04_render_battery_out.png) |
 
-The chassis, tracks, battery and boards in the renders are stand-ins for context. Only the printed parts are to scale from the CAD.
+![](images/13_render_side.png)
+
+The chassis in the renders is traced from John's side and rear photos (2026-11-25): the plate sits toward the front, the lower chassis runs 100 mm past the plate's rear edge with its top 30 mm below the plate, the tracks end about 140 mm behind the plate, and the ground is about 140 mm below the plate top. The battery and boards are stand-ins. Only the printed parts are to scale from the CAD.
 
 ## Drawings
 
@@ -46,8 +48,10 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 - **Two lower pins** (M4 x 30 with R-clips) at the back of the hitch head, 60 mm apart. A tool or a trailer drawbar hangs on them and can pivot up and down.
 - **One lift point.** A DS3235 servo (35 kg·cm, metal gear) lies in the hitch head and swings a lift arm. A short link pins from the arm to the tool's mast.
-- **Sand rake:** 230 mm wide, 4 mm tines 28 mm long. It runs from 8° deeper than resting down to 28° raised, where the tines are about 25 mm clear of the ground, for turns. The servo sets the depth. At full drag (about 20 N, which is about all the tracks can pull) it needs about half the servo's torque.
+- **Sand rake:** 230 mm wide, 4 mm tines 28 mm long. Its arms reach down so the tines just touch the ground at rest (`ground_z`, about 140 mm below the plate top). It runs from 8° deeper than that to 28° raised, where the tines are about 38 mm clear of the ground, for turns. The rake bar sits about 40 mm behind the end of the tracks. The servo sets the depth. At full drag (about 20 N, which is about all the tracks can pull) it needs about 2.3 N·m, two thirds of the servo's 3.4 N·m, so feed the servo 6 to 7.4 V rather than 5 V.
 - **Trailer:** the drawbar hangs on the same two pins and is held level by the link. A 6 mm vertical swivel pin at its back end takes the trailer's tongue eye. The mower trailer in the render is a stand-in.
+
+**Fit to the real chassis:** the lower chassis runs on 100 mm past the plate's rear edge with its top 30 mm below the plate (John). Nothing on the hitch goes lower than 27 mm below the plate, so it rides 3 mm above that part. The lower pins sit 38 mm behind its end. The clamp under the plate is 79 mm wide so it misses the corner standoffs.
 
 **Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 16 go down through the cradle floor, the rear tray's tongue and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
 
@@ -64,7 +68,8 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 **Check before printing the hitch:**
 - The position of the plate's rear slots. I traced them from the photo at about 11 mm in from the rear edge.
-- That nothing on the chassis sits under the plate's rear edge, or directly behind it below the rear tray, down to 30 mm below the plate.
+- That nothing sits under the plate's rear 22 mm between the corner standoffs, above the lower chassis.
+- The plate's height above the ground. The rake is set for about 140 mm, estimated from the side photo; change `ground_z` if it differs.
 - The plate thickness. I assumed 2 mm.
 
 ## GPS antenna pod
@@ -152,7 +157,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 ### Check before printing
 
 1. **Clearance past the 120 mm ends.** The trays sit 0 to 15 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
-2. **Which end is the front.** The drawings assume the IBT-2s go at the front (closer to the motors). Swap the trays if not; the tongues are the same.
+2. **Which end is the front.** From John's photos, the rear is the end where the lower chassis runs on 100 mm past the plate; the hitch goes there. The IBT-2s go at the front. Swap the trays if not; the tongues are the same.
 3. **Corner holes are centred?** The spacing is measured (108 x 90); the design assumes the holes are centred on the plate. Print the base first and test-fit it.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
 5. **Adapter tower orientation.** The model assumes the 41 mm side runs front to back. If it's the other way, swap `tower_L` and `tower_W`.

@@ -31,9 +31,14 @@ rake_lift = 0;        // rake angle about the lower pins (deg): -8 = 8 deg deepe
 /* ---------- interface ---------- */
 plate_t  = 2;          // metal plate thickness (check)
 pin_d    = 4.2;        // lower pins / link pins: M4
-hb_z0    = -30;        // bottom of the hitch (flat, print bed)
-sx = 250; sy = 60; sz = -16;          // servo output shaft (centre of the 60 mm face)
-P  = [278, -22];                      // lower pin axis (x, z)
+// Real chassis (John's photos, 2026-11-25): behind the plate's rear edge the lower
+// chassis runs on for 100 mm with its top 30 mm below the plate; the tracks end
+// about 140 mm behind the edge; the ground is about 140 mm below the plate top
+// (estimated from the side photo).
+lower_L  = 100;  lower_z = -30;  ground_z = -140;
+hb_z0    = lower_z + 3;   // bottom of the hitch (flat, print bed): 3 mm above the lower chassis
+sx = 250; sy = 60; sz = -14;          // servo output shaft (centre of the 60 mm face)
+P  = [278, hb_z0 + 8];                     // lower pin axis (x, z)
 pin_y = [30, 90];                     // lower pin pairs (tool arms sit between the ears)
 ear_t = 4; ear_gap = 7.8;
 arm_len = 30;                         // lift arm, shaft to link pin
@@ -47,7 +52,7 @@ sv_ear_L = 54.5; sv_ear_t = 2.5; sv_ear_h = 28;   // ears 28 mm up from the bott
 sv_x0 = sx - 30;  sv_y0 = sy - sv_H;
 
 /* ---------- beam / head ---------- */
-clamp_x0 = 118;  clamp_y = [18, 102];  clamp_t = 8;
+clamp_x0 = 118;  clamp_y = [20.5, 99.5];  clamp_t = 8;   // clamp clears the corner standoffs
 beam_y   = [35, 85];
 head_x   = [210, 270];  head_y = [16, 104];  head_top = -4;
 beam_top = -0.5;       // just under the rear tray floor
@@ -71,8 +76,9 @@ module hitch() {
                 rbox(clamp_x0, plate_L, clamp_y[0], clamp_y[1], -plate_t - clamp_t, -plate_t, 4);
                 rbox(clamp_x0 + 20, plate_L, beam_y[0], beam_y[1], hb_z0, hb_z0 + 1, 4);
             }
-            // beam under the rear tray
-            rbox(plate_L - 2, head_x[0] + 5, beam_y[0], beam_y[1], hb_z0, beam_top, 3);
+            // beam under the rear tray: below the plate up to its edge, full height behind it
+            rbox(plate_L - 2, plate_L + 4, beam_y[0], beam_y[1], hb_z0, -plate_t, 1);
+            rbox(plate_L + 0.5, head_x[0] + 5, beam_y[0], beam_y[1], hb_z0, beam_top, 3);
             // head: servo housing, 5 mm rounded outside edges
             hull() {
                 rbox(head_x[0], head_x[1], head_y[0], head_y[1], hb_z0, head_top - rnd, rnd);
@@ -139,7 +145,7 @@ module link_bar(a, b) {   // a, b in X-Z
 
 // ---------------- tools ----------------
 rake_W = 230; tine_L = 28; tine_t = 4; tine_pitch = 14;
-rake_bar_rel = [50, -48];    // rake bar centre relative to the lower pins, rake down
+rake_bar_rel = [50, ground_z + 6 + tine_L - P[1]];   // rake bar centre relative to the lower pins: tines touch the ground at rake_lift 0
 module tool_frame_2d_arm() { hull() { circle(r = 7); translate(rake_bar_rel) circle(r = 6); } }
 module rake_frame(phi = 0) {
     translate([P[0], 0, P[1]]) rotate([0, -phi, 0]) {
@@ -206,18 +212,19 @@ else if (part == "hitch") translate([0, 0, -hb_z0]) hitch();       // printed up
 else if (part == "lid") translate([0, 0, -head_top]) lid();
 else if (part == "lift_arm") translate([0, 0, 4]) rotate([-90, 0, 0]) translate([-sx, -sy - 1, -sz]) lift_arm(0);   // flat
 else if (part == "link") translate([0, 0, link_y + 3.5]) rotate([-90, 0, 0]) link_bar([0, 0], [link_len, 0]);   // flat
-else if (part == "rake_frame") translate([0, 0, 76]) rake_frame(0);       // as installed: arms slope 46 deg, cross tube bridges
-else if (part == "rake_bar") translate([0, 0, -63]) rotate([180, 0, 0]) rake_bar(0);   // tines up
-else if (part == "drawbar") translate([0, 0, 29]) drawbar();
+else if (part == "rake_frame") translate([0, 0, -(P[1] + rake_bar_rel[1] - 6)]) rake_frame(0);   // as installed: arms slope about 60 deg, cross tube bridges
+else if (part == "rake_bar") translate([0, 0, P[1] + rake_bar_rel[1] + 7]) rotate([180, 0, 0]) rake_bar(0);   // tines up
+else if (part == "drawbar") translate([0, 0, 7 - P[1]]) drawbar();
 
 // ---------------- stand-in trailer for the renders (not printed) ----------------
 module trailer_ghost() {
     sw = P[0] + 58;   // swivel pin x
     translate([0, 0, 0]) {
-        hull() { translate([sw, 60, P[1] - 4]) cylinder(r = 8, h = 6); translate([sw + 70, 60, P[1] - 4]) cylinder(r = 8, h = 6); }   // tongue
-        translate([sw + 70, -30, -40]) rrect(170, 180, 10, 6);                                  // frame
-        translate([sw + 155, 60, -88]) cylinder(d = 170, h = 34);                               // mower deck
-        translate([sw + 155, 60, -54]) cylinder(d = 46, h = 50);                                // mower motor
-        for (y = [-44, 150]) translate([sw + 155, y + 7, -61.5]) rotate([90, 0, 0]) cylinder(d = 70, h = 14, center = true);   // wheels
+        g = ground_z - (-96.5);   // drop the stand-in trailer to the ground
+        hull() { translate([sw, 60, P[1] - 4]) cylinder(r = 8, h = 6); translate([sw + 70, 60, -40 + g]) cylinder(r = 8, h = 6); }   // tongue
+        translate([sw + 70, -30, -40 + g]) rrect(170, 180, 10, 6);                                  // frame
+        translate([sw + 155, 60, -88 + g]) cylinder(d = 170, h = 34);                               // mower deck
+        translate([sw + 155, 60, -54 + g]) cylinder(d = 46, h = 50);                                // mower motor
+        for (y = [-44, 150]) translate([sw + 155, y + 7, -61.5 + g]) rotate([90, 0, 0]) cylinder(d = 70, h = 14, center = true);   // wheels
     }
 }

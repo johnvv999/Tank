@@ -1,29 +1,36 @@
 include <../tank_deck_mount.scad>
 what = "";
-// illustrative chassis: side frames, sprockets, road wheels, rubber tracks
-trk_L = 250; trk_W = 42; trk_H = 62; trk_y = [-trk_W - 6, plate_W + 6];
-module track_loop() {   // in X-Z, extruded along Y
-    rotate([90, 0, 0]) mirror([0,0,1]) linear_extrude(trk_W) difference() {
-        hull() { translate([-trk_L/2 + 31, 0]) circle(r = 31, $fn = 80); translate([trk_L/2 - 31, 0]) circle(r = 31, $fn = 80); }
-        hull() { translate([-trk_L/2 + 31, 0]) circle(r = 25, $fn = 80); translate([trk_L/2 - 31, 0]) circle(r = 25, $fn = 80); }
+// stand-in chassis, traced from John's side and rear photos (2026-11-25):
+// the plate sits toward the front; the lower chassis runs 100 mm past the plate's
+// rear edge with its top 30 mm below the plate; the tracks end about 140 mm behind it;
+// the ground is about 140 mm below the plate top.
+trk_W = 42; trk_y = [-trk_W - 6, plate_W + 6]; trk_t = 6;
+// track loop outline in X-Z: [x, z, r] of each wheel's outer track radius
+trk_pts = [[246, -73, 33], [79, -36, 26], [-23, -75, 28], [14, -112, 28], [110, -112, 28], [209, -112, 28]];
+module track_loop() {
+    rotate([90, 0, 0]) mirror([0, 0, 1]) linear_extrude(trk_W) difference() {
+        hull() for (p = trk_pts) translate([p[0], p[1]]) circle(r = p[2], $fn = 80);
+        offset(-trk_t) hull() for (p = trk_pts) translate([p[0], p[1]]) circle(r = p[2], $fn = 80);
     }
 }
-module treads() { // grousers on the outside of the loop (top and bottom runs)
-    for (x = [-trk_L/2 + 31 : 9 : trk_L/2 - 31]) for (z = [-31 - 2.5, 31]) translate([x - 2, 0, z]) cube([4, trk_W, 2.5]);
+module treads() { // grousers along the bottom run
+    for (x = [14 : 9 : 209]) translate([x - 2, 0, -140]) cube([4, trk_W, 2.5]);
 }
 module wheels() {
-    for (x = [-trk_L/2 + 31, trk_L/2 - 31]) translate([x, trk_W/2, 0]) rotate([90, 0, 0]) cylinder(r = 24, h = trk_W - 6, center = true, $fn = 60);
-    for (x = [-60, -20, 20, 60]) translate([x, trk_W/2, -10]) rotate([90, 0, 0]) cylinder(r = 14, h = trk_W - 8, center = true, $fn = 48);
+    for (p = trk_pts) translate([p[0], trk_W/2, p[1]]) rotate([90, 0, 0]) cylinder(r = p[2] - trk_t - 2, h = trk_W - 10, center = true, $fn = 60);
 }
-cx = plate_L/2; cz = -2 - 40;
-if (what == "tracks") for (y = trk_y) translate([cx, y, cz]) { track_loop(); treads(); }
-if (what == "wheels") for (y = trk_y) translate([cx, y, cz]) wheels();
+if (what == "tracks") for (y = trk_y) translate([0, y, 0]) { track_loop(); treads(); }
+if (what == "wheels") for (y = trk_y) translate([0, y, 0]) wheels();
 if (what == "frame") {
     translate([0, 0, -2]) rrect(plate_L, plate_W, plate_r, 2);
-    for (y = [-6, plate_W]) translate([cx - 115, y, cz - 18]) cube([230, 6, 56]);          // side plates
-    for (y = [-6, plate_W]) for (x = [-trk_L/2 + 31, trk_L/2 - 31, -60, -20, 20, 60]) translate([cx + x, y + 3, cz + (abs(x) > 80 ? 0 : -10)]) rotate([90,0,0]) cylinder(d = 10, h = 14, center = true);
-    translate([cx - 115, 0, cz - 20]) cube([230, plate_W, 3]);   // belly plate
-    for (y = [10, plate_W - 40]) translate([cx + 70, y, cz - 16]) rotate([0, 90, 0]) cylinder(d = 25, h = 50);  // motors (XR25-370)
+    // side plates: top 30 mm below the plate, running 100 mm past its rear edge
+    for (y = [-6, plate_W]) translate([0, y + 6, 0]) rotate([90, 0, 0]) linear_extrude(6)
+        polygon([[-30, -40], [-30, -100], [240, -100], [240, -30], [40, -30], [20, -40]]);
+    for (y = [-6, plate_W]) for (p = trk_pts) translate([p[0], y + 3, p[1]]) rotate([90, 0, 0]) cylinder(d = 10, h = 14, center = true);   // axles
+    translate([-30, 0, -100]) cube([270, plate_W, 3]);   // belly plate
+    translate([232, 0, -36]) cube([8, plate_W, 6]);       // rear cross bar
+    for (x = hole_x, y = hole_y) translate([x, y, -30]) cylinder(d = 6, h = 28, $fn = 6);   // corner standoffs
+    for (y = [10, plate_W - 40]) translate([40, y, -75]) rotate([0, 90, 0]) cylinder(d = 25, h = 50);  // motors (stand-in)
 }
 if (what == "base") base();
 if (what == "trays") { front_tray(); rear_tray(); }

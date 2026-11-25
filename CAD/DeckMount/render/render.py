@@ -54,7 +54,7 @@ for k in M:
     o.data.materials.append(M[k])
     bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
 # ground
-bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.0965))
+bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.1405))
 g = bpy.context.object; g.data.materials.append(mat("floor", (0.55, 0.55, 0.56), 0.6))
 # world: soft sky
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True
@@ -77,13 +77,13 @@ k = area((0.55, -0.45, 0.65), 14, 0.6, (0,0,0)); aim(k, tgt)
 f = area((-0.5, 0.4, 0.35), 5, 1.0, (0,0,0)); aim(f, tgt)
 r = area((0.1, 0.7, 0.5), 7, 0.5, (0,0,0)); aim(r, tgt)
 # camera
-views = {"front34": ((-0.42, -0.42, 0.28), (0.07, 0.06, 0.03)),
-         "rear34": ((0.55, 0.45, 0.3), (0.07, 0.06, 0.04)),
-         "side":   ((0.07, -0.62, 0.18), (0.07, 0.06, 0.05)),
+views = {"front34": ((-0.50, -0.50, 0.26), (0.10, 0.06, -0.02)),
+         "rear34": ((0.66, 0.54, 0.28), (0.12, 0.06, -0.01)),
+         "side":   ((0.12, -0.80, 0.10), (0.12, 0.06, -0.02)),
          "swap":   ((-0.5, -0.56, 0.5), (0.07, 0.06, 0.15)),
          "pod":    ((0.62, -0.30, 0.42), (0.20, 0.06, 0.07)),
-         "hitch":  ((0.74, -0.50, 0.22), (0.21, 0.06, -0.01)),
-         "trailer": ((1.05, -0.85, 0.55), (0.30, 0.06, -0.04))}
+         "hitch":  ((0.90, -0.64, 0.20), (0.22, 0.06, -0.035)),
+         "trailer": ((0.95, -0.80, 0.42), (0.32, 0.06, -0.08))}
 loc, t = views[view]
 bpy.ops.object.camera_add(location=loc); cam = bpy.context.object; aim(cam, t)
 cam.data.lens = {"swap": 42, "trailer": 40}.get(view, 50); sc.camera = cam
