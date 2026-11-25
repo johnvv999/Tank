@@ -53,19 +53,22 @@ const uint8_t PWM_DEADBAND = 10;  // below this → coast
 
 // ── Motor power cap (battery vs motor voltage) ───────────────
 //   The tank runs on a Ryobi 18 V pack (~20 V fully charged), but the
-//   chassis DC motors are rated ~12 V. The IBT-2 passes the battery
-//   voltage straight through, so the average motor voltage is roughly
-//   battery V x (PWM / 255). Capping PWM at 153 gives ~12 V from a
-//   full 20 V pack.
+//   chassis DC motors (unmarked) are rated 7-15 V. The IBT-2 passes the
+//   battery voltage straight through, so the average motor voltage is
+//   roughly battery V x (PWM / 255). Capping PWM at 153 gives ~12 V from
+//   a full 20 V pack (~11 V at the 18 V nominal), the middle of the
+//   motors' range, leaving headroom below their 15 V maximum.
 //
 //   The full command range from the app (-255..+255) is SCALED into
 //   -MOTOR_PWM_LIMIT..+MOTOR_PWM_LIMIT, so the whole joystick travel
 //   still gives smooth control; full stick = the cap, not a clip.
 //
 //   To change the cap, edit MOTOR_PWM_LIMIT (1..255):
-//     255 = no cap (full battery voltage)
+//     190 = ~75 %  (~15 V from 20 V)  <- motors' max rating, don't exceed
+//     178 = ~70 %  (~14 V from 20 V)  more speed, still inside rating
 //     153 = ~60 %  (~12 V from 20 V)  <- default
 //     128 = ~50 %  (~10 V from 20 V)
+//     255 = no cap (full ~20 V, above the motors' 15 V rating)
 const uint8_t MOTOR_PWM_LIMIT = 153;
 static_assert(MOTOR_PWM_LIMIT > 0 && MOTOR_PWM_LIMIT <= 255,
               "MOTOR_PWM_LIMIT must be 1..255");
