@@ -45,9 +45,11 @@ hole_x   = [(plate_L - hole_sx)/2, (plate_L + hole_sx)/2];
 hole_y   = [(plate_W - hole_sy)/2, (plate_W + hole_sy)/2];
 screw_head_d = 6.5;   // room for an M3 pan/button head on the cradle floor
 // Rear hitch (hitch.scad) bolts up through the plate's two long rear slots
-// (traced from the scan: about 11 mm in from the rear edge). APPROXIMATE.
-hitch_bolt_x = 131;
-hitch_bolt_y = [26, 48, 72, 94];
+// John measured (2026-11-25): slot centre line 10 mm in from the rear edge,
+// slots at y 20..62 and 82..114.  The bolts stay inside y 20.5..99.5 so the
+// clamp under the plate clears the rear corner standoffs.
+hitch_bolt_x = 130;
+hitch_bolt_y = [26, 56, 86, 95];
 m3_csk = 6.4;      // countersunk M3 head
 
 /* ---------- battery + adapter ---------- */

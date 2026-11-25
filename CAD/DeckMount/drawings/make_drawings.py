@@ -330,8 +330,8 @@ def slot_measure_drawing():
     """What John needs to measure for the hitch: the two long slots at the plate's rear edge."""
     fig, ax = plt.subplots(figsize=(11, 10))
     plate_outline(ax, fc="#e9ecef")
-    sl = [(132.3, 18.0, 55.7), (131.0, 64.5, 102.3)]   # traced: (x centre, y start, y end)
-    w = 3.7
+    sl = [(130.0, 20.0, 62.0), (130.0, 82.0, 114.0)]   # John measured 2026-11-25: (x centre, y start, y end)
+    w = 3.5   # not measured; an M3 must pass
     for x, y0, y1 in sl:
         ax.add_patch(FancyBboxPatch((x - w / 2, y0), w, y1 - y0, boxstyle="round,pad=0,rounding_size=1.8",
                                     fc="#ffd8a8", ec=ORANGE, lw=2))
@@ -353,17 +353,19 @@ def slot_measure_drawing():
     ax.text(PL / 2 - 10, PW / 2 + 6, "FRONT", fontsize=13, color=GREY, ha="center")
     ax.annotate("", xy=(PL / 2 - 40, PW / 2), xytext=(PL / 2 + 20, PW / 2), arrowprops=dict(arrowstyle="->", lw=1.5, color=GREY))
     ax.annotate("REAR edge (hitch side)", xy=(PL, PW - 20), xytext=(PL - 30, PW + 7), fontsize=12, ha="left", arrowprops=dict(arrowstyle="->", lw=1.0))
-    ax.text(-2, -6, "measure B to E from this long edge", ha="left", va="top", fontsize=11, color=BLUE)
+    for y in (26, 56, 86, 95):   # hitch bolt positions
+        ax.add_patch(plt.Circle((130, y), 1.6, fc=RED, ec="black", lw=0.6, zorder=5))
+    ax.text(-2, -6, "B to E are from this long edge", ha="left", va="top", fontsize=11, color=BLUE)
     ax.text(PL / 2, -18,
-            "Please measure, in mm, on the top face of the metal plate:\n"
+            "Measured by John, in mm, on the top face of the metal plate:\n"
             "A   rear edge to the centre line of the slots (A2 too, if the two slots are not in line)\n"
             "B, C   that long edge to the near and far ends of the first slot\n"
             "D, E   that long edge to the near and far ends of the second slot\n"
             "W   slot width.        Already known: plate 140 x 120, 3 mm thick.\n"
-            "My traced guesses: A about 9, B 18, C 56, D 64, E 102, W 3.7.",
+            "Measured: A = A2 = 10, B 20, C 62, D 82, E 114.  W assumed 3.5.  Red dots: the 4 hitch bolts (y 26, 56, 86, 95).",
             ha="center", va="top", fontsize=11.5, multialignment="left")
     ax.set_xlim(-12, PL + 55); ax.set_ylim(-62, PW + 14); ax.set_aspect("equal"); ax.axis("off")
-    ax.set_title("Hitch: measurements needed for the plate's two rear slots (top view)", fontsize=15, loc="left")
+    ax.set_title("Hitch: the plate's two rear slots as measured, with the hitch bolts (top view)", fontsize=15, loc="left")
     fig.savefig(os.path.join(OUT, "15_measure_rear_slots.png"), dpi=120, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 

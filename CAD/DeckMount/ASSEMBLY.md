@@ -22,10 +22,10 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 | `deck_mount_hood` | 1 | Open side down | Ready |
 | `antenna_pod_cup` | 1 | Floor down | Ready |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready |
-| `hitch_hitch` | 1 | Flat bottom down, 6 walls, 40% infill | **Wait** for the rear slot measurements ([diagram](images/15_measure_rear_slots.png)) |
-| `hitch_lid`, `hitch_lift_arm`, `hitch_link` | 1 each | Flat | Wait (they go with the hitch) |
-| `hitch_rake_frame`, `hitch_rake_bar` | 1 each | As loaded (the bar prints tines up) | Wait |
-| `hitch_drawbar` | 1 | As loaded | Wait |
+| `hitch_hitch` | 1 | Flat bottom down, 6 walls, 40% infill | Ready (bolts match the measured slots, [diagram](images/15_measure_rear_slots.png)) |
+| `hitch_lid`, `hitch_lift_arm`, `hitch_link` | 1 each | Flat | Ready |
+| `hitch_rake_frame`, `hitch_rake_bar` | 1 each | As loaded (the bar prints tines up) | Ready |
+| `hitch_drawbar` | 1 | As loaded | Ready |
 
 For a slick finish on the casing (hood and covers), use matte black PETG at 0.16 mm layers.
 
@@ -67,7 +67,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 1. **Front tray:** mount the two IBT-2 boards heatsinks up on the slotted standoffs, with 4x M3 x 12 + nut each. The slots let the holes line up even if a board's holes are slightly off.
 2. **Rear tray:** mount the UNO R4 WiFi with its USB-C port facing the rear edge, where the cover's window is (4x M3 x 12). Then mount the GPS board beside it (4x M3 x 12).
 
-## 6. Rear hitch (optional, after the slot measurements)
+## 6. Rear hitch (optional)
 
 1. Lay the **servo** on its side in the hitch head's pocket, shaft toward the lift-arm slot. Screw its ears into the head with 4x M3 x 8.
 2. Lay the servo cable in the channel along the top of the beam toward the plate.

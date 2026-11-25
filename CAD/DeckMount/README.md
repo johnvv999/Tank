@@ -71,7 +71,7 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 | `hitch_drawbar.stl` | 1 | Trailer adapter |
 
 **Check before printing the hitch:**
-- The position of the plate's rear slots. I traced them from the photo at about 9 mm in from the rear edge. `images/15_measure_rear_slots.png` shows the measurements needed.
+- The plate's rear slots are now measured (John, 2026-11-25): centre line 10 mm in from the rear edge, slots at 20 to 62 and 82 to 114 mm from the long edge. The 4 bolts sit at 26, 56, 86 and 95 mm, so the clamp still clears the rear corner standoffs. `images/15_measure_rear_slots.png` shows them. The slot width wasn't measured; an M3 screw just has to pass through.
 - That nothing sits under the plate's rear 22 mm between the corner standoffs, above the lower chassis.
 - The plate thickness is 3 mm (measured).
 
