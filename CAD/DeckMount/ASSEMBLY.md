@@ -55,6 +55,8 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 ![](images/14_base_tongue_pockets.png)
 
+![](images/17_hole_match.png)
+
 1. Set the **base** on the plate, flat bottom down, with its corner holes over the plate's corner holes. The cradle walls run front to back.
 2. Lay the **front tray's** tongue into the 2 mm pocket at the front end of the base, so the tray hangs out over the front. Lay the **rear tray's** tongue into the rear pocket. Each tongue sits flush with the base floor.
 3. Push the 4 longer corner screws down through tongue, base and plate into the standoffs. Snug them up but don't crush the plastic.

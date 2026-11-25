@@ -13,12 +13,12 @@ from matplotlib.patches import FancyBboxPatch, Rectangle, Circle
 OUT = os.path.dirname(os.path.abspath(__file__))
 
 # --- plate (John, 2026-11-24) -------------------------------------------
-PL, PW = 140.0, 120.0            # X = 140 side, Y = 120 side
+PL, PW = 152.0, 135.0            # John, 2026-11-25: 152 x 135
 # Corner holes and cut-outs are traced from Images/BasePlate.png and scaled
 # to John's 140 x 120 outline, so they are approximate.
 SX, SY = PL / 151.6, PW / 135.3
-HX = [(PL - 108) / 2, (PL + 108) / 2]   # measured by John: 108 x 90, assumed centred
-HY = [(PW - 90) / 2, (PW + 90) / 2]
+HX = [(PL - 125) / 2, (PL + 125) / 2]   # John: 125 x 120, centred
+HY = [(PW - 120) / 2, (PW + 120) / 2]
 HOLE_D = 3.4
 # scan blobs: (cx, cy, w, h) in scan mm, y measured down from the top edge
 SCAN = [(49.4, 6.8, 51.0, 2.9), (104.6, 6.8, 45.6, 2.8), (106.7, 20.2, 21.9, 2.7),
@@ -41,9 +41,9 @@ WALL, WALL_H, END_WALL, END_H = 2.4, 22.0, 1.2, 12.0
 BAY_L, BAY_W = BL + 1.6, BW + 2.0
 STANDOFF, LIP_H = 11.0, 10.0
 # trays (match tank_deck_mount.scad)
-FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 26.0, 2.0
+FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 30.0, 2.0
 TRAY_T = 5.0
-CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 65.1, 30 + 5 + 14 + 4.8, FLOOR + 146.0
+CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 70.1, 30 + 5 + 14 + 4.8, FLOOR + 146.0
 TOWER_CX = (PL - BAY_L) / 2 + 0.8 + 80 + 15   # upright: switch face 80 mm behind the battery's front end (John)
 TW_CX = TOWER_CX - 7         # tower opening shifted forward 7 mm: lead, fuse and switch gap in front of the adapter
 LANE_W = 13.0
@@ -86,8 +86,8 @@ def plate_outline(ax, x0=0.0, y0=0.0, fc="#dee2e6", cutouts=True):
 def plate_drawing():
     fig, ax = plt.subplots(figsize=(11, 9.6))
     plate_outline(ax)
-    dim(ax, (0, 0), (PL, 0), "140", off=16, side=-1, fs=13)
-    dim(ax, (0, 0), (0, PW), "120", off=16, side=1, fs=13)
+    dim(ax, (0, 0), (PL, 0), "%.0f" % PL, off=16, side=-1, fs=13)
+    dim(ax, (0, 0), (0, PW), "%.0f" % PW, off=16, side=1, fs=13)
     dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "%.0f" % (HX[1] - HX[0]), off=14, fs=10)
     dim(ax, (HX[1], HY[0]), (HX[1], HY[1]), "%.0f" % (HY[1] - HY[0]), off=16, side=-1, fs=10)
     dim(ax, (0, HY[1]), (HX[0], HY[1]), "%.1f" % HX[0], off=6, fs=9)
@@ -95,17 +95,17 @@ def plate_drawing():
     ax.annotate("4 x corner holes, Ø3.4 (M3)\nplate screws to the kit standoffs here",
                 xy=(HX[1], HY[0]), xytext=(PL + 8, -14), fontsize=10,
                 arrowprops=dict(arrowstyle="->", lw=0.8))
-    ax.text(PL / 2, -34, "Outline 140 x 120 mm as measured by John.\n"
-            "Corner-hole spacing measured by John (108 x 90), assumed centred. Cut-outs are traced\n"
-            "from Images/BasePlate.png and scaled to fit, so they are approximate.\n"
-            "Shaded strips: where the tray tongues lie under the cradle. Which end is the front is assumed.",
+    ax.text(PL / 2, -34, "Outline 152 x 135 mm as measured by John.\n"
+            "Corner holes 125 x 120 apart, centred (John). Cut-outs are traced\n"
+            "from Images/BasePlate.png, so they are approximate.\n"
+            "Shaded strips: where the tray tongues lie under the cradle.",
             ha="center", va="top", fontsize=10, color="#495057")
-    ax.text(-8, PW / 2, "FRONT edge (120)\nfront tray hooks on here", rotation=90, ha="center", va="center",
+    ax.text(-8, PW / 2, "FRONT edge (135)\nfront tray hooks on here", rotation=90, ha="center", va="center",
             fontsize=10, color=BLUE, weight="bold")
-    ax.text(PL + 44, PW / 2 + 20, "REAR edge (120)\nrear tray hooks on here", rotation=90, ha="center",
+    ax.text(PL + 44, PW / 2 + 20, "REAR edge (135)\nrear tray hooks on here", rotation=90, ha="center",
             va="center", fontsize=10, color=BLUE, weight="bold")
-    for x0 in (0, PL - 26):
-        ax.add_patch(Rectangle((x0, 0), 26, PW, fc=BLUE, alpha=0.08, ec=BLUE, ls=":", lw=0.8))
+    for x0 in (0, PL - LAP_L):
+        ax.add_patch(Rectangle((x0, 0), LAP_L, PW, fc=BLUE, alpha=0.08, ec=BLUE, ls=":", lw=0.8))
     ax.set_title("Tank chassis mounting plate, top view (mm)", fontsize=15, loc="left", pad=14)
     ax.set_xlim(-30, PL + 62); ax.set_ylim(-58, PW + 30)
     ax.set_aspect("equal"); ax.axis("off")
@@ -150,14 +150,14 @@ def fit_drawing():
                 arrowprops=dict(arrowstyle="-|>", lw=2.5, color="k"))
     ax.text(-FRONT_OVH - 14, PW / 2 + 7, "travel", ha="center", fontsize=10)
     dim(ax, (-FRONT_OVH, 0), (0, 0), "%d past the plate" % FRONT_OVH, off=10, side=-1)
-    dim(ax, (0, 0), (PL, 0), "plate 140", off=10, side=-1)
+    dim(ax, (0, 0), (PL, 0), "plate %.0f" % PL, off=10, side=-1)
     dim(ax, (PL, 0), (PL + REAR_OVH, 0), "%d past the plate" % REAR_OVH, off=10, side=-1)
     dim(ax, (-FRONT_OVH, -16), (PL + REAR_OVH, -16), "overall %d" % (FRONT_OVH + PL + REAR_OVH), off=12, side=-1)
     dim(ax, (PL + REAR_OVH, ty0), (PL + REAR_OVH, ty0 + TRAY_W), "tray %d" % TRAY_W, off=36, side=-1)
     dim(ax, (bx0 + BL, by0), (bx0 + BL, by0 + BW), "80", off=-9, side=-1)
     ax.text(LAP_L / 2 + 2, 14, "tongue\nunder", ha="center", fontsize=8, color=BLUE)
     ax.text(PL - LAP_L / 2 - 2, 14, "tongue\nunder", ha="center", fontsize=8, color=BLUE)
-    ax.set_title("Top view (mm). Dashed lines are the plate's 120 mm front and rear edges.", fontsize=13, loc="left")
+    ax.set_title("Top view (mm). Dashed lines are the plate's front and rear edges.", fontsize=13, loc="left")
     ax.set_xlim(-FRONT_OVH - 30, PL + REAR_OVH + 50); ax.set_ylim(-48, PW + 22)
     ax.set_aspect("equal"); ax.axis("off")
 
@@ -210,13 +210,8 @@ def fit_drawing():
             "The mount's centre of mass ends up about 6 to 7 mm\n"
             "ahead of the plate centre. With the motors and tracks\n"
             "included it's smaller still, so you won't notice it.\n\n"
-            "Please check on the real chassis:\n"
-            "  1. Nothing sticks up past the 120 mm ends at plate\n"
-            "     height (side frames, the front slope, the rear\n"
-            "     rake). Trays to 15 mm, covers to 69 mm.\n"
-            "  2. Which 120 mm end is the front.\n"
-            "  3. That the corner holes are centred on the plate.\n"
-            "  4. The battery length (cradle takes up to 136.5).",
+            "Plate 152 x 135, corner holes 125 x 120 (John).\n"
+            "Trays reach 17 mm above the plate, covers 69 mm.",
             fontsize=10.5, va="top")
     fig.suptitle("How everything fits: battery in the middle, electronics past the front and rear edges",
                  fontsize=16, x=0.02, ha="left", y=0.995)
@@ -331,7 +326,7 @@ def slot_measure_drawing():
     """What John needs to measure for the hitch: the two long slots at the plate's rear edge."""
     fig, ax = plt.subplots(figsize=(11, 10))
     plate_outline(ax, fc="#e9ecef")
-    sl = [(130.0, 20.0, 62.0), (130.0, 82.0, 114.0)]   # John measured 2026-11-25: (x centre, y start, y end)
+    sl = [(PL - 10, 20.0, 62.0), (PL - 10, 82.0, 127.0)]   # John measured 2026-11-25: (x centre, y start, y end)
     w = 4.0   # John measured
     for x, y0, y1 in sl:
         ax.add_patch(FancyBboxPatch((x - w / 2, y0), w, y1 - y0, boxstyle="round,pad=0,rounding_size=1.8",
@@ -354,16 +349,16 @@ def slot_measure_drawing():
     ax.text(PL / 2 - 10, PW / 2 + 6, "FRONT", fontsize=13, color=GREY, ha="center")
     ax.annotate("", xy=(PL / 2 - 40, PW / 2), xytext=(PL / 2 + 20, PW / 2), arrowprops=dict(arrowstyle="->", lw=1.5, color=GREY))
     ax.annotate("REAR edge (hitch side)", xy=(PL, PW - 20), xytext=(PL - 30, PW + 7), fontsize=12, ha="left", arrowprops=dict(arrowstyle="->", lw=1.0))
-    for y in (26, 56, 86, 95):   # hitch bolt positions
-        ax.add_patch(plt.Circle((130, y), 1.6, fc=RED, ec="black", lw=0.6, zorder=5))
+    for y in (26, 56, 86, 108):   # hitch bolt positions
+        ax.add_patch(plt.Circle((PL - 10, y), 1.6, fc=RED, ec="black", lw=0.6, zorder=5))
     ax.text(-2, -6, "B to E are from this long edge", ha="left", va="top", fontsize=11, color=BLUE)
     ax.text(PL / 2, -18,
             "Measured by John, in mm, on the top face of the metal plate:\n"
             "A   rear edge to the centre line of the slots (A2 too, if the two slots are not in line)\n"
             "B, C   that long edge to the near and far ends of the first slot\n"
             "D, E   that long edge to the near and far ends of the second slot\n"
-            "W   slot width.        Already known: plate 140 x 120, 3 mm thick.\n"
-            "Measured: A = A2 = 10, B 20, C 62, D 82, E 114.  W = 4.  Red dots: the 4 hitch bolts (y 26, 56, 86, 95).",
+            "W   slot width.        Already known: plate 152 x 135, 3 mm thick.\n"
+            "Measured: A = A2 = 10, B 20, C 62, D 82, E 127.  W = 4.  Red dots: the 4 hitch bolts (y 26, 56, 86, 108).",
             ha="center", va="top", fontsize=11.5, multialignment="left")
     ax.set_xlim(-12, PL + 55); ax.set_ylim(-62, PW + 14); ax.set_aspect("equal"); ax.axis("off")
     ax.set_title("Hitch: the plate's two rear slots as measured, with the hitch bolts (top view)", fontsize=15, loc="left")
@@ -387,13 +382,13 @@ def hole_match_drawing():
     base = trimesh.load(os.path.join(OUT, "..", "stl", "deck_mount_base.stl"))
     sec = base.section(plane_origin=[0, 0, 1.0], plane_normal=[0, 0, 1]).to_2D(to_2D=np.eye(4))[0]
     fig, axs = plt.subplots(1, 2, figsize=(20, 10))
-    bolts = [(130, y) for y in (26, 56, 86, 95)]
+    bolts = [(PL - 10, y) for y in (26, 56, 86, 108)]
     corners = [(hx, hy) for hx in HX for hy in HY]
     labs = {c: str(i + 1) for i, c in enumerate(sorted(corners, key=lambda c: (c[1] < 60, c[0])))}
     for k, ax in enumerate(axs):
         if k == 0:
             plate_outline(ax, fc="#dee2e6")
-            for x, y0, y1 in [(130, 20, 62), (130, 82, 114)]:
+            for x, y0, y1 in [(PL - 10, 20, 62), (PL - 10, 82, 127)]:
                 ax.add_patch(FancyBboxPatch((x - 2, y0), 4, y1 - y0, boxstyle="round,pad=0,rounding_size=2",
                                             fc="white", ec="k", lw=1))
             ax.set_title("Metal plate (top view)", fontsize=16, loc="left")
@@ -415,15 +410,15 @@ def hole_match_drawing():
             ax.text(b[0] - 5, b[1], "H%d" % (i + 1), ha="right", va="center", fontsize=12, color=RED, fontweight="bold")
         h1, h3 = (HX[0], HY[1]), (HX[0], HY[0])
         # outside size and corner-hole pattern
-        dim(ax, (0, 0), (PL, 0), "140", off=24, side=-1, fs=12)
-        dim(ax, (0, 0), (0, PW), "120", off=34, fs=12)
-        dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "108", off=PW - HY[1] + 10, fs=12, color="#2f9e44")
-        dim(ax, h3, h1, "90", off=HX[0] + 18, fs=12, color="#2f9e44")
-        dim(ax, (0, HY[0]), (HX[0], HY[0]), "%.0f" % HX[0], off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
-        dim(ax, (HX[1], HY[0]), (PL, HY[0]), "%.0f" % (PL - HX[1]), off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
-        dim(ax, (HX[0], 0), (HX[0], HY[0]), "%.0f" % HY[0], off=HX[0] + 8, fs=10, color="#2f9e44")
+        dim(ax, (0, 0), (PL, 0), "%.0f" % PL, off=24, side=-1, fs=12)
+        dim(ax, (0, 0), (0, PW), "%.0f" % PW, off=34, fs=12)
+        dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "125", off=PW - HY[1] + 10, fs=12, color="#2f9e44")
+        dim(ax, h3, h1, "120", off=HX[0] + 18, fs=12, color="#2f9e44")
+        dim(ax, (0, HY[0]), (HX[0], HY[0]), "%.1f" % HX[0], off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
+        dim(ax, (HX[1], HY[0]), (PL, HY[0]), "%.1f" % (PL - HX[1]), off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
+        dim(ax, (HX[0], 0), (HX[0], HY[0]), "%.1f" % HY[0], off=HX[0] + 8, fs=10, color="#2f9e44")
         # hitch bolts: 10 from the rear edge, heights from the bottom long edge
-        dim(ax, (130, PW), (PL, PW), "10", off=6, fs=10, color=RED)
+        dim(ax, (PL - 10, PW), (PL, PW), "10", off=6, fs=10, color=RED)
         for i, b_ in enumerate(bolts):
             xx = PL + 8 + i * 8
             ax.plot([b_[0] + 3.2, xx], [b_[1], b_[1]], color=RED, lw=0.5, ls=":")
@@ -431,13 +426,13 @@ def hole_match_drawing():
             ax.text(xx, b_[1] + 1.5, "%d" % b_[1], ha="center", va="bottom", fontsize=10, color=RED, fontweight="bold")
         ax.plot([PL, PL + 34], [0, 0], color=RED, lw=0.6)
         if k == 0:
-            ax.text(6, -40, "Corner holes: the kit's M3 holes (about Ø3.4)\nRear slots: 4 wide, 20 to 62 and 82 to 114 from the bottom edge,\ncentre line 10 from the rear edge", fontsize=11, va="top")
+            ax.text(6, -40, "Corner holes: the kit's M3 holes (about Ø3.4)\nRear slots: 4 wide, 20 to 62 and 82 to 127 from the bottom edge,\ncentre line 10 from the rear edge", fontsize=11, va="top")
         else:
             ax.text(6, -40, "Corner holes 1-4: Ø3.4 through (M3)\nHitch holes H1-H4: Ø3.4 through (M3)\nAll holes go right through the flat base", fontsize=11, va="top")
         ax.text(PL / 2, PW + 26, "front on the left, rear (hitch end) on the right; hitch heights from the bottom edge", ha="center", fontsize=11, color=GREY)
         ax.set_xlim(-40, PL + 44); ax.set_ylim(-62, PW + 32); ax.set_aspect("equal"); ax.axis("off")
     fig.text(0.05, 0.02,
-             "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate into the standoffs (108 x 90 apart).\n"
+             "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate into the standoffs (125 x 120 apart).\n"
              "Red H1-H4: hitch bolts. They line up over the plate's two rear slots (only used when the hitch is fitted).\n"
              "No other holes need to line up. The base's other openings are wire and weight-saving cut-outs.",
              fontsize=13, va="bottom")

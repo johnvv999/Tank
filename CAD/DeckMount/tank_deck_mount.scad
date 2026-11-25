@@ -38,9 +38,9 @@ show_case = true;  // pictures: casing on/off
 plate_L  = 152;    // along travel (John, 2026-11-25: 152 x 135)
 plate_W  = 135;    // across (John)
 plate_r  = 4;
-// Corner screw holes: measured by John, 108 front-to-back x 90 side-to-side,
-// assumed centred on the plate.
-hole_sx  = 108; hole_sy = 90;
+// Corner screw holes (John, 2026-11-25): 125 front-to-back x 120 side-to-side,
+// about 13 mm in from the ends and 7-8 mm in from the sides, so centred.
+hole_sx  = 125; hole_sy = 120;
 hole_x   = [(plate_L - hole_sx)/2, (plate_L + hole_sx)/2];
 hole_y   = [(plate_W - hole_sy)/2, (plate_W + hole_sy)/2];
 screw_head_d = 6.5;   // room for an M3 pan/button head on the cradle floor

@@ -1,10 +1,10 @@
 # Tank deck mount: Ryobi P108 battery + Power Wheel adapter + electronics, with casing
 
-A printable mount and casing for the full-metal tank chassis (plate 140 x 120 mm):
+A printable mount and casing for the full-metal tank chassis (plate 152 x 135 mm):
 
-- **Battery cradle** in the middle, on the plate. The Ryobi P108 4 Ah battery (136 x 75.6 mm, 720 g) stands in it along the 140 mm side, with the Power Wheel adapter (84 x 75 mm base, 90 mm tall) on top: 150 mm together. No boards are above the battery.
-- **Front tray** overhanging the front 120 mm edge by 62 mm, carrying both IBT-2 drivers, heatsinks up.
-- **Rear tray** overhanging the rear 120 mm edge by 80 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
+- **Battery cradle** in the middle, on the plate. The Ryobi P108 4 Ah battery (136 x 75.6 mm, 720 g) stands in it along the 152 mm side, with the Power Wheel adapter (84 x 75 mm base, 90 mm tall) on top: 150 mm together. No boards are above the battery.
+- **Front tray** overhanging the front 135 mm edge by 62 mm, carrying both IBT-2 drivers, heatsinks up.
+- **Rear tray** overhanging the rear 135 mm edge by 80 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
 - **Casing**: a hood over the battery that shows only the top of the adapter, and a cover over each tray. No tools needed.
 
 The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its two ends are 2 mm thick, with an open pocket on top. Each tray has a 2 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
@@ -30,7 +30,7 @@ The chassis in the renders is traced from John's side and rear photos (2026-11-2
 
 ## Changing the battery (no tools)
 
-The hood's end walls (1.2 mm) are what hold the battery's ends, so the full 140 mm plate goes to the battery. Once the hood is off, nothing stands beside the battery above the 22 mm cradle walls, so there's room for your fingers on both release latches.
+The hood's end walls (1.2 mm) are what hold the battery's ends, so the full 152 mm plate goes to the battery. Once the hood is off, nothing stands beside the battery above the 22 mm cradle walls, so there's room for your fingers on both release latches.
 
 1. Lift the hood straight up. It slides off over the adapter.
 2. Lift the adapter straight up and set it beside the tank. Its leads stay connected (250 mm lead).
@@ -71,7 +71,7 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 | `hitch_drawbar.stl` | 1 | Trailer adapter |
 
 **Check before printing the hitch:**
-- The plate's rear slots are now measured (John, 2026-11-25): centre line 10 mm in from the rear edge, slots at 20 to 62 and 82 to 114 mm from the long edge. The 4 bolts sit at 26, 56, 86 and 95 mm, so the clamp still clears the rear corner standoffs. `images/15_measure_rear_slots.png` shows them. The slots are 4 mm wide, so M3 screws pass with room to spare.
+- The plate's rear slots are now measured (John, 2026-11-25): centre line 10 mm in from the rear edge, slots at 20 to 62 and 82 to 127 mm from the long edge. The 4 bolts sit at 26, 56, 86 and 108 mm. The clamp sits behind the rear corner standoffs (13.5 mm in) and between them (7.5 mm in from each side). `images/15_measure_rear_slots.png` shows them. The slots are 4 mm wide, so M3 screws pass with room to spare.
 - That nothing sits under the plate's rear 22 mm between the corner standoffs, above the lower chassis.
 - The plate thickness is 3 mm (measured).
 
@@ -130,10 +130,10 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 
 | STL | Qty | Size (mm) | Print orientation |
 |---|---|---|---|
-| `deck_mount_base.stl` | 1 | 140 x 120 x 22 | Floor down, flat bottom, no supports |
-| `deck_mount_front_tray.stl` | 1 | 88 x 120 x 16 | Floor down |
-| `deck_mount_rear_tray.stl` | 1 | 106 x 120 x 16 | Floor down |
-| `deck_mount_hood.stl` | 1 | 152 x 120 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
+| `deck_mount_base.stl` | 1 | 152 x 135 x 22 | Floor down, flat bottom, no supports |
+| `deck_mount_front_tray.stl` | 1 | 92 x 135 x 16 | Floor down |
+| `deck_mount_rear_tray.stl` | 1 | 110 x 135 x 16 | Floor down |
+| `deck_mount_hood.stl` | 1 | 164 x 135 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
 | `deck_mount_front_cover.stl` | 1 | 62 x 116 x 60 | Top down (the STL is already flipped) |
 | `deck_mount_rear_cover.stl` | 1 | 80 x 116 x 60 | Top down (the STL is already flipped) |
 
@@ -147,8 +147,8 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 | Item | Value | Source |
 |---|---|---|
-| Chassis plate | 140 x 120 mm | Measured by John |
-| Plate corner holes | 108 mm front to back x 90 mm side to side, assumed centred (16 / 15 mm in from the edges) | Measured by John |
+| Chassis plate | 152 x 135 x 3 mm | Measured by John (2026-11-25) |
+| Plate corner holes | 125 mm front to back x 120 mm side to side, centred (13.5 / 7.5 mm in from the edges) | Measured by John |
 | P108 battery footprint | 136 x 75.6 mm, cell housing 53.1 tall. The pocket is 137.6 x 77.6 (1.6 mm play on the length, 2 mm on the width) | John, 2026-11-25 |
 | Battery + adapter height | 150 mm | Measured by John |
 | Power Wheel adapter | 84 x 75 mm base, 90 mm tall, 250 mm lead | Listing photo |
@@ -160,9 +160,9 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 ### Check before printing
 
-1. **Clearance past the 120 mm ends.** The trays sit 0 to 15 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
+1. **Clearance past the 135 mm ends.** The trays sit 2 to 17 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
 2. **Which end is the front.** From John's photos, the rear is the end where the lower chassis runs on 100 mm past the plate; the hitch goes there. The IBT-2s go at the front. Swap the trays if not; the tongues are the same.
-3. **Corner holes are centred?** The spacing is measured (108 x 90); the design assumes the holes are centred on the plate. Print the base first and test-fit it.
+3. **Corner holes:** 125 x 120, measured. Print the base first and test-fit it on the plate.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
 5. **Switch height.** The switch faces the front (John). Its height (`sw_drop`, 40 mm below the top) is from a photo.
 
