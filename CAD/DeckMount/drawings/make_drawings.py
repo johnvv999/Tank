@@ -331,7 +331,7 @@ def slot_measure_drawing():
     fig, ax = plt.subplots(figsize=(11, 10))
     plate_outline(ax, fc="#e9ecef")
     sl = [(130.0, 20.0, 62.0), (130.0, 82.0, 114.0)]   # John measured 2026-11-25: (x centre, y start, y end)
-    w = 3.5   # not measured; an M3 must pass
+    w = 4.0   # John measured
     for x, y0, y1 in sl:
         ax.add_patch(FancyBboxPatch((x - w / 2, y0), w, y1 - y0, boxstyle="round,pad=0,rounding_size=1.8",
                                     fc="#ffd8a8", ec=ORANGE, lw=2))
@@ -362,7 +362,7 @@ def slot_measure_drawing():
             "B, C   that long edge to the near and far ends of the first slot\n"
             "D, E   that long edge to the near and far ends of the second slot\n"
             "W   slot width.        Already known: plate 140 x 120, 3 mm thick.\n"
-            "Measured: A = A2 = 10, B 20, C 62, D 82, E 114.  W assumed 3.5.  Red dots: the 4 hitch bolts (y 26, 56, 86, 95).",
+            "Measured: A = A2 = 10, B 20, C 62, D 82, E 114.  W = 4.  Red dots: the 4 hitch bolts (y 26, 56, 86, 95).",
             ha="center", va="top", fontsize=11.5, multialignment="left")
     ax.set_xlim(-12, PL + 55); ax.set_ylim(-62, PW + 14); ax.set_aspect("equal"); ax.axis("off")
     ax.set_title("Hitch: the plate's two rear slots as measured, with the hitch bolts (top view)", fontsize=15, loc="left")
