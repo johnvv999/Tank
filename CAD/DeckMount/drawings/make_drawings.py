@@ -4,6 +4,7 @@ Run:  python3 make_drawings.py   (needs matplotlib)  ->  writes PNGs next to thi
 All numbers mirror the variables in ../tank_deck_mount.scad.
 """
 import os
+import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -376,3 +377,49 @@ if __name__ == "__main__":
     wiring_drawing()
     slot_measure_drawing()
     print("wrote", OUT)
+
+
+def hole_match_drawing():
+    """Which holes in the printed base line up with which holes in the metal plate."""
+    import trimesh
+    from matplotlib.patches import PathPatch
+    from matplotlib.path import Path
+    base = trimesh.load(os.path.join(OUT, "..", "stl", "deck_mount_base.stl"))
+    sec = base.section(plane_origin=[0, 0, 1.0], plane_normal=[0, 0, 1]).to_2D(to_2D=np.eye(4))[0]
+    fig, axs = plt.subplots(1, 2, figsize=(18, 8.6))
+    bolts = [(130, y) for y in (26, 56, 86, 95)]
+    corners = [(hx, hy) for hx in HX for hy in HY]
+    labs = {c: str(i + 1) for i, c in enumerate(sorted(corners, key=lambda c: (c[1] < 60, c[0])))}
+    for k, ax in enumerate(axs):
+        if k == 0:
+            plate_outline(ax, fc="#dee2e6")
+            for x, y0, y1 in [(130, 20, 62), (130, 82, 114)]:
+                ax.add_patch(FancyBboxPatch((x - 2, y0), 4, y1 - y0, boxstyle="round,pad=0,rounding_size=2",
+                                            fc="white", ec="k", lw=1))
+            ax.set_title("Metal plate (top view)", fontsize=16, loc="left")
+        else:
+            loops = [np.asarray(l)[:, :2] for l in sec.discrete]
+            area = lambda l: 0.5 * np.sum(l[:-1, 0] * l[1:, 1] - l[1:, 0] * l[:-1, 1])
+            big = max(range(len(loops)), key=lambda i: abs(area(loops[i])))
+            verts, codes = [], []
+            for i, l in enumerate(loops):
+                if (area(l) > 0) != (i == big): l = l[::-1]
+                verts += l.tolist(); codes += [Path.MOVETO] + [Path.LINETO] * (len(l) - 1)
+            ax.add_patch(PathPatch(Path(verts, codes), fc="#a5b4fc", ec=BLUE, lw=1))
+            ax.set_title("Printed base, same way round (top view)", fontsize=16, loc="left")
+        for c in corners:
+            ax.add_patch(Circle(c, 4.2, fc="none", ec="#2f9e44", lw=3))
+            ax.text(c[0], c[1] + (6.5 if c[1] > 60 else -6.5), labs[c], ha="center", va="bottom" if c[1] > 60 else "top", fontsize=15, color="#2f9e44", fontweight="bold")
+        for i, b in enumerate(bolts):
+            ax.add_patch(Circle(b, 3.2, fc="none", ec=RED, lw=2.5))
+            ax.text(b[0] - 6, b[1], "H%d" % (i + 1), ha="right", va="center", fontsize=12, color=RED, fontweight="bold")
+        ax.text(-4, PW / 2, "FRONT", rotation=90, ha="right", va="center", fontsize=13, color=GREY)
+        ax.text(PL + 4, PW / 2, "REAR (hitch)", rotation=90, ha="left", va="center", fontsize=13, color=GREY)
+        ax.set_xlim(-14, PL + 14); ax.set_ylim(-8, PW + 12); ax.set_aspect("equal"); ax.axis("off")
+    fig.text(0.05, 0.02,
+             "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate into the standoffs (108 x 90 apart).\n"
+             "Red H1-H4: hitch bolts. They line up over the plate's two rear slots (only used when the hitch is fitted).\n"
+             "No other holes need to line up. The base's other openings are wire and weight-saving cut-outs.",
+             fontsize=13, va="bottom")
+    fig.savefig(os.path.join(OUT, "17_hole_match.png"), dpi=110, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
