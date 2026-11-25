@@ -33,9 +33,8 @@ plate_t  = 2;          // metal plate thickness (check)
 pin_d    = 4.2;        // lower pins / link pins: M4
 // Real chassis (John's photos, 2026-11-25): behind the plate's rear edge the lower
 // chassis runs on for 100 mm with its top 30 mm below the plate; the tracks end
-// about 140 mm behind the edge; the ground is about 140 mm below the plate top
-// (estimated from the side photo).
-lower_L  = 100;  lower_z = -30;  ground_z = -140;
+// about 140 mm behind the edge; the plate top is 130 mm above the ground (John measured).
+lower_L  = 100;  lower_z = -30;  ground_z = -130;
 hb_z0    = lower_z + 3;   // bottom of the hitch (flat, print bed): 3 mm above the lower chassis
 sx = 250; sy = 60; sz = -14;          // servo output shaft (centre of the 60 mm face)
 P  = [278, hb_z0 + 8];                     // lower pin axis (x, z)

@@ -31,19 +31,19 @@ SCAN = [(49.4, 6.8, 51.0, 2.9), (104.6, 6.8, 45.6, 2.8), (106.7, 20.2, 21.9, 2.7
         (60.0, 123.0, 16.2, 2.7), (49.4, 128.6, 51.1, 2.8), (104.6, 128.6, 45.5, 2.7)]
 
 # --- battery + adapter ----------------------------------------------------
-BL, BW = 135.0, 80.0             # P108 body footprint (Archive/Battery+VR.f3d)
+BL, BW = 136.0, 75.6             # P108 body footprint (John, 2026-11-25)
 TOTAL_H = 150.0                  # battery + adapter, measured by John
 AD_L, AD_W, AD_H = 84.0, 75.0, 90.0   # Power Wheel adapter (listing photo)
 BODY_H = TOTAL_H - AD_H          # battery top surface (where the adapter base sits)
 FLOOR = 4.0                      # cradle floor
-WALL, WALL_H, END_WALL, END_H = 2.4, 22.0, 1.6, 12.0
-BAY_L, BAY_W = BL + 1.5, BW + 2.0
+WALL, WALL_H, END_WALL, END_H = 2.4, 22.0, 1.2, 12.0
+BAY_L, BAY_W = BL + 1.6, BW + 2.0
 STANDOFF, LIP_H = 11.0, 10.0
 # trays (match tank_deck_mount.scad)
 FRONT_OVH, REAR_OVH, TRAY_W, LAP_L, LAP_T = 62, 80, 116, 26.0, 2.0
 TRAY_T = 5.0
-CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 50.0, 41 + 5 + 10 + 4.8, FLOOR + 146.0
-TW_CX = PL / 2 - 5           # tower opening shifted forward 5 mm: lead channel in front of the adapter
+CASE_TOP, SHOULDER, TOWER_OUT, HOOD_TOP = FLOOR + 65.0, 50.0, 30 + 5 + 14 + 4.8, FLOOR + 146.0
+TW_CX = PL / 2 - 7           # tower opening shifted forward 7 mm: lead, fuse and switch gap in front of the adapter
 LANE_W = 13.0
 IBT_POS = [(-FRONT_OVH + 6, (PW - TRAY_W) / 2 + 3.5), (-FRONT_OVH + 6, PW - (PW - TRAY_W) / 2 - 3.5 - 50)]
 
@@ -122,7 +122,7 @@ def fit_drawing():
         ax.add_patch(FancyBboxPatch((x0, ty0), x1 - x0, TRAY_W, boxstyle="round,pad=0,rounding_size=2",
                                     fc="#a5d8ff", ec=BLUE, lw=1.6, alpha=0.8))
     plate_outline(ax, fc="#e9ecef", cutouts=False)
-    ax.add_patch(Rectangle((bx0 - 0.75 - END_WALL, by0 - 1 - WALL), BAY_L + 2 * END_WALL, BAY_W + 2 * WALL,
+    ax.add_patch(Rectangle((bx0 - 0.8 - END_WALL, by0 - 1 - WALL), BAY_L + 2 * END_WALL, BAY_W + 2 * WALL,
                            fc="none", ec=BLUE, lw=2.2))
     ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.55))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.85))
@@ -181,7 +181,7 @@ def fit_drawing():
     ax.text(PL / 2 + 34, CASE_TOP + SHOULDER + 8, "casing (hood lifts off)", fontsize=9)
     ax.add_patch(Rectangle((bx0, FLOOR), BL, BODY_H, fc=ORANGE, ec="k", alpha=0.6))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((PL / 2 - 20.5, FLOOR + BODY_H + 8), 41, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PL / 2 - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
     zb = TRAY_T + STANDOFF
     ax.add_patch(Rectangle((-FRONT_OVH + 6, zb), 50, 43, fc="#495057", ec="k", alpha=0.85))
     ax.text(-FRONT_OVH + 31, zb + 21, "IBT-2", color="white", ha="center", va="center", fontsize=9)
@@ -240,9 +240,9 @@ def wiring_drawing():
         ax.add_patch(Rectangle((bx0 + 3, y), BAY_L - 8, WALL, fc=BLUE, ec="none", alpha=0.6))
     ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.35))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.5))
-    ax.add_patch(Rectangle((PL / 2 - 20.5, PW / 2 - 17), 41, 34, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((TW_CX - 28, PW / 2 - 19.5), 56, 39, fc="none", ec="#212529", lw=1.6, ls=":"))
-    ax.text(PL / 2, PW / 2, "adapter\n41 x 34", ha="center", va="center", fontsize=9)
+    ax.add_patch(Rectangle((PL / 2 - 15, PW / 2 - 15), 30, 30, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((TW_CX - 24.5, PW / 2 - 19.5), 49, 39, fc="none", ec="#212529", lw=1.6, ls=":"))
+    ax.text(PL / 2, PW / 2, "adapter\n30 x 30", ha="center", va="center", fontsize=9)
     for (x, y) in IBT_POS:
         ax.add_patch(Rectangle((x, y), 50, 50, fc="#495057", ec="k", alpha=0.75))
     ax.text(-FRONT_OVH + 31, IBT_POS[0][1] + 25, "IBT-2\nleft motor", color="white", ha="center", va="center", fontsize=9)
@@ -294,7 +294,7 @@ def wiring_drawing():
     top = FLOOR + TOTAL_H
     ax.add_patch(Rectangle((0, FLOOR), PL, BODY_H, fc=ORANGE, ec="k", alpha=0.35))
     ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((PL / 2 - 20.5, FLOOR + BODY_H + 8), 41, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PL / 2 - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
     hx = [0, 0, TW_CX - TOWER_OUT / 2, TW_CX - TOWER_OUT / 2]
     hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP]
     ax.plot(hx, hz, color="#212529", lw=2.2)

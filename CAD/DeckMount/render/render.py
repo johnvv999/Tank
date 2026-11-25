@@ -42,6 +42,8 @@ M = {
  "p_plate": mat("steelp", (0.6, 0.61, 0.63), 0.35, 1.0),
  "p_puck": mat("puck", (0.015, 0.015, 0.017), 0.6),
  "p_coil": mat("coax", (0.02, 0.02, 0.02), 0.5),
+ "switch": mat("rocker", (0.015, 0.015, 0.017), 0.5),
+ "fuse": mat("fuseh", (0.02, 0.02, 0.022), 0.55),
  "lead_red": mat("lead_r", (0.6, 0.02, 0.02), 0.45),
  "lead_black": mat("lead_k", (0.02, 0.02, 0.02), 0.45),
 }
@@ -54,7 +56,7 @@ for k in M:
     o.data.materials.append(M[k])
     bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
 # ground
-bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.1405))
+bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.1305))
 g = bpy.context.object; g.data.materials.append(mat("floor", (0.55, 0.55, 0.56), 0.6))
 # world: soft sky
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True

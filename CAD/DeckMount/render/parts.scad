@@ -3,10 +3,10 @@ what = "";
 // stand-in chassis, traced from John's side and rear photos (2026-11-25):
 // the plate sits toward the front; the lower chassis runs 100 mm past the plate's
 // rear edge with its top 30 mm below the plate; the tracks end about 140 mm behind it;
-// the ground is about 140 mm below the plate top.
+// the plate top is 130 mm above the ground (John measured).
 trk_W = 42; trk_y = [-trk_W - 6, plate_W + 6]; trk_t = 6;
 // track loop outline in X-Z: [x, z, r] of each wheel's outer track radius
-trk_pts = [[246, -73, 33], [79, -36, 26], [-23, -75, 28], [14, -112, 28], [110, -112, 28], [209, -112, 28]];
+trk_pts = [[246, -73, 33], [79, -36, 26], [-23, -75, 28], [14, -102, 28], [110, -102, 28], [209, -102, 28]];
 module track_loop() {
     rotate([90, 0, 0]) mirror([0, 0, 1]) linear_extrude(trk_W) difference() {
         hull() for (p = trk_pts) translate([p[0], p[1]]) circle(r = p[2], $fn = 80);
@@ -14,7 +14,7 @@ module track_loop() {
     }
 }
 module treads() { // grousers along the bottom run
-    for (x = [14 : 9 : 209]) translate([x - 2, 0, -140]) cube([4, trk_W, 2.5]);
+    for (x = [14 : 9 : 209]) translate([x - 2, 0, -130]) cube([4, trk_W, 2.5]);
 }
 module wheels() {
     for (p = trk_pts) translate([p[0], trk_W/2, p[1]]) rotate([90, 0, 0]) cylinder(r = p[2] - trk_t - 2, h = trk_W - 10, center = true, $fn = 60);
@@ -51,4 +51,6 @@ module lead(dy) {
     for (i = [0 : len(pts) - 2]) hull() { translate(pts[i]) sphere(d = 4.5, $fn = 16); translate(pts[i + 1]) sphere(d = 4.5, $fn = 16); }
 }
 if (what == "lead_red") lead(-3);
+if (what == "switch") translate([0, 0, cap_lift]) switch_ghost();
+if (what == "fuse") translate([0, 0, cap_lift]) fuse_ghost();
 if (what == "lead_black") lead(3);

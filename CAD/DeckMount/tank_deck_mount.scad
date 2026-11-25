@@ -51,10 +51,10 @@ hitch_bolt_y = [26, 48, 72, 94];
 m3_csk = 6.4;      // countersunk M3 head
 
 /* ---------- battery + adapter ---------- */
-bat_L = 135; bat_W = 80;          // P108 footprint (Archive/Battery+VR.f3d)
+bat_L = 136; bat_W = 75.6;        // P108 footprint (John, 2026-11-25: about 136 x 75.6, cell housing 53.1 tall)
 bat_cap_h = 150;                  // battery + adapter (John)
 cap_L = 84; cap_W = 75; cap_h = 90;   // Power Wheel adapter
-end_clear = 0.75; side_clear = 1.0;
+end_clear = 0.8; side_clear = 1.0;   // 1.6 mm total on the length, 2 mm on the width (John: 1.5 to 2)
 
 /* ---------- trays ---------- */
 front_ovh = 62;    // front tray reaches this far past the front edge
@@ -76,17 +76,19 @@ gus      = 10;    // corner gussets inside the bumper
 
 /* ---------- casing ---------- */
 case_t   = 2.4;   // hood + cover walls
-hood_end = 1.6;   // hood end walls (between battery and plate edge)
+hood_end = 1.2;   // hood end walls (between battery and plate edge): 3 lines at 0.4 mm, backed by the covers
 case_top = floor_t + bat_cap_h - cap_h + 5;   // top of covers / start of the hood shoulder
 shoulder = 50;    // shoulder rise (>= 45 deg everywhere, prints without supports)
 tower_clear = 2.5;                // around the adapter's tower
-tower_L = 41; tower_W = 34;       // adapter tower, measured by John (41 along travel assumed)
+tower_L = 30; tower_W = 30;       // adapter tower, measured by John (30 x 30)
+fuse_W  = 35; fuse_t = 10;        // inline fuse holder on the red lead, 35 x 10 x 35 (John): it must pass up through the tower opening
+sw_drop = 40;  sw_win_w = 24; sw_win_h = 30;   // rocker switch on the tower's front face, centre about 40 mm below its top (from John's photo)
 hood_top = floor_t + bat_cap_h - 4;   // top 4 mm of the adapter shows
 lip_L    = 6;     // hood lips reaching over each cover
 cham     = 6;     // lip inset from the covers' long sides
 rnd      = 5;     // outside edge radius (John: "round all edges by 5mm")
 rim_r    = 1.2;   // tower top rim: the 2.4 mm wall can only take a 1.2 mm round
-lead_gap = 10;    // extra room in front of the adapter tower for its leads (they come out the top)
+lead_gap = 14;    // extra room in front of the adapter tower for its leads, the fuse holder and the switch rocker
 lane_w   = 13;    // hidden wire lanes between the cradle walls and the hood sides
 hook_w   = 50;    // cover hook width
 /* ---------- GPS antenna pod on the rear cover (antenna_pod.scad) ---------- */
@@ -281,7 +283,7 @@ module lip_solid(c = 0) {   // across the flat top of the covers, plan corners r
     }
 }
 // hood: built from hulls of spheres and cylinders so every outside edge has a 5 mm radius
-tw_L = tower_L + 2*tower_clear + lead_gap;  tw_W = tower_W + 2*tower_clear;
+tw_L = tower_L + 2*tower_clear + lead_gap;  tw_W = max(tower_W + 2*tower_clear, fuse_W + 4);
 tw_cx = plate_L/2 - lead_gap/2;   // tower opening shifted forward: the leads run down in front of the adapter
 module corners(x0, x1, y0, y1) { for (x = [x0, x1], y = [y0, y1]) translate([x, y, 0]) children(); }
 module hood_shell(o) {   // o = 0 outside, 1 inside
@@ -316,6 +318,9 @@ module hood() {
         // hidden wire lanes: passages at the bottom of both ends, on both sides (between hood and cradle walls)
         for (x = [-1, plate_L - hood_end - 1], y = [case_t + 0.3, plate_W - case_t - 0.3 - lane_w])
             translate([x, y, floor_t - 1]) cube([hood_end + 2, lane_w, 13]);
+        // finger window for the adapter's rocker switch, in the tower's front face
+        translate([tw_cx - tw_L/2 - 40, plate_W/2 - sw_win_w/2, floor_t + bat_cap_h - sw_drop - sw_win_h/2])
+            rotate([0, 90, 0]) translate([-sw_win_h, 0, 0]) rrect(sw_win_h, sw_win_w, 4, 40 + case_t + 1);
         // decorative grooves along the sides
         for (z = [case_top - 18, case_top - 26]) for (y = [-1, plate_W - 0.8])
             translate([14, y, z]) cube([plate_L - 28, 1.8, 1.6]);
@@ -397,6 +402,12 @@ module cap_ghost() {
         cube([cap_L, cap_W, 8]);
         translate([cap_L/2 - tower_L/2, cap_W/2 - tower_W/2, 0]) cube([tower_L, tower_W, cap_h]);
     }
+}
+module switch_ghost() {   // rocker switch on the tower's front face
+    translate([plate_L/2 - tower_L/2 - 4, plate_W/2 - 7.5, floor_t + bat_cap_h - sw_drop - 10]) cube([4, 15, 20]);
+}
+module fuse_ghost() {     // inline fuse holder, hanging in the lead gap in front of the tower
+    translate([plate_L/2 - tower_L/2 - tower_clear - lead_gap + 2, plate_W/2 - fuse_W/2, floor_t + bat_cap_h - cap_h + 9]) cube([fuse_t, fuse_W, 35]);
 }
 module boards_ghost() {
     z = tray_t + standoff_h;
