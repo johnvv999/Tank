@@ -386,7 +386,7 @@ def hole_match_drawing():
     from matplotlib.path import Path
     base = trimesh.load(os.path.join(OUT, "..", "stl", "deck_mount_base.stl"))
     sec = base.section(plane_origin=[0, 0, 1.0], plane_normal=[0, 0, 1]).to_2D(to_2D=np.eye(4))[0]
-    fig, axs = plt.subplots(1, 2, figsize=(18, 8.6))
+    fig, axs = plt.subplots(1, 2, figsize=(20, 10))
     bolts = [(130, y) for y in (26, 56, 86, 95)]
     corners = [(hx, hy) for hx in HX for hy in HY]
     labs = {c: str(i + 1) for i, c in enumerate(sorted(corners, key=lambda c: (c[1] < 60, c[0])))}
@@ -412,10 +412,30 @@ def hole_match_drawing():
             ax.text(c[0], c[1] + (6.5 if c[1] > 60 else -6.5), labs[c], ha="center", va="bottom" if c[1] > 60 else "top", fontsize=15, color="#2f9e44", fontweight="bold")
         for i, b in enumerate(bolts):
             ax.add_patch(Circle(b, 3.2, fc="none", ec=RED, lw=2.5))
-            ax.text(b[0] - 6, b[1], "H%d" % (i + 1), ha="right", va="center", fontsize=12, color=RED, fontweight="bold")
-        ax.text(-4, PW / 2, "FRONT", rotation=90, ha="right", va="center", fontsize=13, color=GREY)
-        ax.text(PL + 4, PW / 2, "REAR (hitch)", rotation=90, ha="left", va="center", fontsize=13, color=GREY)
-        ax.set_xlim(-14, PL + 14); ax.set_ylim(-8, PW + 12); ax.set_aspect("equal"); ax.axis("off")
+            ax.text(b[0] - 5, b[1], "H%d" % (i + 1), ha="right", va="center", fontsize=12, color=RED, fontweight="bold")
+        h1, h3 = (HX[0], HY[1]), (HX[0], HY[0])
+        # outside size and corner-hole pattern
+        dim(ax, (0, 0), (PL, 0), "140", off=24, side=-1, fs=12)
+        dim(ax, (0, 0), (0, PW), "120", off=34, fs=12)
+        dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "108", off=PW - HY[1] + 10, fs=12, color="#2f9e44")
+        dim(ax, h3, h1, "90", off=HX[0] + 18, fs=12, color="#2f9e44")
+        dim(ax, (0, HY[0]), (HX[0], HY[0]), "%.0f" % HX[0], off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
+        dim(ax, (HX[1], HY[0]), (PL, HY[0]), "%.0f" % (PL - HX[1]), off=HY[0] + 9, side=-1, fs=10, color="#2f9e44")
+        dim(ax, (HX[0], 0), (HX[0], HY[0]), "%.0f" % HY[0], off=HX[0] + 8, fs=10, color="#2f9e44")
+        # hitch bolts: 10 from the rear edge, heights from the bottom long edge
+        dim(ax, (130, PW), (PL, PW), "10", off=6, fs=10, color=RED)
+        for i, b_ in enumerate(bolts):
+            xx = PL + 8 + i * 8
+            ax.plot([b_[0] + 3.2, xx], [b_[1], b_[1]], color=RED, lw=0.5, ls=":")
+            ax.annotate("", xy=(xx, 0), xytext=(xx, b_[1]), arrowprops=dict(arrowstyle="<->", lw=0.9, color=RED))
+            ax.text(xx, b_[1] + 1.5, "%d" % b_[1], ha="center", va="bottom", fontsize=10, color=RED, fontweight="bold")
+        ax.plot([PL, PL + 34], [0, 0], color=RED, lw=0.6)
+        if k == 0:
+            ax.text(6, -40, "Corner holes: the kit's M3 holes (about Ø3.4)\nRear slots: 4 wide, 20 to 62 and 82 to 114 from the bottom edge,\ncentre line 10 from the rear edge", fontsize=11, va="top")
+        else:
+            ax.text(6, -40, "Corner holes 1-4: Ø3.4 through (M3)\nHitch holes H1-H4: Ø3.4 through (M3)\nAll holes go right through the flat base", fontsize=11, va="top")
+        ax.text(PL / 2, PW + 26, "front on the left, rear (hitch end) on the right; hitch heights from the bottom edge", ha="center", fontsize=11, color=GREY)
+        ax.set_xlim(-40, PL + 44); ax.set_ylim(-62, PW + 32); ax.set_aspect("equal"); ax.axis("off")
     fig.text(0.05, 0.02,
              "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate into the standoffs (108 x 90 apart).\n"
              "Red H1-H4: hitch bolts. They line up over the plate's two rear slots (only used when the hitch is fitted).\n"
