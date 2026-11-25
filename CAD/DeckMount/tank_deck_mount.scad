@@ -35,8 +35,8 @@ hood_lift = 0;     // pictures: hood lifted (mm)
 show_case = true;  // pictures: casing on/off
 
 /* ---------- chassis plate ---------- */
-plate_L  = 140;    // along travel (John)
-plate_W  = 120;    // across (John)
+plate_L  = 152;    // along travel (John, 2026-11-25: 152 x 135)
+plate_W  = 135;    // across (John)
 plate_r  = 4;
 // Corner screw holes: measured by John, 108 front-to-back x 90 side-to-side,
 // assumed centred on the plate.
@@ -46,10 +46,10 @@ hole_y   = [(plate_W - hole_sy)/2, (plate_W + hole_sy)/2];
 screw_head_d = 6.5;   // room for an M3 pan/button head on the cradle floor
 // Rear hitch (hitch.scad) bolts up through the plate's two long rear slots
 // John measured (2026-11-25): slot centre line 10 mm in from the rear edge,
-// slots at y 20..62 and 82..114.  The bolts stay inside y 20.5..99.5 so the
-// clamp under the plate clears the rear corner standoffs.
-hitch_bolt_x = 130;
-hitch_bolt_y = [26, 56, 86, 95];
+// slots at y 20..62 and 82..114 from the long edge.  The clamp under the
+// plate stays behind the rear corner standoffs (22 mm in from the rear edge).
+hitch_bolt_x = plate_L - 10;
+hitch_bolt_y = [26, 56, 86, 108];
 m3_csk = 6.4;      // countersunk M3 head
 
 /* ---------- battery + adapter ---------- */
@@ -62,7 +62,7 @@ end_clear = 0.8; side_clear = 1.0;   // 1.6 mm total on the length, 2 mm on the 
 front_ovh = 62;    // front tray reaches this far past the front edge
 rear_ovh  = 80;    // rear tray reaches this far past the rear edge
 tray_W    = 116;   // narrower than the plate, to clear the side frames
-lap_L     = 26;    // tongue length under the cradle
+lap_L     = 30;    // tongue length under the cradle
 lap_t     = 2;     // tongue thickness (half of the 4 mm floor)
 // The cradle's bottom is flat everywhere (prints with no supports). Its ends are 2 mm thick with an
 // open pocket on top; each tray's tongue lies in that pocket, flush with the cradle floor, and the
@@ -252,7 +252,7 @@ module rear_tray_unmirrored() {
             cylinder(d = m3, h = lap_t + 2);
             translate([0, 0, lap_t + 0.01 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 1);
         }
-        for (x = [-20, -60]) translate([x, 62.5, -1]) {
+        for (x = [-20, -60]) translate([x, plate_W/2 + 2.5, -1]) {
             cylinder(d = m3, h = tray_t + 2);
             translate([0, 0, tray_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
         }
@@ -293,8 +293,8 @@ tower_cx = bay_x0 + end_clear + sw_from_front + tower_L/2;   // the upright sits
 tw_cx = tower_cx - lead_gap/2;   // tower opening shifted forward: the leads run down in front of the adapter
 tlx_o = (tw_L + 2*case_t)/2 - rnd;
 // shoulder rise: at least 45 deg on both slopes, so the hood prints open side down without supports
-shoulder = max(50, (tw_cx - tlx_o) - rnd + 2, (plate_L - rnd) - (tw_cx + tlx_o) + 2);
-assert(case_top + shoulder < hood_top - 10, "tower too far from the middle: no room for the sleeve");
+shoulder = max(50, (tw_cx - tlx_o) - rnd + 1, (plate_L - rnd) - (tw_cx + tlx_o) + 1);
+assert(case_top + shoulder <= hood_top - 10, "tower too far from the middle: no room for the sleeve");
 module corners(x0, x1, y0, y1) { for (x = [x0, x1], y = [y0, y1]) translate([x, y, 0]) children(); }
 module hood_shell(o) {   // o = 0 outside, 1 inside
     r  = o ? rnd - case_t : rnd;

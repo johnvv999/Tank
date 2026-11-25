@@ -6,7 +6,7 @@ what = "";
 // the plate top is 130 mm above the ground (John measured).
 trk_W = 42; trk_y = [-trk_W - 6, plate_W + 6]; trk_t = 6;
 // track loop outline in X-Z: [x, z, r] of each wheel's outer track radius
-trk_pts = [[246, -73, 33], [79, -36, 26], [-23, -75, 28], [14, -102, 28], [110, -102, 28], [209, -102, 28]];
+trk_pts = [[258, -73, 33], [85, -36, 26], [-23, -75, 28], [14, -102, 28], [116, -102, 28], [221, -102, 28]];
 module track_loop() {
     rotate([90, 0, 0]) mirror([0, 0, 1]) linear_extrude(trk_W) difference() {
         hull() for (p = trk_pts) translate([p[0], p[1]]) circle(r = p[2], $fn = 80);
@@ -14,7 +14,7 @@ module track_loop() {
     }
 }
 module treads() { // grousers along the bottom run
-    for (x = [14 : 9 : 209]) translate([x - 2, 0, -130]) cube([4, trk_W, 2.5]);
+    for (x = [14 : 9 : 221]) translate([x - 2, 0, -130]) cube([4, trk_W, 2.5]);
 }
 module wheels() {
     for (p = trk_pts) translate([p[0], trk_W/2, p[1]]) rotate([90, 0, 0]) cylinder(r = p[2] - trk_t - 2, h = trk_W - 10, center = true, $fn = 60);
@@ -25,10 +25,10 @@ if (what == "frame") {
     translate([0, 0, -3]) rrect(plate_L, plate_W, plate_r, 3);   // 3 mm plate
     // side plates: top 30 mm below the plate, running 100 mm past its rear edge
     for (y = [-6, plate_W]) translate([0, y + 6, 0]) rotate([90, 0, 0]) linear_extrude(6)
-        polygon([[-30, -40], [-30, -100], [240, -100], [240, -30], [40, -30], [20, -40]]);
+        polygon([[-30, -40], [-30, -100], [plate_L + 100, -100], [plate_L + 100, -30], [40, -30], [20, -40]]);
     for (y = [-6, plate_W]) for (p = trk_pts) translate([p[0], y + 3, p[1]]) rotate([90, 0, 0]) cylinder(d = 10, h = 14, center = true);   // axles
-    translate([-30, 0, -100]) cube([270, plate_W, 3]);   // belly plate
-    translate([232, 0, -36]) cube([8, plate_W, 6]);       // rear cross bar
+    translate([-30, 0, -100]) cube([plate_L + 130, plate_W, 3]);   // belly plate
+    translate([plate_L + 92, 0, -36]) cube([8, plate_W, 6]);       // rear cross bar
     for (x = hole_x, y = hole_y) translate([x, y, -30]) cylinder(d = 6, h = 27, $fn = 6);   // corner standoffs
     for (y = [10, plate_W - 40]) translate([40, y, -75]) rotate([0, 90, 0]) cylinder(d = 25, h = 50);  // motors (stand-in)
 }
