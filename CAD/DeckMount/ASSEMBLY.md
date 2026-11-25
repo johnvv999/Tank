@@ -131,7 +131,10 @@ To swap tools, pull the 3 pins.
 
 1. Turn the switch off through the finger window.
 2. Lift the **hood** straight up. It slides off over the adapter and the leads.
-3. Press the adapter's release latches and lift the **adapter** straight up. Set it beside the tank; its leads stay connected.
-4. Press the battery's latches and lift the **battery** straight out. The finger scoops in the cradle walls help.
+3. Squeeze the battery's two release buttons, one on each side just under the adapter, and lift the **adapter** straight up. With the hood off, nothing stands beside the battery above the 22 mm cradle walls, so your thumb and finger have about 20 mm of room on each side. Set the adapter beside the tank; its leads stay connected.
+
+   ![](images/16_battery_release_buttons.png)
+
+4. Lift the **battery** straight out. Nothing latches it into the cradle; the finger scoops in the cradle walls give you a grip.
 
 To refit, drop the battery back in (flat end forward), then the adapter (switch forward), then lower the hood.

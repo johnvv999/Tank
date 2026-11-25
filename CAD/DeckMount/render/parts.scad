@@ -54,3 +54,36 @@ if (what == "lead_red") lead(-3);
 if (what == "switch") translate([0, 0, cap_lift]) switch_ghost();
 if (what == "fuse") translate([0, 0, cap_lift]) fuse_ghost();
 if (what == "lead_black") lead(3);
+
+// ---- Ryobi P108 stand-in for the pictures: flat front, curved rear, two release
+// buttons on the long sides flanking the stem (under the adapter's base).
+bx0 = bay_x0 + end_clear; by0 = bay_y0 + side_clear; bz0 = floor_t;
+bat_H = bat_cap_h - cap_h;           // body up to where the adapter sits
+btn_x = tower_cx - 5; btn_L = 26; btn_z = [bat_H - 17, bat_H - 5];
+module bat_plan(inset = 0) {          // flat front end, rounded rear end
+    offset(-inset) hull() {
+        translate([bx0 + 2, by0 + 2]) circle(r = 2, $fn = 16);
+        translate([bx0 + 2, by0 + bat_W - 2]) circle(r = 2, $fn = 16);
+        translate([bx0 + bat_L - 24, by0 + 24]) circle(r = 24, $fn = 80);
+        translate([bx0 + bat_L - 24, by0 + bat_W - 24]) circle(r = 24, $fn = 80);
+    }
+}
+module bat_btn_cut() { for (y = [by0 - 1, by0 + bat_W - 3]) translate([btn_x - btn_L/2 - 1, y, bz0 + btn_z[0] - 1]) cube([btn_L + 2, 4, btn_z[1] - btn_z[0] + 2]); }
+if (what == "bat_body") translate([0, 0, bat_lift]) difference() {
+    union() {
+        translate([0, 0, bz0]) linear_extrude(bat_H - 18) bat_plan();
+        translate([0, 0, bz0 + bat_H - 4]) linear_extrude(4) bat_plan(1.5);   // top deck under the adapter
+    }
+    bat_btn_cut();
+}
+if (what == "bat_band") translate([0, 0, bat_lift]) difference() {     // green upper housing
+    translate([0, 0, bz0 + bat_H - 18]) linear_extrude(14) bat_plan(0.3);
+    bat_btn_cut();
+}
+if (what == "bat_btn") translate([0, 0, bat_lift]) for (s = [0, 1]) {   // release buttons, ribbed, standing 1.5 proud
+    y = s == 0 ? by0 - 1.5 : by0 + bat_W - 2.5;
+    translate([btn_x - btn_L/2, y, bz0 + btn_z[0]]) cube([btn_L, 4, btn_z[1] - btn_z[0]]);
+    for (i = [0:4]) translate([btn_x - btn_L/2 + 3 + i*5, s == 0 ? y - 0.8 : y + 3.8, bz0 + btn_z[0] + 2]) cube([1.6, 1, btn_z[1] - btn_z[0] - 4]);
+}
+if (what == "bat_gauge") translate([0, 0, bat_lift]) for (i = [0:3])   // fuel gauge LEDs on the flat front
+    translate([bx0 - 0.6, by0 + bat_W/2 - 15 + i*10, bz0 + bat_H - 26]) cube([1, 6, 3]);
