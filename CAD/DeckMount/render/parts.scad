@@ -38,11 +38,11 @@ if (what == "hood") translate([0, 0, hood_lift]) hood();
 if (what == "covers") { front_cover(); rear_cover(); }
 if (what == "battery") translate([0,0,bat_lift]) battery_ghost();
 if (what == "adapter") translate([0,0,cap_lift]) cap_ghost();
-if (what == "ibt_pcb") for (o = ibt_pos) translate([o[0], o[1], tray_t + standoff_h]) cube([ibt_board, ibt_board, 1.6]);
-if (what == "ibt_sink") for (o = ibt_pos) translate([o[0] + 5, o[1] + 5, tray_t + standoff_h + 1.6]) { cube([40, 40, 6]); for (i = [0:7]) translate([1 + i*5.2, 0, 6]) cube([2, 40, 35]); }
-if (what == "uno") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_t + standoff_h]) cube([uno_L, uno_W, 1.6]);
-if (what == "uno_parts") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_t + standoff_h + 1.6]) { translate([-1, 32, 0]) cube([8, 9, 3.3]); translate([-2, 3, 0]) cube([14, 9, 11]); translate([20, 2, 0]) cube([45, 2.5, 8.5]); translate([15, 49, 0]) cube([50, 2.5, 8.5]); }
-if (what == "gps") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([gps_pos[0], gps_pos[1], tray_t + standoff_h]) cube([gps_board, gps_board, 1.6]);
+if (what == "ibt_pcb") for (o = ibt_pos) translate([o[0], o[1], tray_z + tray_t + standoff_h]) cube([ibt_board, ibt_board, 1.6]);
+if (what == "ibt_sink") for (o = ibt_pos) translate([o[0] + 5, o[1] + 5, tray_z + tray_t + standoff_h + 1.6]) { cube([40, 40, 6]); for (i = [0:7]) translate([1 + i*5.2, 0, 6]) cube([2, 40, 35]); }
+if (what == "uno") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_z + tray_t + standoff_h]) cube([uno_L, uno_W, 1.6]);
+if (what == "uno_parts") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_z + tray_t + standoff_h + 1.6]) { translate([-1, 32, 0]) cube([8, 9, 3.3]); translate([-2, 3, 0]) cube([14, 9, 11]); translate([20, 2, 0]) cube([45, 2.5, 8.5]); translate([15, 49, 0]) cube([50, 2.5, 8.5]); }
+if (what == "gps") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([gps_pos[0], gps_pos[1], tray_z + tray_t + standoff_h]) cube([gps_board, gps_board, 1.6]);
 // the adapter's leads: out of the top, a short loop, then down inside the hood in front of the adapter
 module lead(dy) {
     zt = floor_t + bat_cap_h + cap_lift;

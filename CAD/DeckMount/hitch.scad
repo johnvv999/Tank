@@ -54,7 +54,7 @@ sv_x0 = sx - 30;  sv_y0 = sy - sv_H;
 clamp_x0 = 118;  clamp_y = [20.5, 99.5];  clamp_t = 8;   // clamp clears the corner standoffs
 beam_y   = [35, 85];
 head_x   = [210, 270];  head_y = [16, 104];  head_top = -4;
-beam_top = -0.5;       // just under the rear tray floor
+beam_top = tray_z - 0.5;   // just under the rear tray floor
 
 module rbox(x0, x1, y0, y1, z0, z1, r) {   // box with vertical edges rounded
     translate([x0, y0, z0]) rrect(x1 - x0, y1 - y0, min(r, (x1 - x0)/2 - 0.01, (y1 - y0)/2 - 0.01), z1 - z0);

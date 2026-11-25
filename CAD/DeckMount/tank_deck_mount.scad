@@ -62,10 +62,11 @@ rear_ovh  = 80;    // rear tray reaches this far past the rear edge
 tray_W    = 116;   // narrower than the plate, to clear the side frames
 lap_L     = 26;    // tongue length under the cradle
 lap_t     = 2;     // tongue thickness (half of the 4 mm floor)
-// ribs under the cradle's laps reach the print bed, so the laps print as short bridges (no supports);
-// the tongues have matching slots open at their tips
-lap_ribs  = [[0, 3], [38, 42], [58, 62], [78, 82], [117, 120]];
-rib_clear = 0.3;
+// The cradle's bottom is flat everywhere (prints with no supports). Its ends are 2 mm thick with an
+// open pocket on top; each tray's tongue lies in that pocket, flush with the cradle floor, and the
+// corner screws clamp tongue + cradle to the plate. So each tray sits 2 mm up (tray_z).
+tray_z    = lap_t;
+lap_clear = 0.3;   // tongue tip to pocket end
 
 /* ---------- general ---------- */
 floor_t = 4.0; wall_t = 2.4; wall_h = 22; end_t = 1.6;
@@ -116,23 +117,18 @@ module ziptie_pair(h) { for (s = [-1, 1]) translate([0, s*4, 0]) cube([4, 2, h],
 // =====================================================================
 //  BASE / BATTERY CRADLE
 // =====================================================================
-wall_x0 = max(bay_x0 + 4, hole_x[0] + screw_head_d/2 + 0.5);
+wall_x0 = max(bay_x0 + 4, lap_L + lap_clear + 0.5);
 module base() {
     difference() {
         union() {
-            // floor: full 3 mm in the middle, upper 1.5 mm only over the laps
-            intersection() {
-                rrect(plate_L, plate_W, rnd, floor_t);
-                union() {
-                    translate([lap_L, -1, 0]) cube([plate_L - 2*lap_L, plate_W + 2, floor_t]);
-                    translate([-1, -1, lap_t]) cube([plate_L + 2, plate_W + 2, floor_t]);
-                    for (r = lap_ribs, x0 = [-1, plate_L - lap_L]) translate([x0, r[0], 0]) cube([lap_L + 1, r[1] - r[0], lap_t + 0.01]);
-                }
-            }
-            // side walls stop short of the corner screw heads
+            // floor: one flat 4 mm slab, solid to the bed everywhere
+            rrect(plate_L, plate_W, rnd, floor_t);
+            // side walls stand between the two tongue pockets
             for (y = [bay_y0 - wall_t, bay_y0 + bay_W])
-                translate([wall_x0, y, lap_t]) cube([plate_L - 2*wall_x0, wall_t, wall_h - lap_t]);
+                translate([wall_x0, y, 0]) cube([plate_L - 2*wall_x0, wall_t, wall_h]);
         }
+        // tongue pockets: the top 2 mm of each end, open on top and at the end
+        for (x0 = [-1, plate_L - lap_L - lap_clear]) translate([x0, -1, lap_t]) cube([lap_L + lap_clear + 1, plate_W + 2, floor_t]);
         // windows under the middle of the battery
         for (x = [lap_L + 6, plate_L/2 + 3])
             translate([x, bay_y0 + 10, -1]) rrect(plate_L/2 - lap_L - 9, bay_W - 20, 4, floor_t + 2);
@@ -141,11 +137,8 @@ module base() {
             translate([lap_L + 6, y, -1]) rrect(plate_L - 2*lap_L - 12, bay_y0 - wall_t - 8, 2, floor_t + 2);
         // corner screws
         for (x = hole_x, y = hole_y) translate([x, y, -1]) cylinder(d = m3, h = floor_t + 2);
-        // rear hitch bolts: countersunk flush, the battery stands on them
-        for (y = hitch_bolt_y) translate([hitch_bolt_x, y, -1]) {
-            cylinder(d = m3, h = floor_t + 2);
-            translate([0, 0, floor_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
-        }
+        // rear hitch bolts (countersunk in the rear tray's tongue above)
+        for (y = hitch_bolt_y) translate([hitch_bolt_x, y, -1]) cylinder(d = m3, h = floor_t + 2);
         // finger scoops in the side walls to grip the battery
         for (y = [bay_y0 - wall_t - 1, bay_y0 + bay_W - 1])
             translate([plate_L/2, y, wall_h]) rotate([-90, 0, 0]) cylinder(d = 34, h = wall_t + 2);
@@ -192,13 +185,9 @@ module tray_body(ovh, hook_y) {
                 translate([-ovh, ty0, 0]) rrect(12, tray_W, 5, tray_t);
                 translate([-1, ty0, 0]) cube([1, tray_W, tray_t]);
             }
-            difference() {
-                intersection() {
-                    rrect(plate_L, plate_W, plate_r, lap_t);
-                    translate([-1, -1, 0]) cube([lap_L + 1, plate_W + 2, lap_t]);
-                }
-                // slots for the cradle's lap ribs, open at the tongue tip
-                for (r = lap_ribs) translate([-0.01, r[0] - rib_clear, -1]) cube([lap_L + 1, r[1] - r[0] + 2*rib_clear, lap_t + 2]);
+            intersection() {
+                rrect(plate_L, plate_W, plate_r, lap_t);
+                translate([-1, -1, 0]) cube([lap_L + 1, plate_W + 2, lap_t]);
             }
             // bumper wall across the outer end + side walls, all 15 tall, rounded outer corners
             difference() {
@@ -230,7 +219,7 @@ module tray_body(ovh, hook_y) {
     }
 }
 
-module front_tray() {
+module front_tray_flat() {   // as printed (floor on the bed)
     difference() {
         union() {
             tray_body(front_ovh, plate_W/2);
@@ -257,7 +246,10 @@ module rear_tray_unmirrored() {
         }
         for (p = uno_pts()) translate([p[0], p[1], -1]) cylinder(d = m3, h = tray_t + standoff_h + 2);
         // rear hitch: bolts through the tongue, and two countersunk M3 that tie the tray floor to the hitch beam
-        for (y = hitch_bolt_y) translate([plate_L - hitch_bolt_x, y, -1]) cylinder(d = m3, h = lap_t + 2);
+        for (y = hitch_bolt_y) translate([plate_L - hitch_bolt_x, y, -1]) {   // countersunk flush, the battery stands on them
+            cylinder(d = m3, h = lap_t + 2);
+            translate([0, 0, lap_t + 0.01 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 1);
+        }
         for (x = [-20, -60]) translate([x, 62.5, -1]) {
             cylinder(d = m3, h = tray_t + 2);
             translate([0, 0, tray_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
@@ -269,7 +261,8 @@ module rear_tray_unmirrored() {
     }
 }
 // mirrored about X so it attaches at the rear (X = 140) edge
-module rear_tray() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) rear_tray_unmirrored(); }
+module front_tray() { translate([0, 0, tray_z]) front_tray_flat(); }
+module rear_tray() { translate([plate_L, 0, tray_z]) mirror([1, 0, 0]) rear_tray_unmirrored(); }
 
 // =====================================================================
 //  CASING
@@ -342,7 +335,7 @@ module hood() {
 // (against the hood) and the bottom edge (sits on the tray wall) stay square.
 module cover_shell(ovh, o) {
     r  = o ? rnd - case_t : rnd;
-    zb = tray_t + bump_h - o;
+    zb = tray_z + tray_t + bump_h - o;
     ya = ty0 + rnd;  yb = ty0 + tray_W - rnd;
     hull() {
         corners(-ovh + rnd, -ovh + rnd, ya, yb) translate([0, 0, zb]) cylinder(r = r, h = 0.01);
@@ -370,8 +363,8 @@ module cover_body(ovh, hook_y) {
                     polygon([[-lip_L - 3, case_top], [-lip_L - 3, case_top - case_t], [0, case_top - lip_L - 3 - case_t - 3], [0, case_top]]);
             }
             // hook tab: drops into the bumper pocket, nub clicks into the groove
-            translate([-ovh + 0.3, hook_y - hook_w/2, tray_t + bump_h - 7.7]) cube([1.7, hook_w, 8]);
-            translate([-ovh + 1.9, hook_y - hook_w/2, tray_t + bump_h - 6.8]) cube([1.2, hook_w, 1.6]);
+            translate([-ovh + 0.3, hook_y - hook_w/2, tray_z + tray_t + bump_h - 7.7]) cube([1.7, hook_w, 8]);
+            translate([-ovh + 1.9, hook_y - hook_w/2, tray_z + tray_t + bump_h - 6.8]) cube([1.2, hook_w, 1.6]);
         }
         lip_solid(fit_gap);   // seat for the hood's lip
         // sliding gap between the cover's plate end and the hood's end wall
@@ -384,20 +377,20 @@ module front_cover() {
         // vent slots over both IBT-2 heatsinks
         for (o = ibt_pos) for (i = [0:5]) translate([o[0] + ibt_board/2 - 2, o[1] + 7 + i*7.2, case_top - 5]) slot(36, 3.2, 10);
         // grille in the front face
-        for (i = [-6:6]) translate([-front_ovh - 1, plate_W/2 + i*7 - 1.6, tray_t + bump_h + 10]) cube([case_t + 2, 3.2, 26]);
+        for (i = [-6:6]) translate([-front_ovh - 1, plate_W/2 + i*7 - 1.6, tray_z + tray_t + bump_h + 10]) cube([case_t + 2, 3.2, 26]);
     }
 }
 module rear_cover_unmirrored() {
     difference() {
         cover_body(rear_ovh, rear_hook_y);
         // USB-C + barrel jack window, from the bottom edge up
-        translate([-rear_ovh - 1, uno_pos[1] + 1, tray_t + bump_h - 1]) cube([case_t + 2, uno_W - 2, 16]);
+        translate([-rear_ovh - 1, uno_pos[1] + 1, tray_z + tray_t + bump_h - 1]) cube([case_t + 2, uno_W - 2, 16]);
         // antenna cable comes down from the pod here (an SMA plug passes a 10 mm hole)
         translate([ant_exit[0], ant_exit[1], case_top - 5]) cylinder(d = 10, h = 10);
         // 3x M3 holding the antenna pod (nuts inside the cover)
         for (a = ant_screw_a) translate([ant_c[0] + ant_screw_r*cos(a), ant_c[1] + ant_screw_r*sin(a), case_top - 5]) cylinder(d = m3, h = 10);
         // vents moved to the side next to the UNO (the pod covers the top)
-        for (i = [0:5]) translate([-rear_ovh + 14 + i*9, ty0 - 1, tray_t + bump_h + 12]) cube([3.2, case_t + 2, 24]);
+        for (i = [0:5]) translate([-rear_ovh + 14 + i*9, ty0 - 1, tray_z + tray_t + bump_h + 12]) cube([3.2, case_t + 2, 24]);
     }
 }
 module rear_cover() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) rear_cover_unmirrored(); }
@@ -422,7 +415,7 @@ module fuse_ghost() {     // inline fuse holder, hanging in the lead gap in fron
     translate([plate_L/2 - tower_L/2 - tower_clear - lead_gap + 2, plate_W/2 - fuse_W/2, floor_t + bat_cap_h - cap_h + 9]) cube([fuse_t, fuse_W, 35]);
 }
 module boards_ghost() {
-    z = tray_t + standoff_h;
+    z = tray_z + tray_t + standoff_h;
     for (o = ibt_pos) color("dimgray") translate([o[0], o[1], z]) cube([ibt_board, ibt_board, 43]);
     translate([plate_L, 0, 0]) mirror([1, 0, 0]) {
         color("teal") translate([uno_pos[0], uno_pos[1], z]) cube([uno_L, uno_W, 12]);
@@ -439,10 +432,10 @@ module assembly() {
     translate([0, 0, bat_lift + explode]) battery_ghost();
     translate([0, 0, cap_lift + explode*1.8]) cap_ghost();
     translate([0, 0, explode*0.6]) {
-        translate([-explode, 0, 0]) for (o = ibt_pos) color("dimgray") translate([o[0], o[1], tray_t + standoff_h]) cube([ibt_board, ibt_board, 43]);
+        translate([-explode, 0, 0]) for (o = ibt_pos) color("dimgray") translate([o[0], o[1], tray_z + tray_t + standoff_h]) cube([ibt_board, ibt_board, 43]);
         translate([explode, 0, 0]) translate([plate_L, 0, 0]) mirror([1, 0, 0]) {
-            color("teal") translate([uno_pos[0], uno_pos[1], tray_t + standoff_h]) cube([uno_L, uno_W, 12]);
-            color("red") translate([gps_pos[0], gps_pos[1], tray_t + standoff_h]) cube([gps_board, gps_board, 8]);
+            color("teal") translate([uno_pos[0], uno_pos[1], tray_z + tray_t + standoff_h]) cube([uno_L, uno_W, 12]);
+            color("red") translate([gps_pos[0], gps_pos[1], tray_z + tray_t + standoff_h]) cube([gps_board, gps_board, 8]);
         }
     }
     if (show_case) {
@@ -454,7 +447,7 @@ module assembly() {
 
 if (part == "assembly") assembly();
 else if (part == "base") base();
-else if (part == "front_tray") front_tray();
+else if (part == "front_tray") front_tray_flat();
 else if (part == "rear_tray") rear_tray_unmirrored();   // printed flat, tongue to the right
 else if (part == "hood") hood();                         // printed open side down
 else if (part == "front_cover") translate([0, 0, case_top]) mirror([0, 0, 1]) front_cover();          // printed top down
