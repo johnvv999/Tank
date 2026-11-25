@@ -16,8 +16,8 @@ PL, PW = 140.0, 120.0            # X = 140 side, Y = 120 side
 # Corner holes and cut-outs are traced from Images/BasePlate.png and scaled
 # to John's 140 x 120 outline, so they are approximate.
 SX, SY = PL / 151.6, PW / 135.3
-HX = [13.0 * SX, 138.8 * SX]
-HY = [7.9 * SY, 127.3 * SY]
+HX = [(PL - 108) / 2, (PL + 108) / 2]   # measured by John: 108 x 90, assumed centred
+HY = [(PW - 90) / 2, (PW + 90) / 2]
 HOLE_D = 3.4
 # scan blobs: (cx, cy, w, h) in scan mm, y measured down from the top edge
 SCAN = [(49.4, 6.8, 51.0, 2.9), (104.6, 6.8, 45.6, 2.8), (106.7, 20.2, 21.9, 2.7),
@@ -86,16 +86,16 @@ def plate_drawing():
     plate_outline(ax)
     dim(ax, (0, 0), (PL, 0), "140", off=16, side=-1, fs=13)
     dim(ax, (0, 0), (0, PW), "120", off=16, side=1, fs=13)
-    dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "%.1f  (≈, confirm)" % (HX[1] - HX[0]), off=14, fs=10)
-    dim(ax, (HX[1], HY[0]), (HX[1], HY[1]), "%.1f  (≈, confirm)" % (HY[1] - HY[0]), off=16, side=-1, fs=10)
+    dim(ax, (HX[0], HY[1]), (HX[1], HY[1]), "%.0f" % (HX[1] - HX[0]), off=14, fs=10)
+    dim(ax, (HX[1], HY[0]), (HX[1], HY[1]), "%.0f" % (HY[1] - HY[0]), off=16, side=-1, fs=10)
     dim(ax, (0, HY[1]), (HX[0], HY[1]), "%.1f" % HX[0], off=6, fs=9)
     dim(ax, (HX[0], PW), (HX[0], HY[1]), "%.1f" % (PW - HY[1]), off=14, side=-1, fs=9)
     ax.annotate("4 x corner holes, Ø3.4 (M3)\nplate screws to the kit standoffs here",
                 xy=(HX[1], HY[0]), xytext=(PL + 8, -14), fontsize=10,
                 arrowprops=dict(arrowstyle="->", lw=0.8))
     ax.text(PL / 2, -34, "Outline 140 x 120 mm as measured by John.\n"
-            "Cut-outs and hole positions are traced from Images/BasePlate.png and scaled to fit,\n"
-            "so they are approximate (±1 mm). Please measure the corner-hole spacing before printing.\n"
+            "Corner-hole spacing measured by John (108 x 90), assumed centred. Cut-outs are traced\n"
+            "from Images/BasePlate.png and scaled to fit, so they are approximate.\n"
             "Shaded strips: where the tray tongues lie under the cradle. Which end is the front is assumed.",
             ha="center", va="top", fontsize=10, color="#495057")
     ax.text(-8, PW / 2, "FRONT edge (120)\nfront tray hooks on here", rotation=90, ha="center", va="center",
@@ -213,7 +213,7 @@ def fit_drawing():
             "     height (side frames, the front slope, the rear\n"
             "     rake). Trays to 15 mm, covers to 69 mm.\n"
             "  2. Which 120 mm end is the front.\n"
-            "  3. The corner-hole spacing (about 116 x 106).\n"
+            "  3. That the corner holes are centred on the plate.\n"
             "  4. The battery length (cradle takes up to 136.5).",
             fontsize=10.5, va="top")
     fig.suptitle("How everything fits: battery in the middle, electronics past the front and rear edges",

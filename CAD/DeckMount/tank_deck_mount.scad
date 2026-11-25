@@ -38,10 +38,12 @@ show_case = true;  // pictures: casing on/off
 plate_L  = 140;    // along travel (John)
 plate_W  = 120;    // across (John)
 plate_r  = 4;
-// Corner screw holes: traced from Images/BasePlate.png and scaled to the
-// 140 x 120 outline. APPROXIMATE: measure and correct before printing.
-hole_x   = [12.0, 128.2];
-hole_y   = [7.0, 112.9];
+// Corner screw holes: measured by John, 108 front-to-back x 90 side-to-side,
+// assumed centred on the plate.
+hole_sx  = 108; hole_sy = 90;
+hole_x   = [(plate_L - hole_sx)/2, (plate_L + hole_sx)/2];
+hole_y   = [(plate_W - hole_sy)/2, (plate_W + hole_sy)/2];
+screw_head_d = 6.5;   // room for an M3 pan/button head on the cradle floor
 // Rear hitch (hitch.scad) bolts up through the plate's two long rear slots
 // (traced from the scan: about 11 mm in from the rear edge). APPROXIMATE.
 hitch_bolt_x = 131;
@@ -107,6 +109,7 @@ module ziptie_pair(h) { for (s = [-1, 1]) translate([0, s*4, 0]) cube([4, 2, h],
 // =====================================================================
 //  BASE / BATTERY CRADLE
 // =====================================================================
+wall_x0 = max(bay_x0 + 4, hole_x[0] + screw_head_d/2 + 0.5);
 module base() {
     difference() {
         union() {
@@ -118,8 +121,9 @@ module base() {
                     translate([-1, -1, lap_t]) cube([plate_L + 2, plate_W + 2, floor_t]);
                 }
             }
+            // side walls stop short of the corner screw heads
             for (y = [bay_y0 - wall_t, bay_y0 + bay_W])
-                translate([bay_x0 + 4, y, lap_t]) cube([bay_L - 8, wall_t, wall_h - lap_t]);
+                translate([wall_x0, y, lap_t]) cube([plate_L - 2*wall_x0, wall_t, wall_h - lap_t]);
         }
         // windows under the middle of the battery
         for (x = [lap_L + 6, plate_L/2 + 3])

@@ -87,7 +87,7 @@ Source: `antenna_pod.scad`. A round pod sits on top of the rear cover, held by 3
 
 - **IBT-2:** the BTS7960 motor supply runs up to about 27 V, and the Ryobi pack is 18 V nominal, about 20 V full. Feed the IBT-2's logic VCC from the UNO's 5 V, never from the battery.
 - **UNO R4 WiFi:** VIN accepts 6 to 24 V, so it runs straight from the pack.
-- **Motors:** check their rated voltage. If they're 12 V motors, cap the PWM at about 60% in the sketch, or feed the IBT-2s from a 12 V buck converter sized for the motor current.
+- **Motors:** rated 7 to 15 V (John). A full pack is about 20.5 V, so cap the PWM at 70% in the sketch (`analogWrite` 180 out of 255). That gives about 14 V on a full pack and about 12.5 V near empty. A buck converter isn't needed.
 
 ## Wire routing (only the adapter's leads show)
 
@@ -140,7 +140,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 | Item | Value | Source |
 |---|---|---|
 | Chassis plate | 140 x 120 mm | Measured by John |
-| Plate corner holes | about 116 x 106 mm apart, about 12 / 7 mm in from the edges | Traced from `Images/BasePlate.png` and scaled. **Approximate, please measure** |
+| Plate corner holes | 108 mm front to back x 90 mm side to side, assumed centred (16 / 15 mm in from the edges) | Measured by John |
 | P108 battery footprint | 135 x 80 mm | `Archive/Battery+VR.f3d` |
 | Battery + adapter height | 150 mm | Measured by John |
 | Power Wheel adapter | 84 x 75 mm base, 90 mm tall, 250 mm lead | Listing photo |
@@ -153,7 +153,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 1. **Clearance past the 120 mm ends.** The trays sit 0 to 15 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
 2. **Which end is the front.** The drawings assume the IBT-2s go at the front (closer to the motors). Swap the trays if not; the tongues are the same.
-3. **Corner-hole spacing.** Print the base first and test-fit it.
+3. **Corner holes are centred?** The spacing is measured (108 x 90); the design assumes the holes are centred on the plate. Print the base first and test-fit it.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
 5. **Adapter tower orientation.** The model assumes the 41 mm side runs front to back. If it's the other way, swap `tower_L` and `tower_W`.
 
