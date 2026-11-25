@@ -89,6 +89,7 @@ cham     = 6;     // lip inset from the covers' long sides
 rnd      = 5;     // outside edge radius (John: "round all edges by 5mm")
 rim_r    = 1.2;   // tower top rim: the 2.4 mm wall can only take a 1.2 mm round
 lead_gap = 14;    // extra room in front of the adapter tower for its leads, the fuse holder and the switch rocker
+fit_gap  = 0.4;   // printing clearance where the hood meets the covers (end faces and lip seats)
 lane_w   = 13;    // hidden wire lanes between the cradle walls and the hood sides
 hook_w   = 50;    // cover hook width
 /* ---------- GPS antenna pod on the rear cover (antenna_pod.scad) ---------- */
@@ -363,7 +364,9 @@ module cover_body(ovh, hook_y) {
             translate([-ovh + 0.3, hook_y - hook_w/2, tray_t + bump_h - 7.7]) cube([1.7, hook_w, 8]);
             translate([-ovh + 1.9, hook_y - hook_w/2, tray_t + bump_h - 6.8]) cube([1.2, hook_w, 1.6]);
         }
-        lip_solid(0.3);   // seat for the hood's lip
+        lip_solid(fit_gap);   // seat for the hood's lip
+        // sliding gap between the cover's plate end and the hood's end wall
+        translate([-fit_gap, -1, -1]) cube([fit_gap + 5, plate_W + 2, 200]);
     }
 }
 module front_cover() {

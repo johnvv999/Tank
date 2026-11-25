@@ -38,6 +38,8 @@ The hood's end walls (1.2 mm) are what hold the battery's ends, so the full 140 
 
 Reverse to refit. The hood's two lips drop into seats on the front and rear covers, which is what holds the covers down.
 
+**Fit clearances:** 0.4 mm between the hood's end walls and the covers, 0.4 mm around each lip in its seat, 2.5 mm around the adapter's upright (16.5 mm in front of it), 0.8 mm at each end of the battery and about 20 mm at its sides. The hood sits on the cradle floor and the tray tongues.
+
 ## Rear hitch (trailers and the sand rake)
 
 ![](images/09_hitch_rake_down.png)
