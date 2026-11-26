@@ -26,6 +26,10 @@ M = {
  "hood":   mat("case", (0.035, 0.037, 0.042), 0.42, coat=0.15),
  "covers": mat("case2", (0.05, 0.053, 0.06), 0.45, coat=0.15),
  "battery": mat("ryobi_grey", (0.06, 0.065, 0.07), 0.5),
+ "bat_body": mat("ryobi_black", (0.025, 0.026, 0.028), 0.55),
+ "bat_band": mat("ryobi_band", (0.42, 0.62, 0.02), 0.4, coat=0.2),
+ "bat_btn": mat("ryobi_btn", (0.33, 0.34, 0.36), 0.45),
+ "bat_gauge": mat("ryobi_led", (0.1, 0.9, 0.1), 0.3),
  "adapter": mat("ryobi_green", (0.42, 0.62, 0.02), 0.4, coat=0.2),
  "ibt_pcb": mat("pcb_red", (0.5, 0.03, 0.02), 0.4),
  "ibt_sink": mat("sink", (0.75, 0.76, 0.78), 0.3, 1.0),
@@ -42,6 +46,8 @@ M = {
  "p_plate": mat("steelp", (0.6, 0.61, 0.63), 0.35, 1.0),
  "p_puck": mat("puck", (0.015, 0.015, 0.017), 0.6),
  "p_coil": mat("coax", (0.02, 0.02, 0.02), 0.5),
+ "switch": mat("rocker", (0.015, 0.015, 0.017), 0.5),
+ "fuse": mat("fuseh", (0.02, 0.02, 0.022), 0.55),
  "lead_red": mat("lead_r", (0.6, 0.02, 0.02), 0.45),
  "lead_black": mat("lead_k", (0.02, 0.02, 0.02), 0.45),
 }
@@ -54,7 +60,7 @@ for k in M:
     o.data.materials.append(M[k])
     bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
 # ground
-bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.1405))
+bpy.ops.mesh.primitive_plane_add(size=40, location=(0.07, 0.06, -0.1305))
 g = bpy.context.object; g.data.materials.append(mat("floor", (0.55, 0.55, 0.56), 0.6))
 # world: soft sky
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True
@@ -81,6 +87,7 @@ views = {"front34": ((-0.50, -0.50, 0.26), (0.10, 0.06, -0.02)),
          "rear34": ((0.66, 0.54, 0.28), (0.12, 0.06, -0.01)),
          "side":   ((0.12, -0.80, 0.10), (0.12, 0.06, -0.02)),
          "swap":   ((-0.5, -0.56, 0.5), (0.07, 0.06, 0.15)),
+         "latch":  ((0.02, -0.36, 0.20), (0.085, 0.06, 0.045)),
          "pod":    ((0.62, -0.30, 0.42), (0.20, 0.06, 0.07)),
          "hitch":  ((0.90, -0.64, 0.20), (0.22, 0.06, -0.035)),
          "trailer": ((0.95, -0.80, 0.42), (0.32, 0.06, -0.08))}

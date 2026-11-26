@@ -29,21 +29,21 @@ tool = "rake";        // "rake" | "trailer" | "none" (renders)
 rake_lift = 0;        // rake angle about the lower pins (deg): -8 = 8 deg deeper, +28 = fully raised (max)
 
 /* ---------- interface ---------- */
-plate_t  = 2;          // metal plate thickness (check)
+plate_t  = 3;          // metal plate thickness (John measured)
 pin_d    = 4.2;        // lower pins / link pins: M4
 // Real chassis (John's photos, 2026-11-25): behind the plate's rear edge the lower
 // chassis runs on for 100 mm with its top 30 mm below the plate; the tracks end
-// about 140 mm behind the edge; the ground is about 140 mm below the plate top
-// (estimated from the side photo).
-lower_L  = 100;  lower_z = -30;  ground_z = -140;
+// about 140 mm behind the edge; the plate top is 130 mm above the ground (John measured).
+hdx = plate_L - 140;  cy = plate_W/2;   // the hitch was laid out on a 140 x 120 plate; shift it to the real one
+lower_L  = 100;  lower_z = -30;  ground_z = -130;
 hb_z0    = lower_z + 3;   // bottom of the hitch (flat, print bed): 3 mm above the lower chassis
-sx = 250; sy = 60; sz = -14;          // servo output shaft (centre of the 60 mm face)
-P  = [278, hb_z0 + 8];                     // lower pin axis (x, z)
-pin_y = [30, 90];                     // lower pin pairs (tool arms sit between the ears)
+sx = 250 + hdx; sy = cy; sz = -14;          // servo output shaft (centre of the 60 mm face)
+P  = [278 + hdx, hb_z0 + 8];                     // lower pin axis (x, z)
+pin_y = [cy - 30, cy + 30];                     // lower pin pairs (tool arms sit between the ears)
 ear_t = 4; ear_gap = 7.8;
 arm_len = 30;                         // lift arm, shaft to link pin
 mast_h  = 30;                         // tool mast top above the lower pins
-link_y  = 66.5;                       // link plane
+link_y  = cy + 6.5;                       // link plane
 
 /* ---------- DS3235 servo ---------- */
 sv_L = 40; sv_W = 20; sv_H = 40.5;    // body (shaft along H)
@@ -52,10 +52,10 @@ sv_ear_L = 54.5; sv_ear_t = 2.5; sv_ear_h = 28;   // ears 28 mm up from the bott
 sv_x0 = sx - 30;  sv_y0 = sy - sv_H;
 
 /* ---------- beam / head ---------- */
-clamp_x0 = 118;  clamp_y = [20.5, 99.5];  clamp_t = 8;   // clamp clears the corner standoffs
-beam_y   = [35, 85];
-head_x   = [210, 270];  head_y = [16, 104];  head_top = -4;
-beam_top = -0.5;       // just under the rear tray floor
+clamp_x0 = plate_L - 17;  clamp_y = [16, 118];  clamp_t = 8;   // clamp stays behind the rear corner standoffs
+beam_y   = [cy - 25, cy + 25];
+head_x   = [210 + hdx, 270 + hdx];  head_y = [cy - 44, cy + 44];  head_top = -4;
+beam_top = tray_z - 0.5;   // just under the rear tray floor
 
 module rbox(x0, x1, y0, y1, z0, z1, r) {   // box with vertical edges rounded
     translate([x0, y0, z0]) rrect(x1 - x0, y1 - y0, min(r, (x1 - x0)/2 - 0.01, (y1 - y0)/2 - 0.01), z1 - z0);
@@ -93,7 +93,7 @@ module hitch() {
             translate([0, 0, -60]) cylinder(d = 6.4, h = 60 - plate_t - 5, $fn = 6);
         }
         // M3 nut pockets for the two screws coming down from the rear tray floor
-        for (x = [plate_L + 20, plate_L + 60]) translate([x, 62.5, 0]) {
+        for (x = [plate_L + 20, plate_L + 60]) translate([x, cy + 2.5, 0]) {
             translate([0, 0, -12]) cylinder(d = m3, h = 13);
             translate([0, 0, -12 - 30]) cylinder(d = 6.4, h = 30, $fn = 6);
         }
@@ -164,7 +164,7 @@ module rake_frame(phi = 0) {
     }
 }
 module rake_bar(phi = 0) {
-    translate([P[0], 0, P[1]]) rotate([0, -phi, 0]) translate([rake_bar_rel[0], 60 - rake_W/2, rake_bar_rel[1]]) {
+    translate([P[0], 0, P[1]]) rotate([0, -phi, 0]) translate([rake_bar_rel[0], cy - rake_W/2, rake_bar_rel[1]]) {
         translate([-7, 0, -7]) rotate([0, 0, 0]) hull() for (y = [3, rake_W - 3]) translate([7, y, 7]) rotate([0, 90, 0]) translate([0, 0, -7]) cylinder(r = 7, h = 14);
         for (y = [tine_pitch/2 : tine_pitch : rake_W - 1])
             translate([0, y, -6]) hull() {
@@ -178,13 +178,13 @@ module drawbar() {   // trailer adapter: hangs on the two lower pins, held level
         union() {
             for (y = pin_y) translate([0, y + ear_gap/2 - 0.2, 0]) rotate([90, 0, 0]) linear_extrude(ear_gap - 0.4)
                 hull() { circle(r = 7); translate([30, 0]) circle(r = 7); }
-            hull() { translate([22, pin_y[0], -7]) cube([10, pin_y[1] - pin_y[0], 14]); translate([58, 60, -7]) cylinder(r = 10, h = 14); }
+            hull() { translate([22, pin_y[0], -7]) cube([10, pin_y[1] - pin_y[0], 14]); translate([58, cy, -7]) cylinder(r = 10, h = 14); }
             translate([0, link_y - 9, 0]) rotate([90, 0, 0]) mirror([0, 0, 1]) linear_extrude(12) hull() { translate([22, 0]) circle(r = 5); translate(mast0) circle(r = 5); }
         }
         for (y = pin_y) translate([0, y - 10, 0]) rotate([-90, 0, 0]) cylinder(d = pin_d, h = 20);
         translate([mast0[0], link_y - 10, mast0[1]]) rotate([-90, 0, 0]) cylinder(d = pin_d, h = 20);
         translate([mast0[0] - 6, link_y - 3.2, mast0[1] - 8]) cube([12, 3.9, 16]);
-        translate([58, 60, -20]) cylinder(d = 6.5, h = 40);          // trailer swivel pin (6 mm)
+        translate([58, cy, -20]) cylinder(d = 6.5, h = 40);          // trailer swivel pin (6 mm)
     }
 }
 module servo_ghost() {
@@ -221,10 +221,10 @@ module trailer_ghost() {
     sw = P[0] + 58;   // swivel pin x
     translate([0, 0, 0]) {
         g = ground_z - (-96.5);   // drop the stand-in trailer to the ground
-        hull() { translate([sw, 60, P[1] - 4]) cylinder(r = 8, h = 6); translate([sw + 70, 60, -40 + g]) cylinder(r = 8, h = 6); }   // tongue
-        translate([sw + 70, -30, -40 + g]) rrect(170, 180, 10, 6);                                  // frame
-        translate([sw + 155, 60, -88 + g]) cylinder(d = 170, h = 34);                               // mower deck
-        translate([sw + 155, 60, -54 + g]) cylinder(d = 46, h = 50);                                // mower motor
-        for (y = [-44, 150]) translate([sw + 155, y + 7, -61.5 + g]) rotate([90, 0, 0]) cylinder(d = 70, h = 14, center = true);   // wheels
+        hull() { translate([sw, cy, P[1] - 4]) cylinder(r = 8, h = 6); translate([sw + 70, cy, -40 + g]) cylinder(r = 8, h = 6); }   // tongue
+        translate([sw + 70, cy - 90, -40 + g]) rrect(170, 180, 10, 6);                                  // frame
+        translate([sw + 155, cy, -88 + g]) cylinder(d = 170, h = 34);                               // mower deck
+        translate([sw + 155, cy, -54 + g]) cylinder(d = 46, h = 50);                                // mower motor
+        for (y = [cy - 104, cy + 90]) translate([sw + 155, y + 7, -61.5 + g]) rotate([90, 0, 0]) cylinder(d = 70, h = 14, center = true);   // wheels
     }
 }
