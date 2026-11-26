@@ -169,7 +169,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 ## Hardware
 
 - 4x M3 corner screws through cradle + tongue into the chassis. The stack is 4 mm thick, so use the kit screws plus 4 mm.
-- 8x M3 x 12 + nut for the IBT-2s, 4x for the UNO and 4x for the GPS.
+- 16x M3 x 20 + nut for the boards: 8 for the IBT-2s, 4 for the UNO and 4 for the GPS. Each goes down through the board, the 11 mm printed standoff and the 5 mm tray floor, with the nut underneath (see `images/20_standoffs.png`).
 - Cable ties through the slots near each plate edge to hold the wiring.
 
 ## Print settings (PETG, Bambu A1 or similar)

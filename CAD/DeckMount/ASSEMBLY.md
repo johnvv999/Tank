@@ -34,7 +34,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 | What | Qty | Used for |
 |---|---|---|
 | M3 screws, 4 mm longer than the kit's plate screws | 4 | Corners: tray tongue + base + plate into the kit standoffs |
-| M3 x 12 + nut | 16 | 8 for the IBT-2s, 4 for the UNO, 4 for the GPS |
+| M3 x 20 + nut | 16 | 8 for the IBT-2s, 4 for the UNO, 4 for the GPS |
 | M3 x 10 + nut | 3 | Antenna pod to the rear cover (nuts inside the cover) |
 | 1/4-20 x 1/2" button-head bolt | 1 | Up through the pod lid into the antenna plate's welded nut |
 | Cable ties (small) | about 10 | Through the slots near each plate edge |
@@ -66,8 +66,10 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 ![](images/07_layout.png)
 
-1. **Front tray:** mount the two IBT-2 boards heatsinks up on the slotted standoffs, with 4x M3 x 12 + nut each. The slots let the holes line up even if a board's holes are slightly off.
-2. **Rear tray:** mount the UNO R4 WiFi with its USB-C port facing the rear edge, where the cover's window is (4x M3 x 12). Then mount the GPS board beside it (4x M3 x 12).
+![](images/20_standoffs.png)
+
+1. **Front tray:** mount the two IBT-2 boards heatsinks up on the slotted standoffs, with 4x M3 x 20 each, nuts under the tray. The slots let the holes line up even if a board's holes are slightly off.
+2. **Rear tray:** mount the UNO R4 WiFi with its USB-C port facing the rear edge, where the cover's window is (4x M3 x 20, nuts under the tray). Then mount the GPS board beside it (4x M3 x 20).
 
 ## 6. Rear hitch (optional)
 
