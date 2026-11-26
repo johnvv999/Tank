@@ -33,7 +33,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 | What | Qty | Used for |
 |---|---|---|
-| M3 screws, 4 mm longer than the kit's plate screws | 4 | Corners: tray tongue + base + plate into the kit standoffs |
+| M3 x 12 + nyloc nut | 4 | Corners: down through tray tongue + base + plate, nut under the plate (no standoffs) |
 | M3 x 20 + nut | 16 | 8 for the IBT-2s, 4 for the UNO, 4 for the GPS |
 | M3 x 10 + nut | 3 | Antenna pod to the rear cover (nuts inside the cover) |
 | 1/4-20 x 1/2" button-head bolt | 1 | Up through the pod lid into the antenna plate's welded nut |
@@ -48,7 +48,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 ## 3. Prepare the chassis
 
-1. Take out the 4 screws that hold the metal plate's corners to the chassis standoffs. Leave the plate in place.
+1. Check that you can reach under the plate's 4 corner holes to hold a nut. Nothing else needs to come off.
 2. Feed both motors' wires up through the slots near the plate's long edges. Those slots end up under the hood.
 
 ## 4. Base and trays
@@ -59,7 +59,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 1. Set the **base** on the plate, flat bottom down, with its corner holes over the plate's corner holes. The cradle walls run front to back.
 2. Lay the **front tray's** tongue into the 2 mm pocket at the front end of the base, so the tray hangs out over the front. Lay the **rear tray's** tongue into the rear pocket. Each tongue sits flush with the base floor.
-3. Push the 4 longer corner screws down through tongue, base and plate into the standoffs. Snug them up but don't crush the plastic.
+3. Push the 4 M3 x 12 corner screws down through tongue, base and plate, and tighten a nyloc nut on each from under the plate. Snug them up but don't crush the plastic.
    - If you're fitting the hitch, leave the rear tray off for now (see step 6).
 
 ## 5. Electronics on the trays

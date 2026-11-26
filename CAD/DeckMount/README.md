@@ -55,7 +55,7 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 - **Sand rake:** 230 mm wide, 4 mm tines 28 mm long. Its arms reach down so the tines just touch the ground at rest (`ground_z`, 130 mm below the plate top, measured by John). It runs from 8° deeper than that to 28° raised, where the tines are about 37 mm clear of the ground, for turns. The rake bar sits about 40 mm behind the end of the tracks. The servo sets the depth. At full drag (about 20 N, which is about all the tracks can pull) it needs about 2.1 N·m, under two thirds of the servo's 3.4 N·m, so feed the servo 6 to 7.4 V rather than 5 V.
 - **Trailer:** the drawbar hangs on the same two pins and is held level by the link. A 6 mm vertical swivel pin at its back end takes the trailer's tongue eye. The mower trailer in the render is a stand-in.
 
-**Fit to the real chassis:** the lower chassis runs on 100 mm past the plate's rear edge with its top 30 mm below the plate (John). Nothing on the hitch goes lower than 27 mm below the plate, so it rides 3 mm above that part. The lower pins sit 38 mm behind its end. The clamp under the plate is 79 mm wide so it misses the corner standoffs.
+**Fit to the real chassis:** the lower chassis runs on 100 mm past the plate's rear edge with its top 30 mm below the plate (John). Nothing on the hitch goes lower than 27 mm below the plate, so it rides 3 mm above that part. The lower pins sit 38 mm behind its end. The clamp under the plate stops short of the corner screws' nuts.
 
 **Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 16 go down through the rear tray's tongue, the cradle's end and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
 
@@ -71,8 +71,8 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 | `hitch_drawbar.stl` | 1 | Trailer adapter |
 
 **Check before printing the hitch:**
-- The plate's rear slots are now measured (John, 2026-11-25): centre line 10 mm in from the rear edge, slots at 20 to 62 and 82 to 127 mm from the long edge. The 4 bolts sit at 26, 56, 86 and 108 mm. The clamp sits behind the rear corner standoffs (13.5 mm in) and between them (7.5 mm in from each side). `images/15_measure_rear_slots.png` shows them. The slots are 4 mm wide, so M3 screws pass with room to spare.
-- That nothing sits under the plate's rear 22 mm between the corner standoffs, above the lower chassis.
+- The plate's rear slots are now measured (John, 2026-11-25): centre line 10 mm in from the rear edge, slots at 20 to 62 and 82 to 127 mm from the long edge. The 4 bolts sit at 26, 56, 86 and 108 mm. The clamp stays clear of the rear corner screws' nuts (13.5 mm in, 7.5 mm from each side). `images/15_measure_rear_slots.png` shows them. The slots are 4 mm wide, so M3 screws pass with room to spare.
+- That nothing sits under the plate's rear 17 mm, above the lower chassis.
 - The plate thickness is 3 mm (measured).
 
 ## GPS antenna pod

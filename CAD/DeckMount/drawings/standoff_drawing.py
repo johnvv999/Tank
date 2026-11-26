@@ -46,13 +46,13 @@ ax.text(-75, PW / 2 + 4, "front", ha="center", fontsize=11)
 ax.text(PL / 2, -14, "Positions in mm: first number from the plate's FRONT edge (negative = in front of it), second from the bottom long edge.",
         ha="center", fontsize=11, color="#333")
 ax.set_xlim(-82, 240); ax.set_ylim(-22, PW + 26); ax.set_aspect("equal"); ax.axis("off")
-fig.text(0.02, 0.965, "Standoffs: where they go, how tall, which screw (top view)", fontsize=20, fontweight="bold")
+fig.text(0.02, 0.965, "Board standoffs and corner screws: where they go, how tall, which screw (top view)", fontsize=20, fontweight="bold")
 
 leg = fig.add_axes([0.02, 0.02, 0.58, 0.26]); leg.axis("off")
 rows = [(ORANGE, "o", "IBT-2 drivers (8)", "Printed into the front tray. 11 mm tall above the 5 mm tray floor. Slotted so the holes line up.", "M3 x 20 down through board, standoff and floor, nut underneath"),
         (GREEN, "o", "UNO R4 (4)", "Printed into the rear tray. 11 mm tall, round.", "M3 x 20 + nut underneath"),
         (RED, "o", "GPS (4)", "Printed into the rear tray. 11 mm tall, slotted.", "M3 x 20 + nut underneath"),
-        (GREY, "h", "Chassis corner standoffs (4)", "The kit's own metal standoffs under the plate. Nothing to buy or print; keep them as they are.", "Kit screw 4 mm longer (through tray tongue + base + plate)")]
+        (GREY, "h", "Corner holes (4): no standoff needed", "The deck sits flat on the plate. The screw goes through tray tongue 2 + base 2 + plate 3 = 7 mm.", "M3 x 12 + nyloc nut under the plate")]
 for i, (c, mk, name, what, screw) in enumerate(rows):
     y = 0.85 - i * 0.25
     leg.plot([0.01], [y], marker=mk, ms=16, mfc=c, mec="k", transform=leg.transAxes)
@@ -73,7 +73,17 @@ for y0, y1, t in ((0, 5, "tray floor 5"), (5, 16, "standoff 11"), (16, 17.6, "bo
     sx.text(66, (y0 + y1) / 2, t, va="center", fontsize=10)
 sx.text(37, -4.5, "M3 nut", fontsize=10, va="top")
 sx.text(37, 21, "M3 x 20 screw head", fontsize=10)
-sx.set_title("Side view of one board standoff (mm)", fontsize=12, loc="left")
-sx.set_xlim(-2, 95); sx.set_ylim(-8, 26); sx.set_aspect("equal")
+# corner stack: tongue 2 + base 2 + plate 3, nut under
+cx0 = 110
+sx.add_patch(Rectangle((cx0, 0), 30, 3, fc="#adb5bd", ec="k"))        # metal plate
+sx.add_patch(Rectangle((cx0, 3), 30, 2, fc="#e9ecef", ec="k"))        # base
+sx.add_patch(Rectangle((cx0, 5), 30, 2, fc="#c5d0fa", ec="k"))        # tongue
+sx.add_patch(Rectangle((cx0 + 13.5, -5.4), 3, 12.4, fc="#adb5bd", ec="k", alpha=0.6))
+sx.add_patch(Rectangle((cx0 + 11.5, 7), 7, 2, fc="#868e96", ec="k"))
+sx.add_patch(Rectangle((cx0 + 11.5, -2.4), 7, 2.4, fc="#495057", ec="k"))
+sx.text(cx0 + 32, 3.5, "tongue 2\nbase 2\nplate 3", va="center", fontsize=9, linespacing=1.6)
+sx.text(cx0, 12, "Corner: M3 x 12", fontsize=10); sx.text(cx0, -4.5, "nyloc nut under the plate", fontsize=10, va="top")
+sx.set_title("Side views (mm): board standoff, and a corner screw", fontsize=12, loc="left")
+sx.set_xlim(-2, 160); sx.set_ylim(-8, 26); sx.set_aspect("equal")
 fig.savefig(os.path.join(OUT, "20_standoffs.png"), dpi=100, bbox_inches="tight", facecolor="white")
 print("ok")
