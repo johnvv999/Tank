@@ -89,7 +89,7 @@ tower_clear = 2.5;                // around the adapter's tower
 tower_L = 30; tower_W = 30;       // adapter tower, measured by John (30 x 30)
 fuse_W  = 35; fuse_t = 10;        // inline fuse holder on the red lead, 35 x 10 x 35 (John): it must pass up through the tower opening
 sw_from_front = 80;   // battery's flat front end to the upright's switch face, along the top (John)
-sw_drop = 40;  sw_win_w = 24; sw_win_h = 30;   // rocker switch on the tower's front face, centre about 40 mm below its top (from John's photo)
+sw_drop = 40;  sw_win_w = 36; sw_win_h = 44;   // finger opening (John: 24 x 30 was too small to reach through). Rocker switch on the tower's front face, centre about 40 mm below its top (from John's photo)
 hood_top = floor_t + bat_cap_h - 4;   // top 4 mm of the adapter shows
 lip_L    = 6;     // hood lips reaching over each cover
 cham     = 6;     // lip inset from the covers' long sides
@@ -329,8 +329,9 @@ module hood() {
         for (x = [-1, plate_L - hood_end - 1], y = [case_t + 0.3, plate_W - case_t - 0.3 - lane_w])
             translate([x, y, floor_t - 1]) cube([hood_end + 2, lane_w, 13]);
         // finger window for the adapter's rocker switch, in the tower's front face
-        translate([tw_cx - tw_L/2 - 40, plate_W/2 - sw_win_w/2, floor_t + bat_cap_h - sw_drop - sw_win_h/2])
-            rotate([0, 90, 0]) translate([-sw_win_h, 0, 0]) rrect(sw_win_h, sw_win_w, 4, 40 + case_t + 1);
+        // straight-through finger opening, cut from the front edge so it opens the whole slope in front of the switch
+        translate([-5, plate_W/2 - sw_win_w/2, floor_t + bat_cap_h - sw_drop - sw_win_h/2])
+            rotate([0, 90, 0]) translate([-sw_win_h, 0, 0]) rrect(sw_win_h, sw_win_w, 8, tw_cx - tw_L/2 + 5 + case_t + 1);
         // decorative grooves along the sides
         for (z = [case_top - 18, case_top - 26]) for (y = [-1, plate_W - 0.8])
             translate([14, y, z]) cube([plate_L - 28, 1.8, 1.6]);

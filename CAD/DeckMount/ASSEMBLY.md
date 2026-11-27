@@ -19,7 +19,7 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 | `deck_mount_rear_tray` | 1 | Floor down | Ready |
 | `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready |
 | `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready |
-| `deck_mount_hood` | 1 | Open side down | Ready |
+| `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
 | `antenna_pod_cup` | 1 | Floor down | Ready |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready |
 | `hitch_hitch` | 1 | Flat bottom down, 6 walls, 40% infill | Ready (bolts match the measured slots, [diagram](images/15_measure_rear_slots.png)) |
@@ -100,7 +100,7 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 1. Drop the **P108 battery** straight down into the cradle, with its flat end toward the front and its curved end toward the rear.
 2. Slide the **Power Wheel adapter** onto the battery so its switch faces the front.
-3. The leads come out of the top of the upright. Loop them forward and down in front of the upright, and let the **fuse holder** hang in that gap. Then run them down to the side lane. Leave about 150 mm of slack so the adapter can be lifted off and set beside the tank.
+3. The leads come out of the top of the upright. Loop them forward and down in front of the upright, and let the **fuse holder** hang in that gap, off to one side of the switch so your finger can reach the rocker. Then run them down to the side lane. Leave about 150 mm of slack so the adapter can be lifted off and set beside the tank.
 
 ## 9. Antenna pod (before the rear cover goes on)
 
@@ -118,7 +118,9 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 1. **Front cover:** hook its outer tab into the pocket in the front tray's bumper, then lower it until it sits on the tray walls. The nub clicks into its groove.
 2. **Rear cover:** the same on the rear tray. Its window lines up with the UNO's USB-C port.
-3. **Hood:** lower it straight down over the adapter, guiding the leads and the fuse holder up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The finger window in the front of the tower lines up with the switch.
+3. **Hood:** lower it straight down over the adapter, guiding the leads and the fuse holder up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
+
+   ![](images/21_switch_opening.png)
 
 ## 11. Tools on the hitch
 
@@ -133,7 +135,7 @@ To swap tools, pull the 3 pins.
 
 ![](images/03_render_hood_off.png)
 
-1. Turn the switch off through the finger window.
+1. Turn the switch off through the finger opening at the front of the hood.
 2. Lift the **hood** straight up. It slides off over the adapter and the leads.
 3. Squeeze the battery's two release buttons, one on each side just under the adapter, and lift the **adapter** straight up. With the hood off, nothing stands beside the battery above the 22 mm cradle walls, so your thumb and finger have about 20 mm of room on each side. Set the adapter beside the tank; its leads stay connected.
 
