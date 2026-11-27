@@ -1,6 +1,6 @@
 // =====================================================================
 //  GPS antenna pod for the rear cover.
-//  The magnetic antenna sits on John's 102 mm steel plate, which has a
+//  The magnetic u-blox ANN-MB antenna (82 x 60 x 22.5) sits on John's 102 mm steel plate, which has a
 //  1/4-20 nut welded underneath.  A 1/4-20 x 1/2" button-head bolt comes
 //  up through the pod lid into that nut.
 //  Under the lid: a cup with a 40 mm hub to wind spare antenna cable on
@@ -72,7 +72,11 @@ module pod_lid() {
     }
 }
 module plate_ghost() { color("silver") translate([0, 0, lid_t]) cylinder(d = plate_d, h = plate_th, $fn = 120); }
-module puck_ghost()  { color("#151515") translate([0, 0, lid_t + plate_th]) hull() { cylinder(d = 66, h = 6, $fn = 80); translate([0, 0, 12]) cylinder(d = 56, h = 2, $fn = 80); } }
+// u-blox ANN-MB (datasheet UBX-18049862): 82 x 60 x 22.5 mm, magnetic base, 5 m RG174 cable.
+// Its patch specs are measured on a 150 mm ground plane; the 102 mm steel plate is that ground plane.
+module ann_mb() { hull() { linear_extrude(4) offset(r = 18) square([82 - 36, 60 - 36], center = true);
+                           translate([0, 0, 18.5]) linear_extrude(4) offset(r = 14) square([70 - 28, 48 - 28], center = true); } }
+module puck_ghost()  { color("#151515") translate([0, 0, lid_t + plate_th]) ann_mb(); }
 
 // placed on the rear cover (chassis coordinates)
 module at_pod() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) translate([ant_c[0], ant_c[1], case_top]) children(); }

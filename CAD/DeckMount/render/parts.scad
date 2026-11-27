@@ -43,17 +43,24 @@ if (what == "ibt_sink") for (o = ibt_pos) translate([o[0] + 5, o[1] + 5, tray_z 
 if (what == "uno") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_z + tray_t + standoff_h]) cube([uno_L, uno_W, 1.6]);
 if (what == "uno_parts") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([uno_pos[0], uno_pos[1], tray_z + tray_t + standoff_h + 1.6]) { translate([-1, 32, 0]) cube([8, 9, 3.3]); translate([-2, 3, 0]) cube([14, 9, 11]); translate([20, 2, 0]) cube([45, 2.5, 8.5]); translate([15, 49, 0]) cube([50, 2.5, 8.5]); }
 if (what == "gps") translate([plate_L, 0, 0]) mirror([1,0,0]) translate([gps_pos[0], gps_pos[1], tray_z + tray_t + standoff_h]) cube([gps_board, gps_board, 1.6]);
-// the adapter's leads: out of the top, a short loop, then down inside the hood in front of the adapter
-module lead(dy) {
-    zt = floor_t + bat_cap_h + cap_lift;
-    pts = [[tower_cx + 4, plate_W/2 + dy, zt - 2], [tower_cx + 2, plate_W/2 + dy, zt + 10], [tower_cx - 12, plate_W/2 + dy, zt + 14],
-           [tower_cx - 25, plate_W/2 + dy, zt + 6], [tower_cx - 26, plate_W/2 + dy, zt - 30], [tower_cx - 27, plate_W/2 + dy, floor_t + 75]];
+// the adapter's leads: out of the top, a short loop, down in front of the upright to the LEFT of the
+// rocker switch, forward over the adapter's base onto the front of the battery top, over the battery's
+// left edge and down the gap outside the cradle wall (fuse holder on the red lead hangs there), then
+// forward along the left wire lane under the hood end into the front tray.
+module lead(k) {   // k = 0 red, 1 black
+    zt = floor_t + bat_cap_h;  zb = floor_t + bat_cap_h - cap_h;   // adapter top, battery top
+    yl = 51 + 4.6*k;  xd = 36 + 5*k;  yg = k ? 9 : 20;  yl2 = k ? 6.5 : 12;
+    up = [[tower_cx + 4, plate_W/2 - 4 + 5*k, zt - 2], [tower_cx + 2, plate_W/2 - 4 + 5*k, zt + 10], [tower_cx - 14, yl, zt + 13],
+          [tower_cx - 27.5, yl, zt + 4], [tower_cx - 27.5, yl, zb + 8 + 2.3]];
+    dn = [[tower_cx - 54 - 3*k, yl, zb + 8 + 2.3], [tower_cx - 60 - 3*k, yl - 1, zb + 2.3], [xd, 31, zb + 2.3], [xd, 26, zb + 1],
+          [xd, yg, zb - 6], [xd, yg, 16], [xd - 4, yl2, floor_t + 3], [-6, yl2, floor_t + 3]];
+    pts = concat([for (p = up) p + [0, 0, cap_lift]], dn);
     for (i = [0 : len(pts) - 2]) hull() { translate(pts[i]) sphere(d = 4.5, $fn = 16); translate(pts[i + 1]) sphere(d = 4.5, $fn = 16); }
 }
-if (what == "lead_red") lead(-3);
+if (what == "lead_red") lead(0);
 if (what == "switch") translate([0, 0, cap_lift]) switch_ghost();
-if (what == "fuse") translate([0, 0, cap_lift]) fuse_ghost();
-if (what == "lead_black") lead(3);
+if (what == "fuse") fuse_ghost();
+if (what == "lead_black") lead(1);
 
 // ---- Ryobi P108 stand-in for the pictures: flat front, curved rear, two release
 // buttons on the long sides flanking the stem (under the adapter's base).

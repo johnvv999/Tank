@@ -236,7 +236,7 @@ def wiring_drawing():
     for y in (by0 - 1 - WALL, by0 + BW + 1):
         ax.add_patch(Rectangle((bx0 + 3, y), BAY_L - 8, WALL, fc=BLUE, ec="none", alpha=0.6))
     ax.add_patch(Rectangle((bx0, by0), BL, BW, fc=ORANGE, ec="k", alpha=0.35))
-    ax.add_patch(Rectangle(((PL - AD_L) / 2, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.5))
+    ax.add_patch(Rectangle((TOWER_CX - 55, (PW - AD_W) / 2), AD_L, AD_W, fc=YEL, ec="k", alpha=0.5))
     ax.add_patch(Rectangle((TOWER_CX - 15, PW / 2 - 15), 30, 30, fc=YEL, ec="k"))
     ax.add_patch(Rectangle((TW_CX - 24.5, PW / 2 - 19.5), 49, 39, fc="none", ec="#212529", lw=1.6, ls=":"))
     ax.text(TOWER_CX, PW / 2, "adapter\n30 x 30", ha="center", va="center", fontsize=9)
@@ -256,9 +256,13 @@ def wiring_drawing():
     def path(pts, col, lw=3.2, ls="-"):
         xs, ys = zip(*pts); ax.plot(xs, ys, color=col, lw=lw, ls=ls, solid_capstyle="round", solid_joinstyle="round")
     PWR, MOT, SIG = "#e03131", "#f08c00", "#1c7ed6"
-    # power: adapter leads drop down in front of the adapter, cross the battery top to the left lane, forward to both IBT-2s
-    path([(TW_CX - 25, PW / 2 + 4), (TW_CX - 25, 12.5), (-8, 12.5), (-8, IBT_POS[0][1] + 12), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 12)], PWR)
-    path([(-8, 12.5), (-8, PW / 2), (-16, PW / 2), (-16, IBT_POS[1][1] + 12), (IBT_POS[1][0] + 44, IBT_POS[1][1] + 12)], PWR, lw=2.6)
+    # power: adapter leads drop down in front of the upright, LEFT of the switch, forward over the adapter base
+    # onto the front of the battery top, over its left edge, down beside it (fuse holder there), forward in the left lane
+    ax.add_patch(Rectangle((TOWER_CX - 19, PW / 2 - 7.5), 4, 15, fc="#212529", ec="none"))
+    ax.text(TOWER_CX - 21, PW / 2 + 9, "switch", fontsize=8, ha="right")
+    ax.add_patch(Rectangle((18.5, 15), 35, 10, fc="#343a40", ec="k"))
+    ax.text(36, 20, "fuse", color="white", fontsize=8, ha="center", va="center")
+    path([(TOWER_CX - 4, PW / 2 - 4), (TOWER_CX - 27.5, 51), (TOWER_CX - 60, 50), (36, 31), (36, 12.5), (-8, 12.5), (-8, IBT_POS[0][1] + 12), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 12)], PWR)
     # thin 18 V feed to the UNO VIN along the right lane
     path([(-12, PW / 2 + 2), (-4, PW / 2 + 2), (-4, PW - 6), (PL + 10, PW - 6), (PL + 10, uy + 40), (ux + 60, uy + 40)], PWR, lw=1.6)
     # motor wires: up through the plate slots, along the lanes, into the IBT-2 motor terminals
@@ -268,8 +272,8 @@ def wiring_drawing():
     path([(ux + 50, uy + 48), (PL + 6, uy + 48), (PL + 6, PW - 12.5), (-6, PW - 12.5), (-6, PW / 2 + 10), (IBT_POS[0][0] + 44, IBT_POS[0][1] + 30)], SIG, lw=2)
     path([(-6, PW / 2 + 10), (-6, IBT_POS[1][1] + 25), (IBT_POS[1][0] + 44, IBT_POS[1][1] + 25)], SIG, lw=2)
     path([(ux + 20, uy + 50), (gx + 10, gy + 5)], SIG, lw=2)
-    ax.annotate("adapter leads leave its top and drop down\ninside the hood, in the 12 mm gap in front\nof the adapter (dotted = hood opening)",
-                xy=(TW_CX - 25, PW / 2 + 4), xytext=(TW_CX - 60, PW + 22), fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.annotate("adapter leads: down the front of the upright to the\nLEFT of the switch, forward over the front of the battery\ntop, then down beside its left side (not through it)",
+                xy=(TOWER_CX - 27.5, 51), xytext=(TW_CX - 75, PW + 22), fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
     ax.annotate("hidden wire lanes under the hood\n(13 mm wide, between the cradle walls\nand the hood sides)", xy=(110, PW - 9), xytext=(150, PW + 22),
                 fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
     ax.annotate("motor wires come up from the chassis\nthrough the plate's edge slots", xy=(80, 6), xytext=(60, -30),
@@ -282,34 +286,46 @@ def wiring_drawing():
     ax.legend(handles=[Line2D([], [], color=PWR, lw=3, label="18 V power (adapter leads), thin branch to UNO VIN"),
                        Line2D([], [], color=MOT, lw=3, label="motor wires"),
                        Line2D([], [], color=SIG, lw=2, label="signals: UNO to IBT-2s and GPS")],
-              loc="upper right", bbox_to_anchor=(1.0, 1.08), fontsize=10, frameon=False)
+              loc="upper right", bbox_to_anchor=(1.0, 1.16), fontsize=10, frameon=False)
     ax.set_title("Top view with the casing removed (mm). Front on the left.", fontsize=13, loc="left")
     ax.set_xlim(-FRONT_OVH - 25, PL + REAR_OVH + 70); ax.set_ylim(-48, PW + 40); ax.set_aspect("equal"); ax.axis("off")
 
-    # side detail: the adapter leads
-    ax = fig.add_axes([0.05, 0.02, 0.45, 0.3])
-    top = FLOOR + TOTAL_H
-    ax.add_patch(Rectangle((0, FLOOR), PL, BODY_H, fc=ORANGE, ec="k", alpha=0.35))
-    ax.add_patch(Rectangle(((PL - AD_L) / 2, FLOOR + BODY_H), AD_L, 8, fc=YEL, ec="k"))
-    ax.add_patch(Rectangle((TOWER_CX - 15, FLOOR + BODY_H + 8), 30, AD_H - 8, fc=YEL, ec="k"))
-    hx = [0, 0, TW_CX - TOWER_OUT / 2, TW_CX - TOWER_OUT / 2]
-    hz = [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP]
-    ax.plot(hx, hz, color="#212529", lw=2.2)
-    ax.plot([PL - x for x in hx][::-1] + [], hz[::-1], color="#212529", lw=2.2) if False else ax.plot([PL, PL, TW_CX + TOWER_OUT / 2, TW_CX + TOWER_OUT / 2], hz, color="#212529", lw=2.2)
-    lx = PL / 2 - 20.5
-    ax.plot([PL / 2 - 5, PL / 2 - 5, lx - 5, lx - 6, lx - 6, 14, 14, 14], [top - 1, top + 12, top + 12, top - 6, FLOOR + BODY_H + 12, FLOOR + BODY_H + 4, 30, FLOOR + 3],
-            color=PWR, lw=3, solid_joinstyle="round")
-    ax.text(PL / 2 + 6, top + 14, "only this loop of the adapter leads is outside", fontsize=10, color=PWR)
-    ax.text(16, 34, "down the side of the battery\ninto the wire lane", fontsize=9, color=PWR)
-    ax.text(PL + 6, CASE_TOP, "hood", fontsize=10)
-    ax.set_title("Adapter leads, side view", fontsize=12, loc="left")
-    ax.set_xlim(-10, PL + 70); ax.set_ylim(-4, top + 26); ax.set_aspect("equal"); ax.axis("off")
+    # front view (looking at the tank's front): where the adapter leads really go
+    ax = fig.add_axes([0.03, 0.0, 0.5, 0.33])
+    top = FLOOR + TOTAL_H; BT = FLOOR + BODY_H
+    by0 = (PW - BW) / 2; wy = by0 - 1 - WALL
+    ax.add_patch(Rectangle((0, 0), PW, FLOOR, fc="#ced4da", ec="k"))
+    for y in (wy, PW - wy - WALL):
+        ax.add_patch(Rectangle((y, FLOOR), WALL, WALL_H, fc=BLUE, ec="none", alpha=0.7))
+    ax.add_patch(Rectangle((by0, FLOOR), BW, BODY_H, fc=ORANGE, ec="k", alpha=0.35))
+    ax.text(PW / 2, FLOOR + 22, "battery", ha="center", fontsize=10)
+    ax.add_patch(Rectangle(((PW - AD_W) / 2, BT), AD_W, 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PW / 2 - 15, BT + 8), 30, AD_H - 8, fc=YEL, ec="k"))
+    ax.add_patch(Rectangle((PW / 2 - 7.5, top - 50), 15, 20, fc="#212529", ec="k"))
+    ax.annotate("switch", xy=(PW / 2 + 7.5, top - 40), xytext=(PW / 2 + 34, top - 22), fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    hw = 19.5 + 2.4
+    ax.plot([0, 0, PW / 2 - hw, PW / 2 - hw], [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP], color="#212529", lw=2.2)
+    ax.plot([PW, PW, PW / 2 + hw, PW / 2 + hw], [FLOOR, CASE_TOP, CASE_TOP + SHOULDER, HOOD_TOP], color="#212529", lw=2.2)
+    ax.add_patch(Rectangle((2.7, FLOOR), LANE_W, 12, fc="#fff3bf", ec="#e8b100", ls="--"))
+    ax.add_patch(Rectangle((15, 22), 10, 35, fc="#343a40", ec="k"))
+    ax.annotate("fuse holder hangs here,\nbeside the battery", xy=(15, 45), xytext=(-60, 70), fontsize=9.5, arrowprops=dict(arrowstyle="->", lw=0.8))
+    ax.plot([PW / 2 - 4, PW / 2 - 4, 51, 51, 50, 31, 26, 20, 20, 12, 12], [top - 2, top + 12, top + 12, BT + 10, BT + 2.5, BT + 2.5, BT + 1, BT - 6, 16, FLOOR + 3, FLOOR + 3],
+            color=PWR, lw=3, solid_joinstyle="round", solid_capstyle="round")
+    ax.annotate("leads drop LEFT of the switch,\ncross the battery's top near its\nfront end, then go down OUTSIDE\nthe cradle wall into the left lane", xy=(22, 30), xytext=(-62, 2),
+                fontsize=9.5, color=PWR, arrowprops=dict(arrowstyle="->", lw=0.8, color=PWR))
+    ax.text(PW + 4, CASE_TOP - 10, "hood", fontsize=10)
+    ax.text(8, -10, "tank's LEFT side", fontsize=9.5, ha="center", va="top", weight="bold")
+    ax.text(PW - 8, -10, "RIGHT side", fontsize=9.5, ha="center", va="top", weight="bold")
+    ax.set_title("Adapter leads, looking at the front of the tank (hood shown as an outline)", fontsize=12, loc="left")
+    ax.set_xlim(PW + 30, -65); ax.set_ylim(-22, top + 22); ax.set_aspect("equal"); ax.axis("off")
 
     ax = fig.add_axes([0.55, 0.02, 0.43, 0.27]); ax.axis("off")
     ax.text(0, 0.98, "Why it's routed this way", fontsize=13, weight="bold", va="top")
     ax.text(0, 0.86,
-            "The adapter's leads go down inside the hood's tower, in front of the adapter.\n"
-            "So the hood still lifts straight off over the adapter and its leads, and you\n"
+            "The adapter's leads go down inside the hood's tower, in front of the adapter\n"
+            "and to the left of its switch, so your finger reaches the switch. They cross\n"
+            "the front of the battery's top and go down beside it, outside the cradle wall.\n"
+            "So the hood still lifts straight off, the battery lifts out past them, and you\n"
             "don't have to unplug anything to change the battery.\n\n"
             "Everything else stays inside the casing. Motor wires come up from the chassis\n"
             "through the plate's edge slots under the hood. All runs between the trays use\n"

@@ -100,7 +100,14 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 1. Drop the **P108 battery** straight down into the cradle, with its flat end toward the front and its curved end toward the rear.
 2. Slide the **Power Wheel adapter** onto the battery so its switch faces the front.
-3. The leads come out of the top of the upright. Loop them forward and down in front of the upright, and let the **fuse holder** hang in that gap, off to one side of the switch so your finger can reach the rocker. Then run them down to the side lane. Leave about 150 mm of slack so the adapter can be lifted off and set beside the tank.
+3. Route the adapter's two leads ([wiring diagram](images/08_wiring.png)). They never pass through or under the battery:
+   - Out of the top of the upright, loop them forward and down the front of the upright, **to the left of the switch** so your finger can reach the rocker.
+   - Lay them forward along the adapter's base and over its front edge onto the battery's top, near the battery's front end.
+   - Take them over the battery's **left** edge and down the gap between the left cradle wall and the hood side. Let the **fuse holder** hang upright in that gap, well in front of the battery's release button.
+   - At the bottom, run them forward along the left wire lane, under the hood's front end, to the IBT-2 B+ / B- terminals.
+   - Leave about 150 mm of slack so the adapter can be lifted off and set beside the tank.
+
+   ![](images/22_battery_leads.png)
 
 ## 9. Antenna pod (before the rear cover goes on)
 
@@ -109,7 +116,7 @@ The only wires that show outside the finished shell are the adapter's two leads.
 1. Set the **pod cup** on top of the rear cover, over the three holes. From inside the cover, fix it with 3x M3 x 10 and nuts.
 2. Feed the antenna's SMA plug down through the 10 mm hole in the cup's floor and the cover. It comes out above the GPS. Connect it to the GPS.
 3. Wind the spare cord round the cup's hub.
-4. Bolt the antenna's **steel plate** to the **lid** with the 1/4-20 button-head bolt from below, into the plate's welded nut. Stick the magnetic antenna on the plate.
+4. Bolt the antenna's **steel plate** to the **lid** with the 1/4-20 button-head bolt from below, into the plate's welded nut. Stick the magnetic ANN-MB antenna in the middle of the plate; it needs no screws. Keep the plate: it is the antenna's ground plane.
 5. Turn the lid onto the cup (a 3-lug bayonet twist), with the notch in its rim facing the antenna cable.
 
 ## 10. Covers and hood
@@ -118,7 +125,7 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 1. **Front cover:** hook its outer tab into the pocket in the front tray's bumper, then lower it until it sits on the tray walls. The nub clicks into its groove.
 2. **Rear cover:** the same on the rear tray. Its window lines up with the UNO's USB-C port.
-3. **Hood:** lower it straight down over the adapter, guiding the leads and the fuse holder up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
+3. **Hood:** lower it straight down over the adapter, guiding the leads up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
 
    ![](images/21_switch_opening.png)
 

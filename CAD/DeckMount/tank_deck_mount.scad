@@ -87,7 +87,7 @@ hood_end = 1.2;   // hood end walls (between battery and plate edge): 3 lines at
 case_top = floor_t + bat_cap_h - cap_h + 5;   // top of covers / start of the hood shoulder
 tower_clear = 2.5;                // around the adapter's tower
 tower_L = 30; tower_W = 30;       // adapter tower, measured by John (30 x 30)
-fuse_W  = 35; fuse_t = 10;        // inline fuse holder on the red lead, 35 x 10 x 35 (John): it must pass up through the tower opening
+fuse_W  = 35; fuse_t = 10;        // inline fuse holder on the red lead, 35 x 10 x 35 (John): it hangs beside the battery's left side, under the hood
 sw_from_front = 80;   // battery's flat front end to the upright's switch face, along the top (John)
 sw_drop = 40;  sw_win_w = 36; sw_win_h = 44;   // finger opening (John: 24 x 30 was too small to reach through). Rocker switch on the tower's front face, centre about 40 mm below its top (from John's photo)
 hood_top = floor_t + bat_cap_h - 4;   // top 4 mm of the adapter shows
@@ -420,8 +420,9 @@ module cap_ghost() {
 module switch_ghost() {   // rocker switch on the tower's front face
     translate([tower_cx - tower_L/2 - 4, plate_W/2 - 7.5, floor_t + bat_cap_h - sw_drop - 10]) cube([4, 15, 20]);
 }
-module fuse_ghost() {     // inline fuse holder, hanging in the lead gap in front of the tower
-    translate([tower_cx - tower_L/2 - tower_clear - lead_gap + 2, plate_W/2 - fuse_W/2, floor_t + bat_cap_h - cap_h + 9]) cube([fuse_t, fuse_W, 35]);
+module fuse_ghost() {     // inline fuse holder on the red lead, hanging upright in the gap outside the left cradle wall,
+                          // well in front of the battery's release button (not in front of the switch)
+    translate([36 - fuse_W/2, 15, 22]) cube([fuse_W, fuse_t, 35]);
 }
 module boards_ghost() {
     z = tray_z + tray_t + standoff_h;
