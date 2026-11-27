@@ -92,7 +92,7 @@ def plate_drawing():
     dim(ax, (HX[1], HY[0]), (HX[1], HY[1]), "%.0f" % (HY[1] - HY[0]), off=16, side=-1, fs=10)
     dim(ax, (0, HY[1]), (HX[0], HY[1]), "%.1f" % HX[0], off=6, fs=9)
     dim(ax, (HX[0], PW), (HX[0], HY[1]), "%.1f" % (PW - HY[1]), off=14, side=-1, fs=9)
-    ax.annotate("4 x corner holes, Ø3.4 (M3)\nplate screws to the kit standoffs here",
+    ax.annotate("4 x corner holes, Ø3.4 (M3)\nM3 x 12 + nut under the plate",
                 xy=(HX[1], HY[0]), xytext=(PL + 8, -14), fontsize=10,
                 arrowprops=dict(arrowstyle="->", lw=0.8))
     ax.text(PL / 2, -34, "Outline 152 x 135 mm as measured by John.\n"
@@ -432,7 +432,7 @@ def hole_match_drawing():
         ax.text(PL / 2, PW + 26, "front on the left, rear (hitch end) on the right; hitch heights from the bottom edge", ha="center", fontsize=11, color=GREY)
         ax.set_xlim(-40, PL + 44); ax.set_ylim(-62, PW + 32); ax.set_aspect("equal"); ax.axis("off")
     fig.text(0.05, 0.02,
-             "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate into the standoffs (125 x 120 apart).\n"
+             "Green 1-4: corner holes. They must line up: the 4 corner screws go through tray tongue, base and plate, with a nut under the plate (125 x 120 apart).\n"
              "Red H1-H4: hitch bolts. They line up over the plate's two rear slots (only used when the hitch is fitted).\n"
              "No other holes need to line up. The base's other openings are wire and weight-saving cut-outs.",
              fontsize=13, va="bottom")

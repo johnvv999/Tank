@@ -52,7 +52,7 @@ sv_ear_L = 54.5; sv_ear_t = 2.5; sv_ear_h = 28;   // ears 28 mm up from the bott
 sv_x0 = sx - 30;  sv_y0 = sy - sv_H;
 
 /* ---------- beam / head ---------- */
-clamp_x0 = plate_L - 17;  clamp_y = [16, 118];  clamp_t = 8;   // clamp stays behind the rear corner standoffs
+clamp_x0 = plate_L - 17;  clamp_y = [16, 118];  clamp_t = 8;   // clamp stays clear of the rear corner screws' nuts
 beam_y   = [cy - 25, cy + 25];
 head_x   = [210 + hdx, 270 + hdx];  head_y = [cy - 44, cy + 44];  head_top = -4;
 beam_top = tray_z - 0.5;   // just under the rear tray floor
