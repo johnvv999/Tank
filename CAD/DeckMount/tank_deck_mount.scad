@@ -456,7 +456,7 @@ module assembly() {
 if (part == "assembly") assembly();
 else if (part == "base") base();
 else if (part == "front_tray") front_tray_flat();
-else if (part == "rear_tray") rear_tray_unmirrored();   // printed flat, tongue to the right
+else if (part == "rear_tray") mirror([1, 0, 0]) rear_tray_unmirrored();   // printed flat exactly as fitted (top up, tongue to the left); not a mirror image
 else if (part == "hood") hood();                         // printed open side down
 else if (part == "front_cover") translate([0, 0, case_top]) mirror([0, 0, 1]) front_cover();          // printed top down
 else if (part == "rear_cover") translate([0, 0, case_top]) mirror([0, 0, 1]) rear_cover_unmirrored();  // printed top down
