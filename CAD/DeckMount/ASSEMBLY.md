@@ -116,6 +116,8 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 ![](images/23_antenna_pod_cutaway.png)
 
+![](images/25_antenna_pod_section.png)
+
 1. Set the **pod cup** on top of the rear cover, over the three holes. From inside the cover, fix it with 3x M3 x 10 and nuts.
 2. Feed the antenna's SMA plug down through the 10 mm hole in the cup's floor and the cover. It comes out above the GPS. Connect it to the GPS.
 3. Wind the spare cord round the cup's hub.
