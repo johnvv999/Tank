@@ -20,8 +20,9 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 | `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready |
 | `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready |
 | `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
-| `antenna_pod_cup` | 1 | Floor down | Ready |
+| `antenna_pod_cup` | 1 | Floor down | Ready (reprint if its rim has no cable notches) |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready (reprint if yours has no nut pocket on top) |
+| `antenna_pod_radome` | 1 | Top down, as loaded | Optional antenna cover: plain PETG/PLA/ASA, light colour, no carbon-fibre or metal fill |
 | `hitch_hitch` | 1 | Flat bottom down, 6 walls, 40% infill | Ready (bolts match the measured slots, [diagram](images/15_measure_rear_slots.png)) |
 | `hitch_lid`, `hitch_lift_arm`, `hitch_link` | 1 each | Flat | Ready |
 | `hitch_rake_frame`, `hitch_rake_bar` | 1 each | As loaded (the bar prints tines up) | Ready |
@@ -36,7 +37,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 | M3 x 12 + nyloc nut | 4 | Corners: down through tray tongue + base + plate, nut under the plate (no standoffs) |
 | M3 x 20 + nut | 16 | 8 for the IBT-2s, 4 for the UNO, 4 for the GPS |
 | M3 x 10 + nut | 3 | Antenna pod to the rear cover (nuts inside the cover) |
-| 1/4-20 x 3/8" button-head bolt | 1 | Up through the pod lid into the antenna plate's welded nut |
+| 1/4-20 x 3/8" button-head bolt + 1/4" flat washer | 1 | Up through the pod lid into the antenna plate's welded nut |
 | Cable ties (small) | about 10 | Through the slots near each plate edge |
 | **Hitch only:** countersunk M3 x 16 + nut | 4 | Rear tray tongue + base + plate slots into the hitch clamp |
 | **Hitch only:** countersunk M3 x 12 + nut | 2 | Rear tray floor down into the hitch beam |
@@ -118,8 +119,10 @@ The only wires that show outside the finished shell are the adapter's two leads.
 1. Set the **pod cup** on top of the rear cover, over the three holes. From inside the cover, fix it with 3x M3 x 10 and nuts.
 2. Feed the antenna's SMA plug down through the 10 mm hole in the cup's floor and the cover. It comes out above the GPS. Connect it to the GPS.
 3. Wind the spare cord round the cup's hub.
-4. Bolt the antenna's **steel plate** to the **lid** with the 1/4-20 button-head bolt from below, into the plate's welded nut; the nut sits in the pocket on top of the lid. Stick the magnetic ANN-MB antenna in the middle of the plate; it needs no screws. Keep the plate: it is the antenna's ground plane.
-5. Turn the lid onto the cup (a 3-lug bayonet twist), with the notch in its rim facing the antenna cable.
+4. Bolt the antenna's **steel plate** to the **lid** with the 1/4-20 x 3/8" button-head bolt and a washer from below, into the plate's welded nut; the nut sits in the pocket on top of the lid. Stick the magnetic ANN-MB antenna in the middle of the plate; it needs no screws. Keep the plate: it is the antenna's ground plane.
+5. Turn the plate so the antenna's cable end points at the notch in the lid's rim. Lay the cable over the plate edge into that notch.
+6. Turn the lid onto the cup (a 3-lug bayonet twist). When it locks, the lid's notch sits over one of the three notches in the cup's rim; tuck the cable down through it and under the lid.
+7. Optional: push the **radome** down over the plate ring, with its notch over the cable.
 
 ## 10. Covers and hood
 
