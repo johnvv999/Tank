@@ -1,8 +1,8 @@
 // =====================================================================
 //  GPS antenna pod for the rear cover.
 //  The magnetic u-blox ANN-MB antenna (82 x 60 x 22.5) sits on John's 102 mm steel plate, which has a
-//  1/4-20 nut welded underneath.  A 1/4-20 x 1/2" button-head bolt comes
-//  up through the pod lid into that nut.
+//  1/4-20 nut welded underneath (it drops into a pocket in the lid).  A 1/4-20 x 3/8"
+//  button-head bolt comes up through the pod lid into that nut.
 //  Under the lid: a cup with a 40 mm hub to wind spare antenna cable on
 //  (cord storage).  The cable leaves the puck, drops through a notch in the
 //  lid rim, winds round the hub, and goes down through the cover into the
@@ -18,7 +18,9 @@ pod_h   = 22;      // cup height
 pod_t   = 2.4;
 hub_d   = 40;      // cable bend radius 20 mm (RG174 is fine at 15+)
 plate_d = 102;  plate_th = 1.6;   // steel plate (John)
-lid_t   = 4;
+lid_t   = 4;       // lid thickness at the bayonet lugs (sets the cup's slots)
+lid_top = lid_t + 4;   // lid body is 8 thick (stands 4 mm proud of the cup) so the plate's welded nut drops into a pocket
+nut_af = 11.1; nut_h = 5.6;   // 1/4-20 hex nut welded under the steel plate (7/16 in across flats)
 lug_n   = 3;  lug_w = 10;  lug_h = 2.5;
 
 module pod_cup() {
@@ -56,27 +58,29 @@ module pod_lid() {
     r_in = pod_d/2 - pod_t - 0.3;
     difference() {
         union() {
-            cylinder(r = r_in, h = lid_t, $fn = 120);
+            cylinder(r = r_in, h = lid_top, $fn = 120);
             for (i = [0 : lug_n - 1]) rotate([0, 0, i*360/lug_n + 30])
                 rotate([0, 0, -lug_w/2 / (pod_d/2) * 57.3]) rotate_extrude(angle = lug_w/(pod_d/2)*57.3, $fn = 60)
                     translate([r_in - 0.5, 0]) square([1.5, lug_h]);
             // grip ring the plate sits in (1 mm lip around the plate)
-            difference() { cylinder(r = plate_d/2 + 1.6, h = lid_t + plate_th, $fn = 120); translate([0, 0, lid_t]) cylinder(r = plate_d/2 + 0.4, h = 5, $fn = 120); }
+            difference() { cylinder(r = plate_d/2 + 1.6, h = lid_top + plate_th, $fn = 120); translate([0, 0, lid_top]) cylinder(r = plate_d/2 + 0.4, h = 5, $fn = 120); }
         }
-        // 1/4-20 bolt (6.6 mm clearance), head underneath
-        translate([0, 0, -1]) cylinder(d = 6.8, h = lid_t + 2);
+        // 1/4-20 bolt (6.8 mm clearance), head underneath; pocket on top for the nut welded under the plate,
+        // leaving a 2.2 mm floor for the bolt head to pull against
+        translate([0, 0, -1]) cylinder(d = 6.8, h = lid_top + 2);
+        translate([0, 0, lid_top - nut_h - 0.2]) cylinder(d = nut_af/cos(30) + 0.6, h = nut_h + 1, $fn = 48);
         // cable notch through the lip and lid edge (turn the lid so it faces the puck's cable)
-        translate([plate_d/2 - 6, -4, -1]) cube([12, 8, lid_t + plate_th + 2]);
+        translate([plate_d/2 - 6, -4, -1]) cube([12, 8, lid_top + plate_th + 2]);
         // two finger dimples to twist it
-        for (a = [90, 270]) rotate([0, 0, a]) translate([r_in - 8, 0, lid_t + 0.01]) scale([1, 1.6, 1]) sphere(r = 4, $fn = 24);
+        for (a = [90, 270]) rotate([0, 0, a]) translate([r_in - 8, 0, lid_top + 0.01]) scale([1, 1.6, 1]) sphere(r = 4, $fn = 24);
     }
 }
-module plate_ghost() { color("silver") translate([0, 0, lid_t]) cylinder(d = plate_d, h = plate_th, $fn = 120); }
+module plate_ghost() { color("silver") translate([0, 0, lid_top]) cylinder(d = plate_d, h = plate_th, $fn = 120); }
 // u-blox ANN-MB (datasheet UBX-18049862): 82 x 60 x 22.5 mm, magnetic base, 5 m RG174 cable.
 // Its patch specs are measured on a 150 mm ground plane; the 102 mm steel plate is that ground plane.
 module ann_mb() { hull() { linear_extrude(4) offset(r = 18) square([82 - 36, 60 - 36], center = true);
                            translate([0, 0, 18.5]) linear_extrude(4) offset(r = 14) square([70 - 28, 48 - 28], center = true); } }
-module puck_ghost()  { color("#151515") translate([0, 0, lid_t + plate_th]) ann_mb(); }
+module puck_ghost()  { color("#151515") translate([0, 0, lid_top + plate_th]) ann_mb(); }
 
 // placed on the rear cover (chassis coordinates)
 module at_pod() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) translate([ant_c[0], ant_c[1], case_top]) children(); }

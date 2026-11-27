@@ -81,7 +81,9 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 Source: `antenna_pod.scad`. A round pod sits on top of the rear cover, held by 3x M3 with nuts inside the cover:
 
-- **Antenna:** a u-blox ANN-MB (82 x 60 x 22.5 mm, 5 m RG174 cable). Its magnetic base sticks to your 102 mm steel plate, so it needs no screws. Keep the plate: the antenna is a patch type, and u-blox specs it on a 150 mm metal ground plane. The plate is that ground plane, and it helps with gain and with rejecting signals bouncing up from below. A 1/4-20 x 1/2" button-head bolt comes up through the pod lid into the plate's welded nut. A 1 mm lip around the plate keeps it centred.
+- **Antenna:** a u-blox ANN-MB (82 x 60 x 22.5 mm, 5 m RG174 cable). Its magnetic base sticks to your 102 mm steel plate, so it needs no screws. Keep the plate: the antenna is a patch type, and u-blox specs it on a 150 mm metal ground plane. The plate is that ground plane, and it helps with gain and with rejecting signals bouncing up from below. A 1/4-20 x 3/8" button-head bolt comes up through the pod lid into the plate's welded nut, which drops into a pocket in the top of the lid so the plate sits flat. A 1 mm lip around the plate keeps it centred. Use a 3/8" bolt, not a 1/2" one: a longer one would push up into the antenna.
+
+  ![](images/23_antenna_pod_cutaway.png)
 - **Cord storage:** under the lid is a cup with a 40 mm hub. Wind the spare antenna cable round the hub; 40 mm is gentle enough for RG174, and the cup holds the spare of the 5 m cable with room to spare. The cable drops through a 10 mm hole into the rear tray, right above the GPS board, so an SMA plug fits through.
 - **Lid:** twists off with a 3-lug bayonet. Turn it so the notch in its rim faces the cable coming out of the antenna. That short piece from the antenna to the notch is the only bit of antenna cable that shows.
 - **Clearances:** the pod starts 8 mm behind the hood's lip, so the hood still lifts straight off. It sits about 70 mm above the hitch, clear of the lift arm. The antenna's top is about 115 mm above the plate, below the adapter's top.
