@@ -36,7 +36,6 @@ if (what == "base") base();
 if (what == "trays") { front_tray(); rear_tray(); }
 if (what == "hood") translate([0, 0, hood_lift]) hood();
 if (what == "covers") { front_cover(); rear_cover(); }
-if (what == "clips") side_clips();
 if (what == "battery") translate([0,0,bat_lift]) battery_ghost();
 if (what == "adapter") translate([0,0,cap_lift]) cap_ghost();
 if (what == "ibt_pcb") for (o = ibt_pos) translate([o[0], o[1], tray_z + tray_t + standoff_h]) cube([ibt_board, ibt_board, 1.6]);

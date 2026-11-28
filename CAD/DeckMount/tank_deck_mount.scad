@@ -403,37 +403,6 @@ module rear_cover_unmirrored() {
 }
 module rear_cover() { translate([plate_L, 0, 0]) mirror([1, 0, 0]) rear_cover_unmirrored(); }
 
-// side clips (no reprint needed): a C-clip snaps over the cover's rounded top edge and under the tray floor,
-// holding the cover's side wall down on the tray wall. 2 per cover. Profile in the Y-Z plane of the y = ty0 side.
-clip_w   = 10;                 // along X
-clip_t   = 2.2;                // leg / flange thickness
-clip_pre = 0.2;                // squeeze: the opening is this much shorter than tray bottom to cover top
-clip_x   = [-30, plate_L + 12];   // world X: front cover (between the vents), rear cover (behind the last side vent, clear of the pod)
-module clip_env(sh = 0) {      // tray + cover outline at the side, (y, z); sh shrinks it top and bottom
-    t = rnd*(sqrt(2) - 1);   // the covers' top round ends in a short 45 deg chamfer
-    hull() {
-        translate([ty0, tray_z + sh]) square([25, case_top - rnd - tray_z - sh]);
-        translate([ty0 + rnd, case_top - rnd - sh]) circle(r = rnd);
-        translate([ty0 + rnd - t, case_top - sh - 0.01]) square([25, 0.01]);
-    }
-}
-module clip_2d() {
-    intersection() {
-        difference() { offset(r = clip_t + 0.1) clip_env(clip_pre); offset(delta = 0.1) clip_env(clip_pre); }
-        union() {
-            translate([ty0 - 10, tray_z - 10]) square([10.5, case_top - tray_z + 20]);   // leg
-            translate([ty0 - 10, case_top - 8]) square([10 + 7, 20]);                      // top flange, ends short of the vent slots
-            translate([ty0 - 10, tray_z - 10]) square([10 + 4, 10]);                       // hook under the tray floor
-        }
-    }
-}
-module side_clip() {   // as fitted on the y = ty0 side, centred on x = 0
-    translate([-clip_w/2, 0, 0]) rotate([90, 0, 90]) linear_extrude(clip_w) clip_2d();
-}
-module side_clips() {
-    for (x = clip_x, s = [0, 1]) translate([x, 0, 0]) translate([0, s*plate_W, 0]) mirror([0, s, 0]) side_clip();
-}
-
 // =====================================================================
 //  stand-ins for the pictures (not printed)
 // =====================================================================
@@ -483,7 +452,6 @@ module assembly() {
         color("#2b2d31") translate([0, 0, hood_lift + explode*3]) hood();
         color("#3a3d42") translate([-explode*1.6, 0, explode*1.5]) front_cover();
         color("#3a3d42") translate([explode*1.6, 0, explode*1.5]) rear_cover();
-        color("#3a3d42") side_clips();
     }
 }
 
@@ -494,8 +462,6 @@ else if (part == "rear_tray") mirror([1, 0, 0]) rear_tray_unmirrored();   // pri
 else if (part == "hood") hood();                         // printed open side down
 else if (part == "front_cover") translate([0, 0, case_top]) mirror([0, 0, 1]) front_cover();          // printed top down
 else if (part == "rear_cover") translate([0, 0, case_top]) mirror([0, 0, 1]) rear_cover_unmirrored();  // printed top down
-else if (part == "side_clip") linear_extrude(clip_w) clip_2d();   // printed lying on its side, print 4
-else if (part == "side_clip_asm") side_clips();
 else if (part == "hood_asm") hood();
 else if (part == "front_cover_asm") front_cover();
 else if (part == "rear_cover_asm") rear_cover();
