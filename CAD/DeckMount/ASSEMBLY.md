@@ -76,6 +76,10 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
    ![](images/30_rear_longer_tray.png)
 
+   UNO hole spacing and standoffs, to check against your board before printing:
+
+   ![](images/31_uno_holes_dimensions.png)
+
 ## 6. Rear hitch (optional)
 
 1. Lay the **servo** on its side in the hitch head's pocket, shaft toward the lift-arm slot. Screw its ears into the head with 4x M3 x 8.
