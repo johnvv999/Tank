@@ -96,7 +96,8 @@ cham     = 6;     // lip inset from the covers' long sides
 rnd      = 5;     // outside edge radius (John: "round all edges by 5mm")
 rim_r    = 1.2;   // tower top rim: the 2.4 mm wall can only take a 1.2 mm round
 lead_gap = 14;    // extra room in front of the adapter tower for its leads, the fuse holder and the switch rocker
-fit_gap  = 0.4;   // printing clearance where the hood meets the covers (end faces and lip seats)
+fit_gap  = 0.4;
+skirt_t = 1.6; skirt_h = 5; snap_d = 0.6;   // cover side skirts drop into a rabbet on the tray side walls, with snap bumps   // printing clearance where the hood meets the covers (end faces and lip seats)
 lane_w   = 13;    // hidden wire lanes between the cradle walls and the hood sides
 hook_w   = 50;    // cover hook width
 /* ---------- GPS antenna pod on the rear cover (antenna_pod.scad) ---------- */
@@ -179,6 +180,28 @@ module hook_pocket(ovh, yc) {
     translate([-ovh + 1.9, yc - hook_w/2 - 0.3, tray_t + bump_h - 7]) cube([1.7, hook_w + 0.6, 2]);   // groove for the nub
 }
 
+
+// ---- side locks: the bottom of each cover side wall carries a 1.6 mm skirt that drops 5 mm into a rabbet
+// cut in the outer top edge of the tray side wall (flush outside), and two snap bumps on the skirt click into
+// grooves in the rabbet. Modelled for the y = ty0 side; mirrored for the other side.
+function side_clip_x(ovh) = [-ovh + 0.3*ovh + 4, -0.3*ovh - 2];   // clip centres
+module y_both() { children(); translate([0, plate_W, 0]) mirror([0, 1, 0]) children(); }
+module tray_side_rabbet(ovh) {
+    zt = tray_t + bump_h;   // tray wall top (tray coordinates)
+    y_both() {
+        translate([-ovh + 6, ty0 - 1, zt - skirt_h - 0.2]) cube([ovh - 6, 1 + skirt_t + 0.2, skirt_h + 1]);
+        for (x = side_clip_x(ovh)) translate([x - 7.3, ty0 + skirt_t + 0.2 - 0.01, zt - skirt_h + 0.4]) cube([14.6, snap_d + 0.3, 1.4]);
+    }
+}
+module cover_side_skirt(ovh) {
+    zt = tray_z + tray_t + bump_h;   // cover bottom (world)
+    y_both() {
+        translate([-ovh + 6.3, ty0, zt - skirt_h]) cube([ovh - 6.3 - fit_gap - 0.3, skirt_t, skirt_h + 0.5]);
+        for (x = side_clip_x(ovh)) translate([x - 7, ty0 + skirt_t - 0.01, zt - skirt_h + 0.5])
+            hull() { cube([14, 0.01, 1.2]); translate([0, 0, 0.3]) cube([14, snap_d, 0.6]); }   // ramped both ways
+    }
+}
+
 module tray_body(ovh, hook_y) {
     difference() {
         union() {
@@ -218,6 +241,7 @@ module tray_body(ovh, hook_y) {
         translate([-6, plate_W/2 - 8, tray_t]) cube([6, 16, rib_h + 1]);
         for (y = [ty0 + side_t, plate_W - ty0 - side_t - lane_w + 2]) translate([-6, y, tray_t]) cube([6, lane_w - 2, rib_h + 1]);
         hook_pocket(ovh, hook_y);
+        tray_side_rabbet(ovh);
     }
 }
 
@@ -373,6 +397,7 @@ module cover_body(ovh, hook_y) {
             // hook tab: drops into the bumper pocket, nub clicks into the groove
             translate([-ovh + 0.3, hook_y - hook_w/2, tray_z + tray_t + bump_h - 7.7]) cube([1.7, hook_w, 8]);
             translate([-ovh + 1.9, hook_y - hook_w/2, tray_z + tray_t + bump_h - 6.8]) cube([1.2, hook_w, 1.6]);
+            cover_side_skirt(ovh);
         }
         lip_solid(fit_gap);   // seat for the hood's lip
         // sliding gap between the cover's plate end and the hood's end wall
