@@ -4,7 +4,7 @@ A printable mount and casing for the full-metal tank chassis (plate 152 x 135 mm
 
 - **Battery cradle** in the middle, on the plate. The Ryobi P108 4 Ah battery (136 x 75.6 mm, 720 g) stands in it along the 152 mm side, with the Power Wheel adapter (84 x 75 mm base, 90 mm tall) on top: 150 mm together. No boards are above the battery.
 - **Front tray** overhanging the front 135 mm edge by 62 mm, carrying both IBT-2 drivers, heatsinks up.
-- **Rear tray** overhanging the rear 135 mm edge by 80 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
+- **Rear tray** overhanging the rear 135 mm edge by 90 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
 - **Casing**: a hood over the battery that shows only the top of the adapter, and a cover over each tray. No tools needed.
 
 The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its two ends are 2 mm thick, with an open pocket on top. Each tray has a 2 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
@@ -140,10 +140,10 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 |---|---|---|---|
 | `deck_mount_base.stl` | 1 | 152 x 135 x 22 | Floor down, flat bottom, no supports |
 | `deck_mount_front_tray.stl` | 1 | 92 x 135 x 16 | Floor down |
-| `deck_mount_rear_tray.stl` | 1 | 110 x 135 x 16 | Floor down |
+| `deck_mount_rear_tray.stl` | 1 | 120 x 135 x 16 | Floor down |
 | `deck_mount_hood.stl` | 1 | 164 x 135 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
 | `deck_mount_front_cover.stl` | 1 | 62 x 116 x 60 | Top down (the STL is already flipped) |
-| `deck_mount_rear_cover.stl` | 1 | 80 x 116 x 60 | Top down (the STL is already flipped) |
+| `deck_mount_rear_cover.stl` | 1 | 90 x 116 x 60 | Top down (the STL is already flipped) |
 
 None of them need supports, and all fit the A1's 256 mm bed. About 300 g of PETG at the settings below.
 
@@ -168,7 +168,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 ### Check before printing
 
-1. **Clearance past the 135 mm ends.** The trays sit 2 to 17 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
+1. **Clearance past the 135 mm ends.** The trays sit 2 to 17 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 90 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
 2. **Which end is the front.** From John's photos, the rear is the end where the lower chassis runs on 100 mm past the plate; the hitch goes there. The IBT-2s go at the front. Swap the trays if not; the tongues are the same.
 3. **Corner holes:** 125 x 120, measured. Print the base first and test-fit it on the plate.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.

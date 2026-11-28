@@ -60,7 +60,7 @@ end_clear = 0.8; side_clear = 1.0;   // 1.6 mm total on the length, 2 mm on the 
 
 /* ---------- trays ---------- */
 front_ovh = 62;    // front tray reaches this far past the front edge
-rear_ovh  = 80;    // rear tray reaches this far past the rear edge
+rear_ovh  = 90;    // rear tray reaches this far past the rear edge (was 80: the GPS antenna plug needs room to bend; more hits the raised rake link)
 tray_W    = 116;   // narrower than the plate, to clear the side frames
 lap_L     = 30;    // tongue length under the cradle
 lap_t     = 2;     // tongue thickness (half of the 4 mm floor)
@@ -154,7 +154,7 @@ module base() {
 ibt_holes = 40;   ibt_board = 50;      // Archive/MotorBox.f3d
 gps_holes = 38.1; gps_board = 43.2;    // Archive/GPSBox.f3d (SparkFun GPS-RTK2)
 uno_L = 68.6;  uno_W = 53.3;
-uno_holes = [[13.97, 2.54], [15.24, 50.80], [66.04, 7.62], [66.04, 35.56]];
+uno_holes = [[13.97, 2.54], [15.24, 50.80], [66.04, 7.62], [66.04, 35.56]];   // ABX00087 datasheet, top view, USB-C/barrel edge at x = 0
 
 function sq_holes(o, b, s) = [for (i = [0, 1], j = [0, 1]) [o[0] + (b - s)/2 + i*s, o[1] + (b - s)/2 + j*s]];
 module radial_standoff(p, c, d) {
@@ -170,9 +170,11 @@ module radial_slot(p, c) {
 ibt_pos = [[-front_ovh + 6, ty0 + side_t + 0.5], [-front_ovh + 6, plate_W - ty0 - side_t - 0.5 - ibt_board]];
 // rear tray is modelled at the front and then mirrored, so these X are "outboard distance"
 uno_pos = [-rear_ovh + 6, ty0 + side_t + 0.5];               // UNO 68.6 runs along X, USB-C + barrel jack face the rear
-gps_pos = [-rear_ovh + 12, plate_W - ty0 - side_t - 4 - gps_board];
+gps_pos = [-rear_ovh + bump_t + 1, plate_W - ty0 - side_t - 4 - gps_board];   // tight to the bumper (the board clears the corner gusset): about 40 mm in front of it for the antenna plug and its cable bend
 rear_hook_y = gps_pos[1] + gps_board/2;   // hook sits behind the GPS, clear of the USB window
-function uno_pts() = [for (h = uno_holes) [uno_pos[0] + h[0], uno_pos[1] + h[1]]];
+// The rear tray is modelled here and then mirrored in X, which would also mirror the hole pattern.
+// The board itself is turned round, not mirrored, so flip Y here: after the X mirror the pattern is the true top view.
+function uno_pts() = [for (h = uno_holes) [uno_pos[0] + h[0], uno_pos[1] + uno_W - h[1]]];
 
 // hook pocket in the bumper's outer face; the cover's tab drops into it
 module hook_pocket(ovh, yc) {
@@ -281,7 +283,7 @@ module rear_tray_unmirrored() {
             translate([0, 0, tray_t + 1 - (m3_csk - m3)/2]) cylinder(d1 = m3, d2 = m3_csk, h = (m3_csk - m3)/2 + 0.01);
         }
         // wire pass-through between the UNO and the GPS (the hitch servo cable comes up here too)
-        translate([-10, plate_W/2, -1]) rotate([0, 0, 90]) slot(30, 7, tray_t + 2);
+        translate([-45, plate_W/2, -1]) rotate([0, 0, 90]) slot(30, 7, tray_t + 2);   // clear of the UNO holes and the hitch screws
         for (p = sq_holes(gps_pos, gps_board, gps_holes))
             radial_slot(p, [gps_pos[0] + gps_board/2, gps_pos[1] + gps_board/2]);
     }

@@ -16,9 +16,9 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 |---|---|---|---|
 | `deck_mount_base` | 1 | Flat bottom down | Ready. Print this first and test-fit it on the plate. |
 | `deck_mount_front_tray` | 1 | Floor down | Ready (reprint if its side walls have no step along the top outer edge) |
-| `deck_mount_rear_tray` | 1 | Floor down | Ready (same: reprint if no step on the side walls) |
+| `deck_mount_rear_tray` | 1 | Floor down | Ready. Reprint: 10 mm longer for the GPS plug, UNO holes corrected, step on the side walls |
 | `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready (reprint if its sides have no skirt) |
-| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready (same) |
+| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready. Reprint: 10 mm longer to match the rear tray, side skirts |
 | `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
 | `antenna_pod_cup` | 1 | Floor down | Ready (reprint if its rim has no cable notches) |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready (reprint if yours has no nut pocket on top) |
@@ -70,7 +70,11 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 ![](images/20_standoffs.png)
 
 1. **Front tray:** mount the two IBT-2 boards heatsinks up on the slotted standoffs, with 4x M3 x 20 each, nuts under the tray. The slots let the holes line up even if a board's holes are slightly off.
-2. **Rear tray:** mount the UNO R4 WiFi with its USB-C port facing the rear edge, where the cover's window is (4x M3 x 20, nuts under the tray). Then mount the GPS board beside it (4x M3 x 20).
+2. **Rear tray:** mount the UNO R4 WiFi with its USB-C port facing the rear edge, where the cover's window is (4x M3 x 20, nuts under the tray). Then mount the GPS board beside it, tight against the rear bumper, with its antenna jack facing forward (toward the battery). That leaves about 40 mm in front of the jack for the plug and a gentle bend in the cable (4x M3 x 20).
+
+   ![](images/29_rear_tray_layout.png)
+
+   ![](images/30_rear_longer_tray.png)
 
 ## 6. Rear hitch (optional)
 
