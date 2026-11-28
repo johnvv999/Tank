@@ -4,10 +4,10 @@ A printable mount and casing for the full-metal tank chassis (plate 152 x 135 mm
 
 - **Battery cradle** in the middle, on the plate. The Ryobi P108 4 Ah battery (136 x 75.6 mm, 720 g) stands in it along the 152 mm side, with the Power Wheel adapter (84 x 75 mm base, 90 mm tall) on top: 150 mm together. No boards are above the battery.
 - **Front tray** overhanging the front 135 mm edge by 62 mm, carrying both IBT-2 drivers, heatsinks up.
-- **Rear tray** overhanging the rear 135 mm edge by 80 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
+- **Rear tray** overhanging the rear 135 mm edge by 90 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
 - **Casing**: a hood over the battery that shows only the top of the adapter, and a cover over each tray. No tools needed.
 
-The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its two ends are 2 mm thick, with an open pocket on top. Each tray has a 2 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
+The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its floor is 6 mm thick. Its two ends are 2 mm thick, with a 4 mm open pocket on top. Each tray has a 4 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
 
 Source: `tank_deck_mount.scad` (OpenSCAD, fully parametric). STLs are in `stl/`, pictures in `images/`, the 2-D drawings come from `drawings/make_drawings.py`, and the realistic renders from `render/` (Blender Cycles).
 
@@ -57,7 +57,7 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 **Fit to the real chassis:** the lower chassis runs on 100 mm past the plate's rear edge with its top 30 mm below the plate (John). Nothing on the hitch goes lower than 27 mm below the plate, so it rides 3 mm above that part. The lower pins sit 38 mm behind its end. The clamp under the plate stops short of the corner screws' nuts.
 
-**Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 16 go down through the rear tray's tongue, the cradle's end and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
+**Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 18 go down through the rear tray's tongue, the cradle's end and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
 
 **Servo cable:** it runs from the servo pocket in a channel along the top of the beam, which the rear tray floor closes. It then comes up through the rear tray's wire slot to the UNO (D3). No wire shows.
 
@@ -81,15 +81,23 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 Source: `antenna_pod.scad`. A round pod sits on top of the rear cover, held by 3x M3 with nuts inside the cover:
 
-- **Antenna:** the magnetic antenna sits on your 102 mm steel plate. A 1/4-20 x 1/2" button-head bolt comes up through the pod lid into the plate's welded nut. A 1 mm lip around the plate keeps it centred.
-- **Cord storage:** under the lid is a cup with a 40 mm hub. Wind the spare antenna cable round the hub; 40 mm is gentle enough for RG174. The cable drops through a 10 mm hole into the rear tray, right above the GPS board, so an SMA plug fits through.
-- **Lid:** twists off with a 3-lug bayonet. Turn it so the notch in its rim faces the cable coming out of the antenna. That short piece from the antenna to the notch is the only bit of antenna cable that shows.
-- **Clearances:** the pod starts 8 mm behind the hood's lip, so the hood still lifts straight off. It sits about 70 mm above the hitch, clear of the lift arm. The antenna's top is about 110 mm above the plate, below the adapter's top.
+- **Antenna:** a u-blox ANN-MB (82 x 60 x 22.5 mm, 5 m RG174 cable). Its magnetic base sticks to your 102 mm steel plate, so it needs no screws. Keep the plate: the antenna is a patch type, and u-blox specs it on a 150 mm metal ground plane. The plate is that ground plane, and it helps with gain and with rejecting signals bouncing up from below. A 1/4-20 x 3/8" button-head bolt comes up through the pod lid into the plate's welded nut, which drops into a pocket in the top of the lid so the plate sits flat. A 1 mm lip around the plate keeps it centred. Use a 3/8" bolt with one 1/4" flat washer under its head. Anything longer bottoms out on the plate before it tightens.
+
+  ![](images/23_antenna_pod_cutaway.png)
+
+![](images/25_antenna_pod_section.png)
+- **Cord storage:** under the lid is a cup with a 40 mm hub. Wind the spare antenna cable round the hub; 40 mm is gentle enough for RG174, and the cup holds the spare of the 5 m cable with room to spare. The cable drops through a 10 mm hole into the rear tray, right above the GPS board, so an SMA plug fits through.
+- **Lid:** twists off with a 3-lug bayonet. Turn the plate so the antenna's cable end points at the notch in the lid's rim. The cable goes over the plate's edge, down through that notch and the matching notch in the cup's rim (there are three, one for each lock position), and under the lid into the cup.
+- **Cover (optional):** `antenna_pod_radome.stl` is a thin dome that slides over the plate ring, with a notch for the cable. It clears the antenna by 3 mm all round. A 1.6 mm wall of plain PETG, PLA or ASA barely affects GPS signals (typically a few tenths of a dB). Print it in a plain colour, ideally white or light grey (which also keeps the antenna cooler in the sun). Don't use carbon-fibre or metal-filled filament, and don't paint it with metallic paint.
+
+  ![](images/24_antenna_cover.png)
+- **Clearances:** the pod starts 8 mm behind the hood's lip, so the hood still lifts straight off. It sits about 70 mm above the hitch, clear of the lift arm. The antenna's top is about 115 mm above the plate, below the adapter's top.
 
 | STL | Notes |
 |---|---|
 | `antenna_pod_cup.stl` | Print floor down |
 | `antenna_pod_lid.stl` | Print flat, lugs down |
+| `antenna_pod_radome.stl` | Optional cover; print top down as loaded, no supports |
 
 ## Power: no DC-DC converter needed
 
@@ -99,7 +107,7 @@ Source: `antenna_pod.scad`. A round pod sits on top of the rear cover, held by 3
 
 ## Wire routing (only the adapter's leads show)
 
-- **Adapter leads** come out of the top of the adapter. They loop over and drop down inside the hood's tower, which has a 16.5 mm gap in front of the adapter for them, the 35 x 10 x 35 fuse holder and the rocker switch. The tower opening is 39 mm wide so the fuse holder passes up through it when the hood comes off. A 24 x 30 mm finger window in the tower's front face lines up with the switch. Inside, they cross the battery top to a side lane and run forward to the IBT-2s. Because the leads sit inside the tower opening, the hood still lifts straight off over them, and you don't unplug anything to change the battery. Leave about 150 mm of slack so the adapter can be set beside the tank.
+- **Adapter leads** come out of the top of the adapter. They loop over and drop down inside the hood's tower, in the 16.5 mm gap in front of the adapter, to the left of the rocker switch. A 36 x 44 mm finger opening runs straight in through the hood's front slope and the tower's front face to the switch. Keep the leads and fuse holder to one side of the switch so the rocker stays clear. Inside, they run forward over the adapter's base onto the front of the battery's top, over its left edge, and down the gap outside the left cradle wall (the 35 x 10 x 35 fuse holder hangs there). Then they run forward along the left lane to the IBT-2s. They never pass through or under the battery. Because the leads sit inside the tower opening, the hood still lifts straight off over them, and you don't unplug anything to change the battery. Leave about 150 mm of slack so the adapter can be set beside the tank.
 - **Hidden side lanes:** two 13 mm channels run the length of the plate between the cradle walls and the hood's sides. Passages in both ends of the hood lead into the trays, and notches in each tray's rib let the wires pass under the boards.
 - **Motor wires** come up from the chassis through the plate's edge slots, which are under the hood, and run forward along the lanes to the IBT-2 motor terminals (left motor to the left driver).
 - **Signals** (UNO to both IBT-2s) and a thin 18 V feed to the UNO's VIN run along the right lane between the trays. The GPS wiring stays inside the rear cover.
@@ -123,19 +131,19 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 ## How the casing stays on
 
 - **Hood:** located by its tower around the adapter (2.5 mm clearance) and by its own weight. It just lifts off.
-- **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
+- **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. A 1.6 mm skirt along each side of the cover drops into a step on top of the tray's side walls (flush outside), with two snap bumps per side, so the sides can't lift or slide ([picture](images/28_cover_side_lock.png)). The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
 - **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, side vents next to the UNO, and a 10 mm hole under the antenna pod for the antenna cable. The hood has wire passages at both bottom ends into the trays
 
 ## Parts
 
 | STL | Qty | Size (mm) | Print orientation |
 |---|---|---|---|
-| `deck_mount_base.stl` | 1 | 152 x 135 x 22 | Floor down, flat bottom, no supports |
+| `deck_mount_base.stl` | 1 | 152 x 135 x 24 | Floor down, flat bottom, no supports |
 | `deck_mount_front_tray.stl` | 1 | 92 x 135 x 16 | Floor down |
-| `deck_mount_rear_tray.stl` | 1 | 110 x 135 x 16 | Floor down |
+| `deck_mount_rear_tray.stl` | 1 | 120 x 135 x 16 | Floor down |
 | `deck_mount_hood.stl` | 1 | 164 x 135 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
 | `deck_mount_front_cover.stl` | 1 | 62 x 116 x 60 | Top down (the STL is already flipped) |
-| `deck_mount_rear_cover.stl` | 1 | 80 x 116 x 60 | Top down (the STL is already flipped) |
+| `deck_mount_rear_cover.stl` | 1 | 90 x 116 x 60 | Top down (the STL is already flipped) |
 
 None of them need supports, and all fit the A1's 256 mm bed. About 300 g of PETG at the settings below.
 
@@ -160,7 +168,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 ### Check before printing
 
-1. **Clearance past the 135 mm ends.** The trays sit 2 to 17 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 80 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
+1. **Clearance past the 135 mm ends.** The trays sit 2 to 17 mm above the plate, the covers reach 69 mm, and they stick out 62 mm forward and 90 mm back. Check that the side frames, the front slope and the rear rake don't get in the way. `front_ovh`, `rear_ovh` and `tray_W` (116, inside the plate width) are adjustable.
 2. **Which end is the front.** From John's photos, the rear is the end where the lower chassis runs on 100 mm past the plate; the hitch goes there. The IBT-2s go at the front. Swap the trays if not; the tongues are the same.
 3. **Corner holes:** 125 x 120, measured. Print the base first and test-fit it on the plate.
 4. **Battery length.** The hood's end walls take a battery up to 136.8 mm. The file refuses to render if `bat_L` doesn't fit.
@@ -168,7 +176,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 ## Hardware
 
-- 4x M3 corner screws through cradle + tongue into the chassis. The stack is 4 mm thick, so use the kit screws plus 4 mm.
+- 4x M3 corner screws through cradle + tongue into the chassis. The plastic stack is 6 mm (4 mm tongue + 2 mm cradle), so use M3 x 16 with a nyloc nut.
 - 16x M3 x 20 + nut for the boards: 8 for the IBT-2s, 4 for the UNO and 4 for the GPS. Each goes down through the board, the 11 mm printed standoff and the 5 mm tray floor, with the nut underneath (see `images/20_standoffs.png`).
 - Cable ties through the slots near each plate edge to hold the wiring.
 

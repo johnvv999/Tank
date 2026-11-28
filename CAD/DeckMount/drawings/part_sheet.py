@@ -35,11 +35,11 @@ def sheet(parts, name, heading):
 
 deck = [("deck_mount_base", "Base (battery cradle)", "Sits on the 152 x 135 plate. 4 corner holes 125 x 120, 4 hitch holes 10 mm from the rear edge (see 17_hole_match)"),
         ("deck_mount_front_tray", "Front tray (2x IBT-2)", "Tongue goes into the base's front pocket; sticks out 62 mm past the plate"),
-        ("deck_mount_rear_tray", "Rear tray (UNO + GPS)", "Tongue goes into the base's rear pocket; sticks out 80 mm past the plate"),
+        ("deck_mount_rear_tray", "Rear tray (UNO + GPS)", "Tongue goes into the base's rear pocket; sticks out 90 mm past the plate"),
         ("deck_mount_front_cover", "Front cover", "Prints top down"),
         ("deck_mount_rear_cover", "Rear cover", "Prints top down; USB-C window, antenna pod holes"),
         ("deck_mount_hood", "Hood", "Prints open side down; lifts off for battery changes")]
-other = [("antenna_pod_cup", "Antenna pod cup", ""), ("antenna_pod_lid", "Antenna pod lid", "Twist-on bayonet"),
+other = [("antenna_pod_cup", "Antenna pod cup", ""), ("antenna_pod_lid", "Antenna pod lid", "Twist-on bayonet"), ("antenna_pod_radome", "Antenna cover (optional)", "Top down, light PETG"),
          ("hitch_hitch", "Hitch (clamp, beam and servo head)", "6 walls, 40% infill"), ("hitch_lid", "Servo lid", ""),
          ("hitch_lift_arm", "Lift arm", ""), ("hitch_link", "Link", ""),
          ("hitch_rake_frame", "Rake frame", ""), ("hitch_rake_bar", "Rake bar", "Prints tines up"), ("hitch_drawbar", "Trailer drawbar", "")]
