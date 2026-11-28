@@ -63,15 +63,15 @@ front_ovh = 62;    // front tray reaches this far past the front edge
 rear_ovh  = 90;    // rear tray reaches this far past the rear edge (was 80: the GPS antenna plug needs room to bend; more hits the raised rake link)
 tray_W    = 116;   // narrower than the plate, to clear the side frames
 lap_L     = 30;    // tongue length under the cradle
-lap_t     = 2;     // tongue thickness (half of the 4 mm floor)
+lap_t     = 4;     // tongue thickness (John: was 2, doubled; the cradle floor went from 4 to 6 to keep it flush)
 // The cradle's bottom is flat everywhere (prints with no supports). Its ends are 2 mm thick with an
 // open pocket on top; each tray's tongue lies in that pocket, flush with the cradle floor, and the
 // corner screws clamp tongue + cradle to the plate. So each tray sits 2 mm up (tray_z).
-tray_z    = lap_t;
+tray_z    = 2;     // cradle floor left under the tongue (floor_t - lap_t)
 lap_clear = 0.3;   // tongue tip to pocket end
 
 /* ---------- general ---------- */
-floor_t = 4.0; wall_t = 2.4; wall_h = 22; end_t = 1.6;
+floor_t = tray_z + lap_t; wall_t = 2.4; wall_h = 24; end_t = 1.6;   // floor 6, walls still stand 18 above it
 m3 = 3.4; standoff_h = 11;   // boards sit 16 above the plate, clear of all tray walls
 // tray strength (John: "make extensions thicker in case they are bumped")
 tray_t   = 5;     // tray floor past the plate edge
@@ -130,8 +130,8 @@ module base() {
             for (y = [bay_y0 - wall_t, bay_y0 + bay_W])
                 translate([wall_x0, y, 0]) cube([plate_L - 2*wall_x0, wall_t, wall_h]);
         }
-        // tongue pockets: the top 2 mm of each end, open on top and at the end
-        for (x0 = [-1, plate_L - lap_L - lap_clear]) translate([x0, -1, lap_t]) cube([lap_L + lap_clear + 1, plate_W + 2, floor_t]);
+        // tongue pockets: the top 4 mm of each end (2 mm left under), open on top and at the end
+        for (x0 = [-1, plate_L - lap_L - lap_clear]) translate([x0, -1, tray_z]) cube([lap_L + lap_clear + 1, plate_W + 2, floor_t]);
         // windows under the middle of the battery
         for (x = [lap_L + 6, plate_L/2 + 3])
             translate([x, bay_y0 + 10, -1]) rrect(plate_L/2 - lap_L - 9, bay_W - 20, 4, floor_t + 2);

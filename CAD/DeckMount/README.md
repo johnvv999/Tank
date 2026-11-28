@@ -7,7 +7,7 @@ A printable mount and casing for the full-metal tank chassis (plate 152 x 135 mm
 - **Rear tray** overhanging the rear 135 mm edge by 90 mm, carrying the UNO R4 WiFi (USB-C facing the rear) and the GPS board.
 - **Casing**: a hood over the battery that shows only the top of the adapter, and a cover over each tray. No tools needed.
 
-The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its two ends are 2 mm thick, with an open pocket on top. Each tray has a 2 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
+The trays are built to take knocks: a 5 mm floor, a 5 mm bumper wall across the outer end, 3 mm side walls, corner gussets, and a cross rib where the tray meets the plate. The cradle's bottom is flat everywhere, so it prints with no supports. Its floor is 6 mm thick. Its two ends are 2 mm thick, with a 4 mm open pocket on top. Each tray has a 4 mm tongue that lies in that pocket, flush with the cradle floor (a half-lap joint), and the kit's corner screws clamp tongue + cradle to the metal plate. So the trays sit 2 mm above the plate.
 
 Source: `tank_deck_mount.scad` (OpenSCAD, fully parametric). STLs are in `stl/`, pictures in `images/`, the 2-D drawings come from `drawings/make_drawings.py`, and the realistic renders from `render/` (Blender Cycles).
 
@@ -57,7 +57,7 @@ Source: `hitch.scad`. It works like a small tractor hitch, so any tool swaps by 
 
 **Fit to the real chassis:** the lower chassis runs on 100 mm past the plate's rear edge with its top 30 mm below the plate (John). Nothing on the hitch goes lower than 27 mm below the plate, so it rides 3 mm above that part. The lower pins sit 38 mm behind its end. The clamp under the plate stops short of the corner screws' nuts.
 
-**Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 16 go down through the rear tray's tongue, the cradle's end and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
+**Mounting to the metal:** a clamp sits under the plate's rear edge. 4x countersunk M3 x 18 go down through the rear tray's tongue, the cradle's end and the plate's two long rear slots into nuts in the clamp. They sit flush, so the battery stands on them. The rear tray floor is screwed down onto the hitch beam with 2x countersunk M3 x 12, so knocks on the rear tray also go into the plate.
 
 **Servo cable:** it runs from the servo pocket in a channel along the top of the beam, which the rear tray floor closes. It then comes up through the rear tray's wire slot to the UNO (D3). No wire shows.
 
@@ -138,7 +138,7 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 
 | STL | Qty | Size (mm) | Print orientation |
 |---|---|---|---|
-| `deck_mount_base.stl` | 1 | 152 x 135 x 22 | Floor down, flat bottom, no supports |
+| `deck_mount_base.stl` | 1 | 152 x 135 x 24 | Floor down, flat bottom, no supports |
 | `deck_mount_front_tray.stl` | 1 | 92 x 135 x 16 | Floor down |
 | `deck_mount_rear_tray.stl` | 1 | 120 x 135 x 16 | Floor down |
 | `deck_mount_hood.stl` | 1 | 164 x 135 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
@@ -176,7 +176,7 @@ The battery and adapter (about 1 kg) stay centred on the plate. The front tray c
 
 ## Hardware
 
-- 4x M3 corner screws through cradle + tongue into the chassis. The stack is 4 mm thick, so use the kit screws plus 4 mm.
+- 4x M3 corner screws through cradle + tongue into the chassis. The plastic stack is 6 mm (4 mm tongue + 2 mm cradle), so use M3 x 16 with a nyloc nut.
 - 16x M3 x 20 + nut for the boards: 8 for the IBT-2s, 4 for the UNO and 4 for the GPS. Each goes down through the board, the 11 mm printed standoff and the 5 mm tray floor, with the nut underneath (see `images/20_standoffs.png`).
 - Cable ties through the slots near each plate edge to hold the wiring.
 

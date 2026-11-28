@@ -14,11 +14,11 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 
 | Part (in `stl/`) | Qty | Lay it on the bed | Status |
 |---|---|---|---|
-| `deck_mount_base` | 1 | Flat bottom down | Ready. Print this first and test-fit it on the plate. |
-| `deck_mount_front_tray` | 1 | Floor down | Ready (reprint if its side walls have no step along the top outer edge) |
-| `deck_mount_rear_tray` | 1 | Floor down | Ready. Reprint: 10 mm longer for the GPS plug, UNO holes corrected, step on the side walls |
-| `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready (reprint if its sides have no skirt) |
-| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready. Reprint: 10 mm longer to match the rear tray, side skirts |
+| `deck_mount_base` | 1 | Flat bottom down | Ready. Print this first and test-fit it on the plate. Reprint: 6 mm floor for the thicker tongues |
+| `deck_mount_front_tray` | 1 | Floor down | Ready. Reprint: 4 mm tongue, step on the side walls |
+| `deck_mount_rear_tray` | 1 | Floor down | Ready. Reprint: 4 mm tongue, 10 mm longer for the GPS plug, UNO holes corrected, step on the side walls |
+| `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready. Reprint: side skirts, 2 mm taller |
+| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready. Reprint: 10 mm longer to match the rear tray, side skirts, 2 mm taller |
 | `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
 | `antenna_pod_cup` | 1 | Floor down | Ready (reprint if its rim has no cable notches) |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready (reprint if yours has no nut pocket on top) |
@@ -34,12 +34,12 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 | What | Qty | Used for |
 |---|---|---|
-| M3 x 12 + nyloc nut | 4 | Corners: down through tray tongue + base + plate, nut under the plate (no standoffs) |
+| M3 x 16 + nyloc nut | 4 | Corners: down through tray tongue + base + plate, nut under the plate (no standoffs) |
 | M3 x 20 + nut | 16 | 8 for the IBT-2s, 4 for the UNO, 4 for the GPS |
 | M3 x 10 + nut | 3 | Antenna pod to the rear cover (nuts inside the cover) |
 | 1/4-20 x 3/8" button-head bolt + 1/4" flat washer | 1 | Up through the pod lid into the antenna plate's welded nut |
 | Cable ties (small) | about 10 | Through the slots near each plate edge |
-| **Hitch only:** countersunk M3 x 16 + nut | 4 | Rear tray tongue + base + plate slots into the hitch clamp |
+| **Hitch only:** countersunk M3 x 18 + nut | 4 | Rear tray tongue + base + plate slots into the hitch clamp |
 | **Hitch only:** countersunk M3 x 12 + nut | 2 | Rear tray floor down into the hitch beam |
 | **Hitch only:** M3 x 8 | 6 | 4 servo ears, 2 for the servo lid |
 | **Hitch only:** M4 x 30 + R-clip | 4 | 2 lower pins, plus 2 for the lift link |
@@ -56,11 +56,13 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 
 ![](images/14_base_tongue_pockets.png)
 
+![](images/32_thicker_tongue.png)
+
 ![](images/17_hole_match.png)
 
 1. Set the **base** on the plate, flat bottom down, with its corner holes over the plate's corner holes. The cradle walls run front to back.
-2. Lay the **front tray's** tongue into the 2 mm pocket at the front end of the base, so the tray hangs out over the front. Lay the **rear tray's** tongue into the rear pocket. Each tongue sits flush with the base floor.
-3. Push the 4 M3 x 12 corner screws down through tongue, base and plate, and tighten a nyloc nut on each from under the plate. Snug them up but don't crush the plastic.
+2. Lay the **front tray's** tongue (4 mm thick) into the 4 mm pocket at the front end of the base, so the tray hangs out over the front. Lay the **rear tray's** tongue into the rear pocket. Each tongue sits flush with the base floor.
+3. Push the 4 M3 x 16 corner screws down through tongue, base and plate, and tighten a nyloc nut on each from under the plate. Snug them up but don't crush the plastic.
    - If you're fitting the hitch, leave the rear tray off for now (see step 6).
 
 ## 5. Electronics on the trays
@@ -86,7 +88,7 @@ For a slick finish on the casing (hood and covers), use matte black PETG at 0.16
 2. Lay the servo cable in the channel along the top of the beam toward the plate.
 3. Screw the **lid** over the servo pocket (2x M3 x 8).
 4. Slide the hitch's clamp under the plate's rear edge, with the beam running back under where the rear tray goes.
-5. Put the **rear tray** back, tongue in its pocket. Push 4x countersunk M3 x 16 down through the tongue, the base and the plate's rear slots into the nuts in the clamp. They sit flush, so the battery stands on them.
+5. Put the **rear tray** back, tongue in its pocket. Push 4x countersunk M3 x 18 down through the tongue, the base and the plate's rear slots into the nuts in the clamp. They sit flush, so the battery stands on them.
 6. Screw the rear tray floor to the beam with 2x countersunk M3 x 12 (the holes are already in the tray). Then fit the rear corner screws.
 7. Bring the servo cable up through the rear tray's wire slot to the UNO (signal to D3). Power it from the BEC at 6 to 7.4 V, not from the UNO's 5 V.
 8. Bolt the **lift arm** to the servo horn.
