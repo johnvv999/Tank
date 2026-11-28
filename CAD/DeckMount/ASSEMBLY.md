@@ -15,10 +15,10 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 | Part (in `stl/`) | Qty | Lay it on the bed | Status |
 |---|---|---|---|
 | `deck_mount_base` | 1 | Flat bottom down | Ready. Print this first and test-fit it on the plate. |
-| `deck_mount_front_tray` | 1 | Floor down | Ready |
-| `deck_mount_rear_tray` | 1 | Floor down | Ready |
-| `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready |
-| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready |
+| `deck_mount_front_tray` | 1 | Floor down | Ready (reprint if its side walls have no step along the top outer edge) |
+| `deck_mount_rear_tray` | 1 | Floor down | Ready (same: reprint if no step on the side walls) |
+| `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready (reprint if its sides have no skirt) |
+| `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready (same) |
 | `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
 | `antenna_pod_cup` | 1 | Floor down | Ready (reprint if its rim has no cable notches) |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready (reprint if yours has no nut pocket on top) |
@@ -135,6 +135,10 @@ The only wires that show outside the finished shell are the adapter's two leads.
 1. **Front cover:** hook its outer tab into the pocket in the front tray's bumper, then lower it until it sits on the tray walls. The nub on the inside of the tab clicks into its groove (hidden once fitted; see the section below).
 
    ![](images/27_cover_hook_and_nub.png)
+
+   As it comes down, the skirt along each side of the cover drops into the step on top of the tray's side walls, and two bumps per side click into grooves, so the sides are held too.
+
+   ![](images/28_cover_side_lock.png)
 2. **Rear cover:** the same on the rear tray. Its window lines up with the UNO's USB-C port.
 3. **Hood:** lower it straight down over the adapter, guiding the leads up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
 
