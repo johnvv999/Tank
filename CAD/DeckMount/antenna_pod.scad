@@ -16,6 +16,7 @@ part = "pod_asm";
 pod_d   = 108;     // outside
 pod_h   = 22;      // cup height
 pod_t   = 2.4;
+cup_r   = 1.5;     // rounding on the cup's top outer edge
 hub_d   = 40;      // cable bend radius 20 mm (RG174 is fine at 15+)
 plate_d = 102;  plate_th = 1.6;   // steel plate (John)
 lid_t   = 4;       // lid thickness at the bayonet lugs (sets the cup's slots)
@@ -26,11 +27,12 @@ lug_n   = 3;  lug_w = 10;  lug_h = 2.5;
 module pod_cup() {
     difference() {
         union() {
-            // cup with a 5 mm rounded top outer edge
+            // cup with a 1.5 mm rounded top outer edge (a 5 mm round ate the 2.4 mm wall and left a knife-edge
+            // rim hanging over the bayonet slots, which the slicer flagged as a floating cantilever)
             rotate_extrude($fn = 120) hull() {
-                square([pod_d/2 - rnd, pod_h]);
-                square([pod_d/2, pod_h - rnd]);
-                translate([pod_d/2 - rnd, pod_h - rnd]) circle(r = rnd, $fn = 40);
+                square([pod_d/2 - cup_r, pod_h]);
+                square([pod_d/2, pod_h - cup_r]);
+                translate([pod_d/2 - cup_r, pod_h - cup_r]) circle(r = cup_r, $fn = 24);
             }
         }
         // storage space (leaves the floor, the hub and the wall)
