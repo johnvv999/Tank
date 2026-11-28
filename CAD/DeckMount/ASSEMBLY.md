@@ -132,7 +132,9 @@ The only wires that show outside the finished shell are the adapter's two leads.
 
 ![](images/02_render_rear.png)
 
-1. **Front cover:** hook its outer tab into the pocket in the front tray's bumper, then lower it until it sits on the tray walls. The nub clicks into its groove.
+1. **Front cover:** hook its outer tab into the pocket in the front tray's bumper, then lower it until it sits on the tray walls. The nub on the inside of the tab clicks into its groove (hidden once fitted; see the section below).
+
+   ![](images/27_cover_hook_and_nub.png)
 2. **Rear cover:** the same on the rear tray. Its window lines up with the UNO's USB-C port.
 3. **Hood:** lower it straight down over the adapter, guiding the leads up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
 
