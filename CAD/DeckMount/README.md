@@ -131,7 +131,7 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 ## How the casing stays on
 
 - **Hood:** located by its tower around the adapter (2.5 mm clearance) and by its own weight. It just lifts off.
-- **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. A 1.6 mm skirt along each side of the cover drops into a step on top of the tray's side walls (flush outside), with two snap bumps per side, so the sides can't lift or slide ([picture](images/28_cover_side_lock.png)). The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
+- **Covers:** each one has a tab with a small nub at the outer end that drops into a pocket in the tray's bumper. Tilt the cover in, tab first, then lower the plate end. The hood's lip then sits on top of the cover's plate end and stops it lifting. To remove a cover, take the hood off first.
 - **Openings:** vent slots over both IBT-2 heatsinks and a grille in the front face. In the rear cover: a window for the UNO's USB-C and barrel jack, side vents next to the UNO, and a 10 mm hole under the antenna pod for the antenna cable. The hood has wire passages at both bottom ends into the trays
 
 ## Parts
