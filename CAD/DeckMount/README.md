@@ -144,6 +144,7 @@ All outside edges of the hood, the covers and the tray bumper corners have a 5 m
 | `deck_mount_hood.stl` | 1 | 164 x 135 x 146 | Open side down. The shoulder slopes at 45° or steeper, and the lips have 45° undersides |
 | `deck_mount_front_cover.stl` | 1 | 62 x 116 x 60 | Top down (the STL is already flipped) |
 | `deck_mount_rear_cover.stl` | 1 | 80 x 116 x 60 | Top down (the STL is already flipped) |
+| `deck_mount_side_clip.stl` | 4 | 9 x 72 x 10 | Flat on its side, as loaded. Snaps over each cover's top edge and under the tray floor to hold the cover's sides down |
 
 None of them need supports, and all fit the A1's 256 mm bed. About 300 g of PETG at the settings below.
 
@@ -194,7 +195,7 @@ Every dimension is a named variable at the top of `tank_deck_mount.scad`:
 openscad -D 'part="front_tray"' -o stl/deck_mount_front_tray.stl tank_deck_mount.scad
 ```
 
-`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover` or `rear_cover`. In `antenna_pod.scad` it can be `pod_cup`, `pod_lid` or `pod_asm`. In `hitch.scad` it can be `hitch`, `lid`, `lift_arm`, `link`, `rake_frame`, `rake_bar`, `drawbar` or `hitch_asm`, plus `tool` and `rake_lift` for the pictures. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
+`part` can be `assembly`, `base`, `front_tray`, `rear_tray`, `hood`, `front_cover`, `rear_cover` or `side_clip`. In `antenna_pod.scad` it can be `pod_cup`, `pod_lid` or `pod_asm`. In `hitch.scad` it can be `hitch`, `lid`, `lift_arm`, `link`, `rake_frame`, `rake_bar`, `drawbar` or `hitch_asm`, plus `tool` and `rake_lift` for the pictures. The assembly also takes `hood_lift`, `cap_lift`, `bat_lift`, `explode` and `show_case` for the pictures.
 
 Realistic renders: `render/parts.scad` exports the scene meshes, and `render/render.py` renders them with Blender's Python module (`pip install bpy`):
 

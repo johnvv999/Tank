@@ -19,6 +19,7 @@ All parts are PETG on a 0.4 mm nozzle with 0.2 mm layers, 4 walls, 5 top and 5 b
 | `deck_mount_rear_tray` | 1 | Floor down | Ready |
 | `deck_mount_front_cover` | 1 | Top down (already flipped) | Ready |
 | `deck_mount_rear_cover` | 1 | Top down (already flipped) | Ready |
+| `deck_mount_side_clip` | 4 | Flat, as loaded | New. Holds the covers' sides down; fits the trays and covers you already printed |
 | `deck_mount_hood` | 1 | Open side down | Ready (reprint if yours has the small 24 x 30 switch window) |
 | `antenna_pod_cup` | 1 | Floor down | Ready (reprint if its rim has no cable notches) |
 | `antenna_pod_lid` | 1 | Flat, lugs down | Ready (reprint if yours has no nut pocket on top) |
@@ -139,6 +140,11 @@ The only wires that show outside the finished shell are the adapter's two leads.
 3. **Hood:** lower it straight down over the adapter, guiding the leads up through the tower opening. Its two lips drop into the seats on the covers, which locks the covers down. Only the top 4 mm of the adapter and its leads stick out. The 36 x 44 mm finger opening in the front of the hood lines up with the switch.
 
    ![](images/21_switch_opening.png)
+4. **Side clips:** 4 of them, 2 per cover, one on each side. Hook the clip's bottom under the tray floor, then push its top over the cover's rounded top edge until it sits snug on top. On the front cover they go about 30 mm from the plate's front edge; on the rear cover, just behind the last side vent, about 12 mm from the plate's rear edge. The clip is a little tight on purpose, so it squeezes the cover down onto the tray. To take a cover off, pull the bottom of each clip out with a fingernail and lift the clip off.
+
+   ![](images/28_cover_side_clips.png)
+
+   ![](images/29_side_clip_section.png)
 
 ## 11. Tools on the hitch
 
